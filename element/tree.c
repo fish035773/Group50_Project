@@ -27,10 +27,13 @@ Elements *New_Tree(int label)
 }
 void Tree_update(Elements *self) {}
 void Tree_interact(Elements *self) {}
+int no = -1;
 void Tree_draw(Elements *self)
 {
+    if(no == 0){
     Tree *Obj = ((Tree *)(self->pDerivedObj));
     al_draw_bitmap(Obj->img, Obj->x, Obj->y, 0);
+    }
 }
 void Tree_destory(Elements *self)
 {

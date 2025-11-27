@@ -58,10 +58,13 @@ void _Teleport_interact_Character(Elements *self, Elements *tar)
         _Character_update_position(tar, 0 - chara->x, 0);
     }
 }
+int io = -1;
 void Teleport_draw(Elements *self)
 {
+    if(io == 0){
     Teleport *Obj = ((Teleport *)(self->pDerivedObj));
     al_draw_bitmap(Obj->img, Obj->x, Obj->y, 0);
+    }
 }
 void Teleport_destory(Elements *self)
 {

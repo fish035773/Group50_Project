@@ -1,5 +1,22 @@
 {
 	"terminal.integrated.env.windows": {
 		"PATH": "${workspaceFolder}\\..\\MinGW\\bin;${env:PATH}"
-	}
+	},
+	"files.associations": {
+		"tree.h": "c",
+		"projectile.h": "c",
+		"allegro_font.h": "c",
+		"shape.h": "c",
+		"scene.h": "c",
+		"projectile2.h": "c",
+		"rectangle.h": "c",
+		"algif.h": "c",
+		"allegro_primitives.h": "c",
+		"allegro_audio.h": "c",
+		"scenemanager.h": "c",
+		"gamescene.h": "c",
+		"enemy.h": "c",
+		"circle.h": "c"
+	},
+	"makefile.configureOnOpen": true
 }

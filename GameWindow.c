@@ -22,11 +22,13 @@ Game *New_Game()
     game->game_update = game_update;
     game->game_draw = game_draw;
     game->game_destroy = game_destroy;
-    game->title = "Final Project 10xxxxxxx";
+    // TODO: INPUT OUR GAME TITLE HERE:
+    game->title = "Group 50's Final Project";
     game->display = NULL;
     game->game_init(game);
     return game;
 }
+
 void execute(Game *self)
 {
     // main game loop
@@ -79,6 +81,7 @@ void execute(Game *self)
         }
     }
 }
+
 void game_init(Game *self)
 {
     printf("Game Initializing...\n");
@@ -89,10 +92,12 @@ void game_init(Game *self)
     addon_init &= al_init_font_addon();   // initialize the font addon
     addon_init &= al_init_ttf_addon();    // initialize the ttf (True Type Font) addon
     addon_init &= al_init_image_addon();  // initialize the image addon
-    addon_init &= al_init_acodec_addon(); // initialize acodec addon
     addon_init &= al_install_keyboard();  // install keyboard event
     addon_init &= al_install_mouse();     // install mouse event
-    addon_init &= al_install_audio();     // install audio event
+    addon_init &= al_install_audio();     // install audio first!
+    addon_init &= al_init_acodec_addon(); // THEN init acodec
+    al_reserve_samples(20);
+
     GAME_ASSERT(addon_init, "failed to initialize allegro addons.");
     // Create display
     self->display = al_create_display(WIDTH, HEIGHT);
@@ -117,12 +122,31 @@ void game_init(Game *self)
     ALLEGRO_BITMAP *icon = al_load_bitmap("assets/image/icon.jpg");
     al_set_display_icon(self->display, icon);
 }
+
 bool game_update(Game *self)
 {
-    scene->Update(scene);
-    if (scene->scene_end)
+    // Normal update
+    if (scene != NULL)
     {
-        scene->Destroy(scene);
+        // if scene_end, directly destroy + NULL
+        if (scene->scene_end && !scene_switched)
+        {
+            printf("[GameWindow] Switching scene... current window = %d\n", window);
+            scene->Destroy(scene);
+            scene = NULL;  // extremelly important so that the Update() not being recall again.
+            scene_switched = true;
+        }
+
+        // if the scene still exist >> Update()
+        if (scene != NULL)
+        {
+            scene->Update(scene);
+        }
+    }
+    else if (scene == NULL && scene_switched)
+    {
+        printf("[GameWindow] Creating new scene... current window = %d\n", window);
+
         switch (window)
         {
         case 0:
@@ -131,26 +155,60 @@ bool game_update(Game *self)
         case 1:
             create_scene(GameScene_L);
             break;
+        case 2:
+            create_scene(StartScene_L);
+            break;
+        case 3:
+            create_scene(VictoryScene_L);
+            break;
+        case 4:
+            create_scene(DeathScene_L);
+            break;
+        case 5:
+            create_scene(CreditScene_L);
+            break;
+        // new update 16:57 2025/07/06
+        case 6:
+            create_scene(About_L);
+            break;
         case -1:
             return false;
         default:
             break;
         }
+
+        scene_switched = false; // after create, reset flag.
     }
+
     return true;
 }
+
+
 void game_draw(Game *self)
 {
-    // Flush the screen first.
     al_clear_to_color(al_map_rgb(100, 100, 100));
-    scene->Draw(scene);
+
+    if (scene != NULL)
+    {
+        scene->Draw(scene);
+    }
+    else
+    {
+        // Optional debug
+        printf("[GameWindow] Warning: scene == NULL, skipping draw.\n");
+    }
+
     al_flip_display();
 }
+
+
 void game_destroy(Game *self)
 {
-    // Make sure you destroy all things
     al_destroy_event_queue(event_queue);
     al_destroy_display(self->display);
-    scene->Destroy(scene);
+    if (scene != NULL)
+    {
+        scene->Destroy(scene);
+    }
     free(self);
 }
