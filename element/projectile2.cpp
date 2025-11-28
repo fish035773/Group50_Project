@@ -132,4 +132,3 @@ void Projectile2_destroy(Elements *self)
     free(Obj);
     free(self);
 }
-

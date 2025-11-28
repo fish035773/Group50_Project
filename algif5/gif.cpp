@@ -66,7 +66,7 @@ ALGIF_ANIMATION *algif_load_raw(ALLEGRO_FILE *file) {
     int version;
     ALGIF_BITMAP *bmp = NULL;
     int i, j;
-    ALGIF_ANIMATION *gif = calloc (1, sizeof *gif);
+    ALGIF_ANIMATION *gif = (ALGIF_ANIMATION*)calloc(1, sizeof *gif);
     ALGIF_FRAME frame;
 
     gif->frames_count = 0;
@@ -154,7 +154,7 @@ ALGIF_ANIMATION *algif_load_raw(ALLEGRO_FILE *file) {
 
                 gif->frames_count++;
                 gif->frames =
-                    realloc (gif->frames,
+                    (ALGIF_FRAME*)realloc (gif->frames,
                              gif->frames_count * sizeof *gif->frames);
                 gif->frames[gif->frames_count - 1] = frame;
 

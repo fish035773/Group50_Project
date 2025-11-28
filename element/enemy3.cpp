@@ -19,7 +19,7 @@
 Elements *New_Enemy3(int label) {
     Enemy3 *pDerivedObj = (Enemy3 *)malloc(sizeof(Enemy3));
     Elements *pObj = New_Elements(label);
-
+    
 
 
 
@@ -29,7 +29,10 @@ Elements *New_Enemy3(int label) {
         char buffer[100];
         sprintf(buffer, "assets/image/enemy3_%s.gif", state_string[i]);
         printf("Loading GIF: %s\n", buffer);
-        pDerivedObj->gif_status[i] = algif_new_gif(buffer, -1);
+        pDerivedObj->gif_status[i] = algif_load_animation(buffer);
+        if (!pDerivedObj->gif_status[i]) {
+            printf("Failed to load GIF: %s\n", buffer);
+        }
     }
 
 
@@ -102,10 +105,10 @@ Elements *New_Enemy3(int label) {
 
 
 
-int player_center_x;
+int player_center_x3;
 void enemy_charater3(int dx){
     
-    player_center_x =  dx;
+    player_center_x3 =  dx;
 }
 void Enemy3_update(Elements *self) {
     Enemy3 *enemy3 = (Enemy3 *)(self->pDerivedObj);
@@ -116,7 +119,7 @@ void Enemy3_update(Elements *self) {
 
     int enemy3_center_x = enemy3->x + enemy3->width / 2;
    
-    int dx = player_center_x - enemy3_center_x;
+    int dx = player_center_x3 - enemy3_center_x;
 
      printf("Enemy3_update _ __A\n");
     double current_time = al_get_time();

@@ -30,7 +30,7 @@ Elements *New_Enemy(int label)
         char buffer[100];
         sprintf(buffer, "assets/image/enemy_%s.gif", state_string[i]);
         printf("Loading GIF: %s\n", buffer);
-        pDerivedObj->gif_status[i] = algif_new_gif(buffer, -1);
+        pDerivedObj->gif_status[i] = algif_load_animation(buffer);
     }
     // load effective sound
     ALLEGRO_SAMPLE *sample = al_load_sample("assets/sound/fire_atk_sound.mp3");
@@ -84,10 +84,10 @@ Elements *New_Enemy(int label)
     pDerivedObj->chasing = false;
     return pObj;
 }
-int player_center_x;
+int player_center_x1;
 void enemy_charater(int dx){
     
-    player_center_x =  dx;
+    player_center_x1 =  dx;
 }
 
 void Enemy_update(Elements *self)
@@ -104,7 +104,7 @@ void Enemy_update(Elements *self)
     int enemy_center_x = enemy->x + enemy->width / 2;
    
    
-    int dx = player_center_x - enemy_center_x;
+    int dx = player_center_x1 - enemy_center_x;
 
 
    // Enemy_draw(self);
@@ -360,4 +360,3 @@ void Enemy_interact(Elements *self) {
         }
     }
 }
-

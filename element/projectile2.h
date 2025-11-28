@@ -62,4 +62,3 @@ void _Projectile2_interact_Character(Elements *self, Elements *tar);
 
 
 
-
