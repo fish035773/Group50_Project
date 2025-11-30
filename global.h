@@ -10,8 +10,12 @@
         printf("check at line number %d in file %s\n", __LINE__, __FILE__); \
     }
 #define MAX_ELEMENT 100
-#define min(x, y) ((x) > (y) ? (y) : (x))
-#define max(x, y) ((x) < (y) ? (y) : (x))
+template<typename T>
+inline T min(T a, T b) { return (a > b) ? b : a; }
+
+template<typename T>
+inline T max(T a, T b) { return (a < b) ? b : a; }
+
 // note that you can't assign initial value for extern variable!
 extern const double FPS;
 extern const int WIDTH;

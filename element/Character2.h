@@ -1,78 +1,59 @@
-#ifndef CHARACTER2_H_INCLUDED
-#define CHARACTER2_H_INCLUDED
-
-
+#pragma once
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
-#include "element.h"
+#include <allegro5/allegro_acodec.h>
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
-#include <stdbool.h>
+#include "projectile.h"
 
-/*
-   [Character object header]
-
-   This file defines the structure and functions for the Character2 object.
-   It includes state management, animation handling, direction control,
-   attack sound, jumping behavior, and health system.
-*/
-
-// Define the possible states of the character
-typedef enum CharacterType2
+class Character2
 {
-    STOP2 = 0,   // Character is idle
-    MOVE2,       // Character is moving
-    ATK2         // Character is attacking
-} CharacterType2;
+public:
+    enum State2 { STOP = 0, MOVE, ATK };
+    enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };
 
-// Structure for character object
-typedef struct _Character2
-{
-    int x, y;                      // Position of the character
-    int width, height;            // Dimensions of the character's sprite
-    bool dir;                     // Facing direction: true = right, false = left
-    int state;                    // Current state (STOP2, MOVE2, ATK2)
-    ALGIF_ANIMATION *gif_status[3]; // GIF animations for each state: stop, move, attack
-    ALLEGRO_SAMPLE_INSTANCE *atk_Sound; // Attack sound effect
-    int anime;                    // Animation counter (not always used)
-    int anime_time;               // Total time animation lasts
-    bool new_proj;                // Whether a new projectile has been created
-    Shape *hitbox;                // Hitbox shape for collision detection
-    bool is_jumping;             // Is the character currently jumping?
-    double jump_start_time;      // When the jump started
-    int ground_y;                // Y-position representing the ground level
-    int blood;                   // Health points of the character
-    int atk_type;
-    int cool_L;
-    int cool_K;
-    int cool_J;
+    // 建構與解構
+   // 建構子 / 解構子
+    Character2();
+    ~Character2();
+    // 更新角色狀態
+    void update();
+
+    // 繪製角色
+    void draw();
+
+    // 互動
+    void interact();
+
+   
+
+    // 更新位置與 hitbox
+    void update_position(int dx, int dy);
+
+    // 成員變數
+    int x, y;
+    int width, height;
+    int blood;
     int level;
     int levelup_points;
     int add_blood;
-} Character2;
 
-// Define types of attacks (not used in main struct yet, could be for future combat system)
-typedef enum {
-    ATK2_WEAK,
-    ATK2_MEDIUM,
-    ATK2_STRONG
-} AttackType2;
+    bool dir; // false: left, true: right
+    bool is_jumping;
+    double jump_start_time;
+    int ground_y;
 
-// Function to create and initialize a new Character2 object
-Elements *New_Character2(int label);
+    int cool_J, cool_K, cool_L;
+    int atk_type;
+    bool new_proj;
+    State2 state;
 
-// Update function to handle character behavior and state transitions
-void Character2_update(Elements *self);
+    Shape* hitbox;
+    ALGIF_ANIMATION* gif_status[3];
+    ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
 
-// Placeholder for handling character interactions with other objects
-void Character2_interact(Elements *self);
+private:
+   void trigger_attack(int atk_type);
+};
 
-// Draw the character's current animation frame on screen
-void Character2_draw(Elements *self);
 
-// Free all resources used by the character
-void Character2_destory(Elements *self);
-
-// Helper function to move character and update its hitbox accordingly
-void _Character2_update_position(Elements *self, int dx, int dy);
-
-#endif

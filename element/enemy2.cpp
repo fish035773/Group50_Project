@@ -29,7 +29,10 @@ Elements *New_Enemy2(int label)
         char buffer[100];
         sprintf(buffer, "assets/image/enemy2_%s.gif", state_string[i]);
         printf("Loading GIF: %s\n", buffer);
-        pDerivedObj->gif_status[i] = algif_new_gif(buffer, -1);
+        pDerivedObj->gif_status[i] = algif_load_animation(buffer);
+        if (!pDerivedObj->gif_status[i]) {
+            printf("Failed to load GIF: %s\n", buffer);
+        }
     }
     // load effective sound
     ALLEGRO_SAMPLE *sample = al_load_sample("assets/sound/enemy_sword_atk_sound.mp3");
@@ -76,10 +79,10 @@ Elements *New_Enemy2(int label)
     printf("enemy2 inited");
     return pObj;
 }
-int player_center_x;
+int player_center_x2;
 void enemy2_charater(int dx){
     
-    player_center_x =  dx;
+    player_center_x2 =  dx;
 }
 void Enemy2_update(Elements *self)
 {
@@ -94,7 +97,7 @@ void Enemy2_update(Elements *self)
     // Calculate distance between enemy2 and player on x-axis (horizontal)
     int enemy2_center_x = enemy2->x + enemy2->width / 2;
     
-    int dx = player_center_x - enemy2_center_x;
+    int dx = player_center_x2 - enemy2_center_x;
 
 
 
@@ -357,7 +360,6 @@ void Enemy2_interact(Elements *self)
         }
     }
 }
-
 
 
 

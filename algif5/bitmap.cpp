@@ -1,10 +1,10 @@
 #include "algif.h"
 
 ALGIF_BITMAP *algif_create_bitmap(int w, int h) {
-    ALGIF_BITMAP *bitmap = calloc(1, sizeof *bitmap);
+    ALGIF_BITMAP *bitmap = (ALGIF_BITMAP*)calloc(1, sizeof *bitmap);
     bitmap->w = w;
     bitmap->h = h;
-    bitmap->data = calloc(1, w * h);
+    bitmap->data = (uint8_t*)calloc(1, w * h);
     return bitmap;
 }
 
