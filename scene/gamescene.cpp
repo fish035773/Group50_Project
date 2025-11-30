@@ -328,7 +328,7 @@ void game_scene_update(Scene *self)
                     e->x = start_x + i * spacing;
                     e->y = HEIGHT - e->height - 60;
                     _Register_elements(self, enemy);
-                    printf("[GameScene] Round 1: Enemy1 %d spawned at (%.1f, %.1f)\n",
+                    printf("[GameScene] Round 1: Enemy1 %d spawned at (%d, %d)\n",
                         i+1, e->x, e->y);
                 }
                 break;
@@ -343,7 +343,7 @@ void game_scene_update(Scene *self)
                     e->x = start_x + i * spacing;
                     e->y = HEIGHT - e->height - 60;
                     _Register_elements(self, enemy2);
-                    printf("[GameScene] Round 2: Enemy2 %d spawned at (%.1f, %.1f)\n",
+                    printf("[GameScene] Round 2: Enemy2 %d spawned at (%d, %d)\n",
                         i+1, e->x, e->y);
                 }
                 break;
@@ -357,7 +357,7 @@ void game_scene_update(Scene *self)
                     e->x = start_x;
                     e->y = HEIGHT - e->height - 60;
                     _Register_elements(self, enemy3);
-                    printf("[GameScene] Round 3: Enemy3 spawned at (%.1f, %.1f)\n",
+                    printf("[GameScene] Round 3: Enemy3 spawned at (%d, %d)\n",
                         e->x, e->y);
                 }
                 break;

@@ -8,7 +8,8 @@
 class Character {
 public:
     enum State { STOP = 0, MOVE, ATK1 };
-    enum ProjectileType { Projectile_X, Projectile_C, Projectile_V };
+    enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };
+
 
     // 屬性
     double x, y;

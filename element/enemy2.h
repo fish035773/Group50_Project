@@ -85,4 +85,3 @@ void enemy2_charater(int chra2x);
 
 
 
-

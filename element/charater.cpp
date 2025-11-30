@@ -175,7 +175,16 @@ void Character::trigger_attack(int atk)
             if (dir) pro = New_Projectile(Projectile_X, x + width, y + 30, 2, this);
             else pro = New_Projectile(Projectile_X, x - 150, y + 30, -2, this);
             _Register_elements(scene, pro);
+
+            // --- debug print ---
+            if (pro && pro->pDerivedObj) {
+                Projectile* p = (Projectile*)pro->pDerivedObj;
+                printf("[DEBUG] X attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
+            } else {
+                printf("[DEBUG] X attack projectile creation FAILED\n");
+            }
             break;
+
         case 2: // C attack
             if (dir) {
                 pro = New_Projectile(Projectile_C, x + width + 10, y + 70, 5, this);
@@ -184,6 +193,9 @@ void Character::trigger_attack(int atk)
                 Elements* tail2 = New_Projectile(Projectile_C, x + width + 30, y + 125, 3, this);
                 _Register_elements(scene, tail1);
                 _Register_elements(scene, tail2);
+
+                printf("[DEBUG] C attack projectiles created: main=%p, tail1=%p, tail2=%p\n",
+                       pro, tail1, tail2);
             } else {
                 pro = New_Projectile(Projectile_C, x - 120, y + 80, -5, this);
                 _Register_elements(scene, pro);
@@ -191,12 +203,23 @@ void Character::trigger_attack(int atk)
                 Elements* tail2 = New_Projectile(Projectile_C, x - 100, y + 125, -3, this);
                 _Register_elements(scene, tail1);
                 _Register_elements(scene, tail2);
+
+                printf("[DEBUG] C attack projectiles created: main=%p, tail1=%p, tail2=%p\n",
+                       pro, tail1, tail2);
             }
             break;
+
         case 3: // V attack
             if (dir) pro = New_Projectile(Projectile_V, x + width, y + 10, 5, this);
             else pro = New_Projectile(Projectile_V, x - 180, y + 10, -5, this);
             _Register_elements(scene, pro);
+
+            if (pro && pro->pDerivedObj) {
+                Projectile* p = (Projectile*)pro->pDerivedObj;
+                printf("[DEBUG] V attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
+            } else {
+                printf("[DEBUG] V attack projectile creation FAILED\n");
+            }
             break;
     }
 }

@@ -10,7 +10,8 @@ class Character2
 {
 public:
     enum State2 { STOP = 0, MOVE, ATK };
-    enum ProjectileType { Projectile_J, Projectile_K, Projectile_L };
+    enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };
+
     // 建構與解構
    // 建構子 / 解構子
     Character2();
