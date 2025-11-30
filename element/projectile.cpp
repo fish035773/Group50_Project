@@ -35,7 +35,8 @@ Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
         case Projectile_X: path = "assets/image/projectile_x.png"; damage = DAMAGE_X; origin = 1; break;
         default: path = nullptr; damage = 1; origin = 1; break;
     }
-
+    //element_wrapper->dele = false;
+    printf("[Projectile] Creating projectile label=%d at (%d,%d) with v=%d\n", label, x, y, v);
     if (path) img = al_load_bitmap(path);
 
     if (!img) {
@@ -57,7 +58,7 @@ Projectile::~Projectile()
 {
     // element_wrapper 由 wrapper 的 Destroy 處理 (會 free)
     if (img) al_destroy_bitmap(img);
-    
+    printf("[Projectile] Destroyed projectile label=%d at (%d,%d)\n", label, x, y);
     if (hitbox) free(hitbox);
 }
 
@@ -82,7 +83,11 @@ void Projectile::Update()
         hitbox->update_center_x(hitbox, v);
         // vertical dy = 0 so no update_center_y call necessary unless needed
     }
-  
+    // 如果超出遊戲邊界 → 標記刪除
+    if (x < 0 || x > 900) {
+        if (element_wrapper) element_wrapper->dele = true;
+        printf("[Projectile] Out of bounds, marked for deletion label=%d\n", label);
+    }
 }
 
 // Interaction: scan labels that original projectiles used and apply effects.
@@ -99,16 +104,16 @@ void Projectile::Interact()
 
     // Enemy
    ElementVec enemies = _Get_label_elements(scene, Enemy_L);
-   for (int i = 0; i < enemies.len; ++i) interactEnemy(enemies.arr[i]);
-
+    for (int i = 0; i < enemies.len; ++i) interactEnemy(enemies.arr[i]);
+    printf("[Projectile] (Interact) Checked interaction with %d enemies for label=%d\n", enemies.len, label);
     // Enemy2
-   ElementVec enemies2 = _Get_label_elements(scene, Enemy2_L);
-   for (int i = 0; i < enemies2.len; ++i) interactEnemy2(enemies2.arr[i]);
-
+    ElementVec enemies2 = _Get_label_elements(scene, Enemy2_L);
+    for (int i = 0; i < enemies2.len; ++i) interactEnemy2(enemies2.arr[i]);
+    printf("[Projectile] (Interact) Checked interaction with %d enemy2 for label=%d\n", enemies2.len, label);
     //Enemy3
     ElementVec enemies3 = _Get_label_elements(scene, Enemy3_L);
     for (int i = 0; i < enemies3.len; ++i) interactEnemy3(enemies3.arr[i]);
-
+    printf("[Projectile] (Interact) Checked interaction with %d enemy3 for label=%d\n", enemies3.len, label);
     
     
     
@@ -144,28 +149,22 @@ void Projectile::Destroy()
 
 
 
-void Projectile::interactEnemy(Elements* tar) {
-    printf("[Projectile] (Projectile::interactEnemy) Interact called for label=%d at (%d,%d), dele=%d\n",
-       label, x, y, element_wrapper ? element_wrapper->dele : -1);
-    if (element_wrapper && element_wrapper->dele) return;
-    element_wrapper->dele = true; // ✅ 立刻標記，防止下一行訪問 hitbox
+// 只在真正碰撞時才標記 dele
+void Projectile::interactEnemy(Elements* tar)
+{
     Enemy* enemy = (Enemy*)tar->pDerivedObj;
-    if (origin == 2) {
-        Character2* ch2 = (Character2*)owner;
-        if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch2->blood > 0 && enemy->hp > 0) {
-            element_wrapper->dele = true;
-            enemy->hp -= damage;
-            if (enemy->hp <= 0) tar->dele = true;
-            ch2->levelup_points++;
-        }
-    } else {
-        Character* ch = (Character*)owner;
-        if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch->blood > 0 && enemy->hp > 0) {
-            element_wrapper->dele = true;
-            enemy->hp -= damage;
-            if (enemy->hp <= 0) tar->dele = true;
-            ch->levelup_points++;
-        }
+    if (enemy->hp <= 0) return;
+
+    bool hit = enemy->hitbox->overlap(enemy->hitbox, hitbox);
+    if (hit) {
+        enemy->hp -= damage;
+        element_wrapper->dele = true;
+        if (enemy->hp <= 0) tar->dele = true;
+
+        if (origin == 2) ((Character2*)owner)->levelup_points++;
+        else ((Character*)owner)->levelup_points++;
+
+        printf("[Projectile] Enemy hit! Enemy HP: %d\n", enemy->hp);
     }
 }
 void Projectile::interactEnemy2(Elements* tar) {
@@ -178,6 +177,7 @@ void Projectile::interactEnemy2(Elements* tar) {
         Character2* ch2 = (Character2*)owner;
         if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch2->blood > 0 && enemy->hp > 0) {
             element_wrapper->dele = true;
+            printf("[Projectile] Enemy2 hit by Character2's projectile. Enemy2 HP before: %d\n", enemy->hp);
             enemy->hp -= damage;
             if (enemy->hp <= 0) tar->dele = true;
             ch2->levelup_points++;
@@ -188,6 +188,7 @@ void Projectile::interactEnemy2(Elements* tar) {
         if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch->blood > 0 && enemy->hp > 0) {
             element_wrapper->dele = true;
             enemy->hp -= damage;
+            printf("[Projectile] Enemy2 hit by Character's projectile. Enemy2 HP before: %d\n", enemy->hp);
             if (enemy->hp <= 0) tar->dele = true;
             ch->levelup_points++;
             return; // ✅ 立刻跳出，不要再訪問 hitbox
@@ -207,6 +208,8 @@ void Projectile::interactEnemy3(Elements* tar) {
             enemy->hp -= damage;
             if (enemy->hp <= 0) tar->dele = true;
             ch2->levelup_points++;
+            printf("[Projectile] Enemy3 hit by Character2's projectile. Enemy3 HP: %d, Character2 Levelup Points: %d\n", enemy->hp, ch2->levelup_points);
+            return; // ✅ 立刻跳出，不要再訪問 hitbox
         }
     } else {
         Character* ch = (Character*)owner;
@@ -215,6 +218,8 @@ void Projectile::interactEnemy3(Elements* tar) {
             enemy->hp -= damage;
             if (enemy->hp <= 0) tar->dele = true;
             ch->levelup_points++;
+            printf("[Projectile] Enemy3 hit by Character's projectile. Enemy3 HP: %d, Character Levelup Points: %d\n", enemy->hp, ch->levelup_points);
+            return; // ✅ 立刻跳出，不要再訪問 hitbox
         }
     }
 }

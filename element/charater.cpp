@@ -143,11 +143,18 @@ void Character::update()
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-            if (gif_status[state]->done) {
+           // if (gif->display_index == gif->frame_count - 1) {
+            //    gif_status[state] = true; // 設 flag 結束動畫
+         //   }
+            if (gif_status[ATK1]->display_index == 6) {
                 state = is_jumping ? MOVE : STOP;
                 new_proj = false;
                 atk_type = 0;
+                break;
+
             }
+            printf("[DEBUG] ATK1 state: display_index=%d, done=%d, new_proj=%d\n",
+                   gif_status[ATK1]->display_index, gif_status[ATK1]->done, new_proj);
             break;
     }
 }

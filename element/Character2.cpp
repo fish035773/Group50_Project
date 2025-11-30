@@ -143,7 +143,7 @@ void Character2::update()
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-            if (gif_status[state]->done) {
+            if (gif_status[ATK]->display_index == 6) {
                 state = is_jumping ? MOVE : STOP;
                 new_proj = false;
                 atk_type = 0;
