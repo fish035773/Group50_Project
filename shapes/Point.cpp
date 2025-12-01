@@ -1,53 +1,59 @@
-#include "Point.h"
-#include <math.h>
+/*#include "Point.h"
+#include <cmath>
 
-/**
- * @see Shape.c
- */
-Point *Point_Self(Shape *self)
+Point::Point(double x, double y)
 {
-    return (Point *)self->pDerivedObj;
+    this->x = x;
+    this->y = y;
 }
-Shape *New_Point(double x, double y)
+
+double Point::center_x()
 {
-    Point *pDerivedObj = (Point *)malloc(sizeof(Point));
-    pDerivedObj->x = x;
-    pDerivedObj->y = y;
-    Shape *pObj = New_Shape();
-    pObj->overlap = Point_overlap;
-    pObj->center_x = Point_center_x;
-    pObj->center_y = Point_center_y;
-    pObj->update_center_x = Point_update_center_x;
-    pObj->update_center_y = Point_update_center_y;
-    pObj->getType = Point_getType;
-    pObj->pDerivedObj = pDerivedObj;
-    return pObj;
+    return this->x;
 }
-double Point_center_x(Shape *self)
+
+double Point::center_y()
 {
-    return Point_Self(self)->x;
+    return this->y;
 }
-double Point_center_y(Shape *self)
+
+void Point::update_center_x(int x)
 {
-    return Point_Self(self)->y;
+    this->x += x;
 }
-void Point_update_center_x(Shape *self, int x)
+
+void Point::update_center_y(int y)
 {
-    Point_Self(self)->x += x;
+    this->y += y;
 }
-void Point_update_center_y(Shape *self, int y)
-{
-    Point_Self(self)->y += y;
-}
-ShapeType Point_getType()
+
+ShapeType Point::getType()
 {
     return POINT;
 }
-double Point_dist2(Point *p1, Point *p2)
+
+bool Point::overlap(Shape* tar)
 {
-    return (p1->x - p2->x) * (p1->x - p2->x) + (p1->y - p2->y) * (p1->y - p2->y);
+    switch (tar->getType())
+    {
+    case POINT:
+        return checkOverlap_pp(this, (Point*)tar);
+    case RECTANGLE:
+        return checkOverlap_pr(this, (Rectangle*)tar);
+    case CIRCLE:
+        return checkOverlap_pc(this, (Circle*)tar);
+    }
+    return false;
 }
-double Point_dist(Point *p1, Point *p2)
+
+double Point::Point_dist2(Point* p2)
 {
-    return sqrt(Point_dist2(p1, p2));
+    return (this->x - p2->x) * (this->x - p2->x)
+         + (this->y - p2->y) * (this->y - p2->y);
 }
+
+double Point::Point_dist(Point* p2)
+{
+    return std::sqrt(Point_dist2(p2));
+}
+*/

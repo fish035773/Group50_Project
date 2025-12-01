@@ -3,74 +3,49 @@
 #include "../shapes/Circle.h"
 #include "charater.h"
 #include "tree.h"
-#include "../scene/sceneManager.h" // for scene variable
-#include "../scene/gamescene.h"    // for element label
+#include "../scene/sceneManager.h"
+#include "../scene/gamescene.h"
 #include <allegro5/allegro_primitives.h>
-Elements *New_Ball(int label)
-{
-    Ball *pDerivedObj = (Ball *)malloc(sizeof(Ball));
-    Elements *pObj = New_Elements(label);
-    pDerivedObj->x = mouse.x;
-    pDerivedObj->y = mouse.y;
-    pDerivedObj->r = 10;
-    pDerivedObj->color = al_map_rgb(255, 0, 0);
-    pDerivedObj->hitbox = New_Circle(pDerivedObj->x,
-                                     pDerivedObj->y,
-                                     pDerivedObj->r);
-    // setting the interact object
-    pObj->inter_obj[pObj->inter_len++] = Character_L;
-    pObj->inter_obj[pObj->inter_len++] = Tree_L;
 
-    // setting derived object function
-    pObj->pDerivedObj = pDerivedObj;
-    pObj->Draw = Ball_draw;
-    pObj->Update = Ball_update;
-    pObj->Interact = Ball_interact;
-    pObj->Destroy = Ball_destory;
-    return pObj;
+Ball::Ball(int label): Elements(label){
+    this->x = mouse.x;
+    this->y = mouse.y;
+    this->r = 10;
+    this->color = al_map_rgb(255, 0, 0);
+    this->hitbox = new Circle(this->x, this->y, this->r);
+
+    this->inter_obj[this->inter_len++] = Character_L;
+    this->inter_obj[this->inter_len++] = Tree_L;
 }
-void Ball_update(Elements *self)
-{
-    Ball *Obj = ((Ball *)(self->pDerivedObj));
-    Shape *hitbox = Obj->hitbox;
-    hitbox->update_center_x(hitbox, mouse.x - Obj->x);
-    hitbox->update_center_y(hitbox, mouse.y - Obj->y);
-    Obj->x = mouse.x;
-    Obj->y = mouse.y;
+    
+Ball::~Ball(){
+    delete hitbox;
 }
-void Ball_interact(Elements *self)
-{
-    Ball *Obj = ((Ball *)(self->pDerivedObj));
+
+void Ball::Update() {
+    this->hitbox->update_center_x(mouse.x - x);
+    this->hitbox->update_center_y(mouse.y - x);
+
+    x = mouse.x;
+    y = mouse.y;
+}
+
+void Ball::Interact() {
     ElementVec labelEle = _Get_label_elements(scene, Character_L);
-    Character *Obj1 = (Character *)(labelEle.arr[0]->pDerivedObj);
-    labelEle = _Get_label_elements(scene, Tree_L);
-    Tree *Obj2 = (Tree *)(labelEle.arr[0]->pDerivedObj);
+    Character* Obj1 = (Character*)labelEle.arr[0];
 
-    if (Obj->hitbox->overlap(Obj->hitbox, Obj1->hitbox))
-    {
-        Obj->color = al_map_rgb(0, 255, 0);
-    }
-    else if (Obj->hitbox->overlap(Obj->hitbox, Obj2->hitbox))
-    {
-        Obj->color = al_map_rgb(0, 0, 255);
-    }
-    else
-    {
-        Obj->color = al_map_rgb(255, 0, 0);
+    labelEle = _Get_label_elements(scene, Tree_L);
+    Tree* Obj2 = (Tree*)labelEle.arr[0];
+
+    if (hitbox->overlap(*Obj1->hitbox)) {
+        color = al_map_rgb(0, 255, 0);
+    } else if (hitbox->overlap(*Obj2->hitbox)) {
+        color = al_map_rgb(0, 0, 255);
+    } else {
+        color = al_map_rgb(255, 0, 0);
     }
 }
-int it = -1;
-void Ball_draw(Elements *self)
-{   
-    if(it != -1){
-    Ball *Obj = ((Ball *)(self->pDerivedObj));
-    al_draw_circle(Obj->x, Obj->y, Obj->r, Obj->color, 10);
-    }
-}
-void Ball_destory(Elements *self)
-{
-    Ball *Obj = ((Ball *)(self->pDerivedObj));
-    free(Obj->hitbox);
-    free(Obj);
-    free(self);
+
+void Ball::Draw() {
+    al_draw_circle(x, y, r, color, 10);
 }

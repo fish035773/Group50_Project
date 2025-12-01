@@ -5,7 +5,7 @@
 #include "tree.h"
 #include "teleport.h"
 #include "ball.h"
-#include "../scene/gamescene.h" // 如果需要 scene 指標
+#include "../scene/gamescene.h" 
 
 // wrapper functions
 Elements* New_Character(int label);

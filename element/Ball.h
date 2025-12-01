@@ -5,17 +5,21 @@
 /*
    [Ball object]
 */
-typedef struct _Ball
-{
+
+class Ball : public Elements{
+
+public:
     int x, y; // the position of image
     int r;    // the radius
     Shape *hitbox; // the hitbox of object
     ALLEGRO_COLOR color;
-} Ball;
 
-Elements *New_Ball(int label);
-void Ball_update(Elements *self);
-void Ball_interact(Elements *self);
-void Ball_draw(Elements *self);
-void Ball_destory(Elements *self);
+    Ball(int label);
+    ~Ball();
+
+    void Draw() override;
+    void Interact() override;
+    void Update() override;
+};
+
 #endif

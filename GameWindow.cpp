@@ -12,7 +12,6 @@
 #include <allegro5/allegro_ttf.h>
 // include scene and following component
 #include "scene/sceneManager.h"
-#include <stdbool.h>
 
 Game *New_Game()
 {
