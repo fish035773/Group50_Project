@@ -76,8 +76,7 @@ void Enemy::update_position(int dx, int dy){
 
 int player_center_x1;
 void enemy_charater(int dx){
-    
-    player_center_x1 =  dx;
+    player_center_x1 = dx;
 }
 
 void Enemy::Update(){

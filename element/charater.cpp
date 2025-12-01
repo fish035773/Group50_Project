@@ -38,7 +38,7 @@ Character::Character()
     ground_y = y;
 
     // Create hitbox
-    hitbox = New_Rectangle(x, y, x + width, y + height);
+    hitbox = new Rectangle(x, y, x + width, y + height);
 
     // Load attack sound
     ALLEGRO_SAMPLE* sample = al_load_sample("assets/sound/atk_sound.wav");
@@ -238,7 +238,7 @@ void Character::update_position(int dx, int dy)
     y += dy;
 
     if (hitbox) {
-        hitbox->update_center_x(hitbox, dx); // 傳入 self + dx
-        hitbox->update_center_y(hitbox, dy); // 傳入 self + dy
+        hitbox->update_center_x(hitbox->center_x() + dx);
+        hitbox->update_center_y(hitbox->center_y() + dy);
     }
 }

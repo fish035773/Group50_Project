@@ -52,7 +52,7 @@ public:
     void Draw() override;
 
     void update_position(int dx, int dy);
-    void enemy_charater(int dx);
 };
 
+void enemy_charater(int dx);
 Elements* New_Enemy(int label);
