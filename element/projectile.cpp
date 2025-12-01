@@ -25,6 +25,7 @@ Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
 : label(label_), x(x_), y(y_), v(v_), owner(owner_), img(nullptr), hitbox(nullptr),
   element_wrapper(nullptr)
 {
+    printf("[Projectile] Constructor called for label=%d at (%d,%d) with v=%d\n", label, x, y, v);
     const char* path = nullptr;
     switch (label) {
         case Projectile_K: path = "assets/image/projectile_k.png"; damage = DAMAGE_K; origin = 2; break;
@@ -56,6 +57,7 @@ Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
 
 Projectile::~Projectile()
 {
+    printf("[Projectile] Destructor called for label=%d at (%d,%d)\n", label, x, y);
     // element_wrapper 由 wrapper 的 Destroy 處理 (會 free)
     if (img) al_destroy_bitmap(img);
     printf("[Projectile] Destroyed projectile label=%d at (%d,%d)\n", label, x, y);
@@ -65,19 +67,21 @@ Projectile::~Projectile()
 // Move and update hitbox
 void Projectile::Update()
 {   
+   
     if (element_wrapper && element_wrapper->dele) {
-    printf("[Projectile] Skipping action because dele=1 for label=%d\n", label);
+    printf("[Projectile::Update] Skipping action because dele=1 for label=%d\n", label);
     return;
     }
-    printf("[DEBUG] Update called for label=%d, x=%d, y=%d, v=%d, dele=%d\n",
-           label, x, y, v, element_wrapper ? element_wrapper->dele : -1);
+    
+    
 
     if (element_wrapper && element_wrapper->dele) {
-        printf("[DEBUG] Skipping Update because dele=1 for label=%d\n", label);
+        printf("[Projectile::Update] Skipping Update because dele=1 for label=%d\n", label);
         return;
     }
 
     x += v;
+    //printf("(Projectile update) label=%d x=%d v=%d\n", label, x, v);
     // update hitbox: 你現有 Shape 的實作似乎是 function pointer style:
     if (hitbox && hitbox->update_center_x) {
         hitbox->update_center_x(hitbox, v);
@@ -95,6 +99,7 @@ void Projectile::Update()
 // 但如果你直接 call Projectile::Interact()，我們仍需使用全域 scene 和 _Get_label_elements。
 void Projectile::Interact()
 {   
+   
     if (element_wrapper && element_wrapper->dele) {
         printf("[Projectile] (Interact)Skipping action because dele=1 for label=%d\n", label);
         return;
@@ -105,25 +110,26 @@ void Projectile::Interact()
     // Enemy
    ElementVec enemies = _Get_label_elements(scene, Enemy_L);
     for (int i = 0; i < enemies.len; ++i) interactEnemy(enemies.arr[i]);
-    printf("[Projectile] (Interact) Checked interaction with %d enemies for label=%d\n", enemies.len, label);
+    //printf("[Projectile] (Interact) Checked interaction with %d enemies for label=%d\n ", enemies.len, label);
     // Enemy2
     ElementVec enemies2 = _Get_label_elements(scene, Enemy2_L);
     for (int i = 0; i < enemies2.len; ++i) interactEnemy2(enemies2.arr[i]);
-    printf("[Projectile] (Interact) Checked interaction with %d enemy2 for label=%d\n", enemies2.len, label);
+   // printf("[Projectile] (Interact) Checked interaction with %d enemy2 for label=%d\n", enemies2.len, label);
     //Enemy3
     ElementVec enemies3 = _Get_label_elements(scene, Enemy3_L);
     for (int i = 0; i < enemies3.len; ++i) interactEnemy3(enemies3.arr[i]);
-    printf("[Projectile] (Interact) Checked interaction with %d enemy3 for label=%d\n", enemies3.len, label);
+   // printf("[Projectile] (Interact) Checked interaction with %d enemy3 for label=%d\n", enemies3.len, label);
     
     
     
 }
 
 void Projectile::Draw()
-{
-    printf("[Projectile] Draw label=%d at (%d,%d)\n", label, x, y);
+{   
+    
+
     if (element_wrapper && element_wrapper->dele) {
-        printf("[Projectile] (Draw) Skipping action because dele=1 for label=%d\n", label);
+        //printf("[Projectile] (Draw) Skipping action because dele=1 for label=%d\n", label);
         return;
     }
 
@@ -152,6 +158,7 @@ void Projectile::Destroy()
 // 只在真正碰撞時才標記 dele
 void Projectile::interactEnemy(Elements* tar)
 {
+    
     Enemy* enemy = (Enemy*)tar->pDerivedObj;
     if (enemy->hp <= 0) return;
 
@@ -168,8 +175,7 @@ void Projectile::interactEnemy(Elements* tar)
     }
 }
 void Projectile::interactEnemy2(Elements* tar) {
-    printf("[Projectile] (Projectile::interactEnemy2) Interact called for label=%d at (%d,%d), dele=%d\n",
-       label, x, y, element_wrapper ? element_wrapper->dele : -1);
+    
     if (element_wrapper && element_wrapper->dele) return;
     element_wrapper->dele = true; // ✅ 立刻標記，防止下一行訪問 hitbox
     Enemy2* enemy = (Enemy2*)tar->pDerivedObj;
@@ -177,31 +183,34 @@ void Projectile::interactEnemy2(Elements* tar) {
         Character2* ch2 = (Character2*)owner;
         if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch2->blood > 0 && enemy->hp > 0) {
             element_wrapper->dele = true;
-            printf("[Projectile] Enemy2 hit by Character2's projectile. Enemy2 HP before: %d\n", enemy->hp);
+           // printf("[Projectile] Enemy2 hit by Character2's projectile. Enemy2 HP before: %d\n", enemy->hp);
             enemy->hp -= damage;
             if (enemy->hp <= 0) tar->dele = true;
             ch2->levelup_points++;
+            printf("[Projectile] Enemy2 HP after: %d, Character2 Levelup Points: %d\n", enemy->hp, ch2->levelup_points);
             return; // ✅ 立刻跳出，不要再訪問 hitbox
         }
     } else {
         Character* ch = (Character*)owner;
         if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch->blood > 0 && enemy->hp > 0) {
             element_wrapper->dele = true;
+           // printf("[Projectile] Enemy2 hit by Character's projectile. Enemy2 HP before: %d\n", enemy->hp);
             enemy->hp -= damage;
             printf("[Projectile] Enemy2 hit by Character's projectile. Enemy2 HP before: %d\n", enemy->hp);
             if (enemy->hp <= 0) tar->dele = true;
             ch->levelup_points++;
+            printf("[Projectile] Enemy2 HP after: %d, Character Levelup Points: %d\n", enemy->hp, ch->levelup_points);
             return; // ✅ 立刻跳出，不要再訪問 hitbox
         }
     }
 }
 void Projectile::interactEnemy3(Elements* tar) {
-    printf("[Projectile] (Projectile::interactEnemy3) Interact called for label=%d at (%d,%d), dele=%d\n",
-       label, x, y, element_wrapper ? element_wrapper->dele : -1);
+    
     if (element_wrapper && element_wrapper->dele) return;
     element_wrapper->dele = true; // ✅ 立刻標記，防止下一行訪問 hitbox
     Enemy3* enemy = (Enemy3*)tar->pDerivedObj;
     if (origin == 2) {
+        printf("[Projectile] Checking hit on Enemy3 by Character2's projectile. Enemy3 HP before: %d\n", enemy->hp);
         Character2* ch2 = (Character2*)owner;
         if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch2->blood > 0 && enemy->hp > 0) {
             element_wrapper->dele = true;
@@ -231,7 +240,7 @@ void Projectile::interactEnemy3(Elements* tar) {
 Elements* Projectile::toElements()
 {
     
-    
+    printf("[Projectile] (toElements) Called for label=%d at (%d,%d)\n", label, x, y);
     if (element_wrapper) return element_wrapper;
 
     element_wrapper = New_Elements(label);
@@ -242,6 +251,7 @@ Elements* Projectile::toElements()
     element_wrapper->inter_obj[element_wrapper->inter_len++] = Enemy3_L;
     element_wrapper->inter_obj[element_wrapper->inter_len++] = Character_L;
     element_wrapper->inter_obj[element_wrapper->inter_len++] = Character2_L;
+    //printf("[Projectile] (toElements) Set up interaction labels for label=%d\n", label);
 
     element_wrapper->pDerivedObj = this; // store pointer to this object
 
@@ -253,6 +263,7 @@ Elements* Projectile::toElements()
     element_wrapper->Interact = [](Elements* e) {
         Projectile* p = (Projectile*)e->pDerivedObj;
         p->Interact();
+        //printf("[Projectile](toElements) (Wrapper Interact) Called for label=%d\n", p->label);
     };
     element_wrapper->Draw = [](Elements* e) {
         Projectile* p = (Projectile*)e->pDerivedObj;
@@ -265,6 +276,7 @@ Elements* Projectile::toElements()
     p->Destroy();  // 釋放 bitmap / hitbox
     delete p;      // 刪除 C++ 對象
     free(e);       // 刪除 wrapper
+    printf("[Projectile] (Wrapper Destroy) Called and cleaned up\n");
 };
 
     // map internal numeric fields into element if needed (for other systems reading them)
@@ -278,7 +290,9 @@ Elements* Projectile::toElements()
 // 保留你原本程式碼呼叫方式： New_Projectile(label, x, y, v, owner)
 Elements* New_Projectile(int label, int x, int y, int v, void* owner)
 {
+    printf("[New_Projectile] Creating projectile label=%d at (%d,%d) with v=%d\n", label, x, y, v);
     Projectile* p = new Projectile(label, x, y, v, owner);
     Elements* e = p->toElements();
+    printf("[New_Projectile] Created projectile label=%d at (%d,%d) with v=%d\n", label, x, y, v);
     return e;
 }

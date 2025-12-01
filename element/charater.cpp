@@ -96,9 +96,18 @@ void Character::update()
         }
 
         int new_atk_type = 0;
-        if (key_state[ALLEGRO_KEY_X] && cool_X == 0) { new_atk_type = 1; cool_X = cool_x; }
-        else if (key_state[ALLEGRO_KEY_C]) new_atk_type = 2;
-        else if (key_state[ALLEGRO_KEY_V]) new_atk_type = 3;
+        if (key_state[ALLEGRO_KEY_X] && cool_X == 0) {
+            new_atk_type = 1;
+            cool_X = cool_x;
+        }
+        else if (key_state[ALLEGRO_KEY_C] && cool_C == 0) {
+            new_atk_type = 2;
+            cool_C = cool_c;
+        }
+        else if (key_state[ALLEGRO_KEY_V] && cool_V == 0) {
+            new_atk_type = 3;
+            cool_V = cool_v;
+        }
 
         if (!new_proj && new_atk_type != 0) {
             atk_type = new_atk_type;
@@ -116,7 +125,7 @@ void Character::update()
             else if (key_state[ALLEGRO_KEY_C] && cool_C == 0) { state = ATK1; atk_type = 2; new_proj = false; cool_C = cool_c; }
             else if (key_state[ALLEGRO_KEY_V] && cool_V == 0) { state = ATK1; atk_type = 3; new_proj = false; cool_V = cool_v; }
             else if (key_state[ALLEGRO_KEY_A]) { dir = false; state = MOVE; }
-            else if (key_state[ALLEGRO_KEY_D] || key_state[ALLEGRO_KEY_W] || key_state[ALLEGRO_KEY_S]) { dir = true; state = MOVE; }
+            else if (key_state[ALLEGRO_KEY_D] || key_state[ALLEGRO_KEY_W] ) { dir = true; state = MOVE; }
             break;
 
         case MOVE: {
@@ -143,18 +152,15 @@ void Character::update()
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-           // if (gif->display_index == gif->frame_count - 1) {
-            //    gif_status[state] = true; // 設 flag 結束動畫
-         //   }
-            if (gif_status[ATK1]->display_index == 6) {
+            
+            if (gif_status[ATK1]->display_index == 4) {
                 state = is_jumping ? MOVE : STOP;
                 new_proj = false;
                 atk_type = 0;
                 break;
 
             }
-            printf("[DEBUG] ATK1 state: display_index=%d, done=%d, new_proj=%d\n",
-                   gif_status[ATK1]->display_index, gif_status[ATK1]->done, new_proj);
+            
             break;
     }
 }
@@ -221,12 +227,7 @@ void Character::trigger_attack(int atk)
             else pro = New_Projectile(Projectile_V, x - 180, y + 10, -5, this);
             _Register_elements(scene, pro);
 
-            if (pro && pro->pDerivedObj) {
-                Projectile* p = (Projectile*)pro->pDerivedObj;
-                printf("[DEBUG] V attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
-            } else {
-                printf("[DEBUG] V attack projectile creation FAILED\n");
-            }
+            
             break;
     }
 }
