@@ -1,7 +1,7 @@
 #include "charater.h"
 #include "projectile.h"
 #include "../shapes/Rectangle.h"
-
+//character 圖片敲可愛的 很喜翻~
 #include "enemy.h"
 #include "../scene/sceneManager.h"
 #include "../algif5/algif.h"
