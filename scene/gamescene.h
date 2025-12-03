@@ -83,4 +83,3 @@ void game_scene_draw(Scene *self);
 void game_scene_destroy(Scene *self);
 void Add_Elements_to_GameScene(Elements *elem);
 #endif
-

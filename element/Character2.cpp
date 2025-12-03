@@ -10,9 +10,9 @@
 #include "../element/elements_factory.h"
 
 #include <iostream>
-#define cool_l 600
-#define cool_k 480
-#define cool_j 300
+#define cool_l 10 * 80
+#define cool_k 8 * 80
+#define cool_j 5 * 80
 // 建立角色的 wrapper 函式
 
 Character2::Character2()
