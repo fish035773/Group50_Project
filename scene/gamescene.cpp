@@ -18,7 +18,7 @@
 #include "../element/enemy.h"
 #include "../element/enemy2.h"
 #include "../element/enemy3.h"
-#define FPS 60
+#define FPS 80
 #define barlong 510
 Scene *current_game_scene = NULL; //pointer to reference active scene
 int i = 0;
@@ -56,8 +56,7 @@ Scene *New_GameScene(int label)
 
 
 
-    // Load background
-    pDerivedObj->background = al_load_bitmap("assets/image/round1_scene.png");
+
     if (pDerivedObj->background)
         printf("[GameScene] Background loaded OK.\n");
     else
@@ -77,7 +76,7 @@ Scene *New_GameScene(int label)
             printf("WARNING: Round image %d NOT FOUND!\n", i + 1);
     }
     // setting derived object member
-    pDerivedObj->background = al_load_bitmap("assets/image/round1_scene.png");
+    
     al_init_font_addon();
     al_init_ttf_addon();
     pDerivedObj->font = al_load_ttf_font("assets/font/Consolas.ttf", 24, 0);
@@ -103,6 +102,9 @@ Scene *New_GameScene(int label)
     pDerivedObj->round_bgm[0] = al_load_sample("assets/sound/bgm_round1.mp3");
     pDerivedObj->round_bgm[1] = al_load_sample("assets/sound/bgm_round2.mp3");
     pDerivedObj->round_bgm[2] = al_load_sample("assets/sound/bgm_round3.mp3");
+    // Load round image
+    pDerivedObj->background = al_load_bitmap("assets/image/round1_scene.png");
+  
 
 
 
@@ -243,14 +245,14 @@ void game_scene_update(Scene *self)
 
 
         if (all_enemies_defeated) {
-            printf("[GameScene] All enemies defeated in round %d!\n", gs->round_counter);
+            printf("[game_scene_update] All enemies defeated in round %d!\n", gs->round_counter);
             gs->round_locked = true;          // Prevent re-trigger
             gs->round_advancing = true;       // Signal advancement
             gs->round_timer = 0;
         }
     }
 
-
+  
 
 
     // === ROUND TRIGGER ===
@@ -258,7 +260,7 @@ void game_scene_update(Scene *self)
         gs->round_timer++;
         if (gs->round_timer > FPS * 2) {
             gs->round_triggered = false;
-            printf("[GameScene] Round %d display done.\n", gs->round_counter);
+            printf("[game_scene_update] Round %d display done.\n", gs->round_counter);
         }
     }
 
@@ -291,8 +293,9 @@ void game_scene_update(Scene *self)
                 if (gs->round_bgm_instance) {
                     al_stop_sample_instance(gs->round_bgm_instance);
                     al_destroy_sample_instance(gs->round_bgm_instance);
+                    
                 }
-                gs->round_bgm_instance = al_create_sample_instance(gs->round_bgm[gs->round_counter - 1]);
+                
                 al_set_sample_instance_playmode(gs->round_bgm_instance, ALLEGRO_PLAYMODE_LOOP);
                 al_attach_sample_instance_to_mixer(gs->round_bgm_instance, al_get_default_mixer());
                 al_play_sample_instance(gs->round_bgm_instance);
@@ -308,13 +311,27 @@ void game_scene_update(Scene *self)
             }
         }
     }
-
+    
 
     // === SPAWN ENEMIES FOR CURRENT ROUND ===
     if (!gs->round_triggered && !gs->enemies_spawned && !gs->round_locked) {
         int enemy_count = 1;  // Default to 1 enemy
         int start_x = 500;    // Default starting position
         int spacing = 100;    // Default spacing
+        ALLEGRO_BITMAP *new_bg = NULL;
+    switch (gs->round_counter) {
+        case 1: new_bg = al_load_bitmap("assets/image/round1_scene.png"); break;
+        case 2: new_bg = al_load_bitmap("assets/image/round2_scene.png"); break;
+        case 3: new_bg = al_load_bitmap("assets/image/round3_scene.png"); break;
+    }
+
+    if (new_bg) {
+        if (gs->background)
+            al_destroy_bitmap(gs->background);
+            gs->background = new_bg;
+    } else {
+        printf("WARNING: Failed to load round %d background!\n", gs->round_counter);
+    }
 
 
         switch (gs->round_counter) {
@@ -780,7 +797,6 @@ void game_scene_destroy(Scene *self)
 
     printf("[GameScene] Scene destroyed.\n");
 }
-
 
 
 
