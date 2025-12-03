@@ -1,10 +1,9 @@
+
 #ifndef TELEPORT_H_INCLUDED
 #define TELEPORT_H_INCLUDED
 #include "element.h"
 #include <stdbool.h>
-/*
-   [teleport object]
-*/
+
 typedef struct _Teleport
 {
     int x, y;          // the position of image

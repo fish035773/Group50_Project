@@ -1,62 +1,35 @@
-#ifndef Projectile3_H_INCLUDED
-#define Projectile3_H_INCLUDED
+#pragma once
 #include "element.h"
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
-
-
-
 
 //Projection Direction
 #define Projectile3_Right 201
 #define Projectile3_Left 202
 
+class Projectile3 : public Elements {
+public:
+    int x, y;
+    int width, height;
+    int v;
+    int damage;     
 
-
-
-/*
-   [Projectile object]
-*/
-typedef struct _Projectile3
-{
-    int x, y;          // the position of image
-    int width, height; // the width and height of image
-    int v;             // the velocity of projectile
-    int damage;        // hit strength
-    ALLEGRO_BITMAP *img;
-    Shape *hitbox; // the hitbox of object
-
-
-
+    ALLEGRO_BITMAP* img;
+    Shape* hitbox;
 
     bool is_enemy_projectile;
-} Projectile3;
 
+    Projectile3(int label, int x, int y, int v);
+    ~Projectile3();
 
+    void Update() override;
+    void Interact() override;
+    void Draw() override;
 
-
-Elements *New_Projectile3(int label, int x, int y, int v);
-void Projectile3_update(Elements *self);
-void Projectile3_interact(Elements *self);
-void Projectile3_draw(Elements *self);
-void Projectile3_destroy(Elements *self);
-
-
-
-
-void _Projectile3_update_position(Elements *self, int dx, int dy);
-void _Projectile3_interact_Floor(Elements *self, Elements *tar);
-void _Projectile3_interact_Character(Elements *self, Elements *tar);
-
-
-
-
-
-
-
-
-#endif
-
+    void update_position(int dx, int dy);
+    void interact_Floor(Elements* tar);
+    void interact_Character(Elements* tar);
+};
 
 
 

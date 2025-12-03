@@ -1,3 +1,4 @@
+/*
 #include "Ball.h"
 #include "../global.h"
 #include "../shapes/Circle.h"
@@ -35,7 +36,6 @@ void Ball::Interact() {
     Character* Obj1 = (Character*)labelEle.arr[0];
 
     labelEle = _Get_label_elements(scene, Tree_L);
-    Tree* Obj2 = (Tree*)labelEle.arr[0];
 
     if (hitbox->overlap(*Obj1->hitbox)) {
         color = al_map_rgb(0, 255, 0);
@@ -49,3 +49,4 @@ void Ball::Interact() {
 void Ball::Draw() {
     al_draw_circle(x, y, r, color, 10);
 }
+*/

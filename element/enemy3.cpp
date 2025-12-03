@@ -151,7 +151,7 @@ void Enemy3::Update(){
                 ? x + width - 100
                 : x + 100;
 
-            Elements* pro = New_Projectile3(
+            Elements* pro = new Projectile3(
                 Projectile2_L,
                 projectile_x,
                 y + height / 2 - 20,
@@ -160,7 +160,7 @@ void Enemy3::Update(){
 
             //===========TODO===============
             ((Projectile3 *)pro->pDerivedObj)->is_enemy_projectile = true;
-            _Register_elements(scene, pro);
+            scene->addElement(pro);
             //====
             al_play_sample_instance(atk_sound);
             active_proj = true;
@@ -185,7 +185,7 @@ void Enemy3::Update(){
         int frame = gif_status[ENEMY3_THROW]->display_index;
 
         if (frame == 2 && !active_proj) {
-            Elements* pro = New_Projectile3(
+            Elements* pro = new Projectile3(
                 Projectile3_L,
                 dir ? (x + width - 100) : (x + 20),
                 y + height / 2 + 20,
@@ -193,7 +193,7 @@ void Enemy3::Update(){
             );
 
             ((Projectile3*)pro->pDerivedObj)->is_enemy_projectile = true;
-            _Register_elements(scene, pro);
+            scene->addElement(pro);
 
             al_play_sample_instance(throw_sound);
             active_proj = true;
@@ -235,34 +235,32 @@ void Enemy3::Draw(){
 void Enemy3::Interact(){
     if (!alive || dying) return;
 
-    for (int i = 0; i < MAX_ELEMENT; i++) {
-        EPNode* node = scene->ele_list[i];
+    if (!alive || dying) return;
+    if (!scene) return;
 
-        while (node) {
-            Elements* obj = node->ele;
-            Projectile3* proj = (Projectile3*)obj->pDerivedObj;
+    for (Elements* obj : scene->getAllElements()) {
+        if (obj->dele) continue;
+        Projectile3* proj = (Projectile3*)obj->pDerivedObj;
 
-            if ((obj->label == Projectile3_Right ||
-                 obj->label == Projectile3_Left ||
-                 obj->label == Projectile3_L) &&
-                !proj->is_enemy_projectile &&
-                hitbox->overlap(*proj->hitbox))
-            {
-                obj->dele = true;
-                got_hit = true;
-                hit_time = al_get_time();
-                hp--;
+        if ((obj->label == Projectile3_Right ||
+                obj->label == Projectile3_Left ||
+                obj->label == Projectile3_L) &&
+            !proj->is_enemy_projectile &&
+            hitbox->overlap(*proj->hitbox))
+        {
+            obj->dele = true;
+            got_hit = true;
+            hit_time = al_get_time();
+            hp--;
 
-                if (hp <= 0 && !dying) {
-                    alive = false;
-                    dying = true;
-                    state = ENEMY3_DEAD;
-                    gif_status[ENEMY3_DEAD]->display_index = 0;
-                    gif_status[ENEMY3_DEAD]->done = false;
-                    death_time = al_get_time();
-                }
+            if (hp <= 0 && !dying) {
+                alive = false;
+                dying = true;
+                state = ENEMY3_DEAD;
+                gif_status[ENEMY3_DEAD]->display_index = 0;
+                gif_status[ENEMY3_DEAD]->done = false;
+                death_time = al_get_time();
             }
-            node = node->next;
         }
     }
 }

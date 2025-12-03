@@ -1,7 +1,7 @@
 #include "Character2.h"
 #include "projectile.h"
 #include "../shapes/Rectangle.h"
-
+#include "../scene/gamescene.h"
 #include "enemy.h"
 #include "../scene/sceneManager.h"
 #include "../algif5/algif.h"
@@ -17,7 +17,7 @@
 // 建立角色的 wrapper 函式
 
 Character2::Character2()
-    : x(30), y(0), width(0), height(0),
+    :Elements(Character2_L), x(30), y(0), width(0), height(0),
       blood(100), level(0), levelup_points(0), add_blood(10),
       dir(false), is_jumping(false), jump_start_time(0.0), ground_y(0),
       cool_J(0), cool_K(0), cool_L(0),
@@ -143,10 +143,13 @@ void Character2::update()
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-            if (gif_status[ATK]->display_index == 6) {
+            if (gif_status[ATK]->done) {
                 state = is_jumping ? MOVE : STOP;
                 new_proj = false;
                 atk_type = 0;
+                gif_status[ATK]->done = false; // 重設動畫結束旗標
+                gif_status[ATK]->display_index = 0; // 重設影格
+                break;
             }
             break;
     }
@@ -160,9 +163,6 @@ void Character2::draw()
     }
 }
 
-
-
-
 void Character2::interact()
 {
     // Placeholder
@@ -175,31 +175,31 @@ void Character2::trigger_attack(int atk)
 
     switch (atk) {
         case 1: // X attack
-            if (dir) pro = New_Projectile(Projectile_J, x + width, y + 30, 2, this);
-            else pro = New_Projectile(Projectile_J, x - 150, y + 30, -2, this);
-            _Register_elements(scene, pro);
+            if (dir) pro = new Projectile(Projectile_J, x + width, y + 30, 2, this);
+            else pro = new Projectile(Projectile_J, x - 150, y + 30, -2, this);
+            scene->addElement(pro);
             break;
         case 2: 
             if (dir) {
-                pro = New_Projectile(Projectile_K, x + width + 10, y + 70, 5, this);
-                _Register_elements(scene, pro);
-                Elements* tail1 = New_Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
-                Elements* tail2 = New_Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
-                _Register_elements(scene, tail1);
-                _Register_elements(scene, tail2);
+                pro = new Projectile(Projectile_K, x + width + 10, y + 70, 5, this);
+                scene->addElement(pro);
+                Elements* tail1 = new Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
+                Elements* tail2 = new Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
+                scene->addElement(tail1);
+                scene->addElement(tail2);
             } else {
-                pro = New_Projectile(Projectile_K, x - 120, y + 80, -5, this);
-                _Register_elements(scene, pro);
-                Elements* tail1 = New_Projectile(Projectile_K, x - 100, y + 15, -3, this);
-                Elements* tail2 = New_Projectile(Projectile_K, x - 100, y + 125, -3, this);
-                _Register_elements(scene, tail1);
-                _Register_elements(scene, tail2);
+                pro = new Projectile(Projectile_K, x - 120, y + 80, -5, this);
+                scene->addElement(pro);
+                Elements* tail1 = new Projectile(Projectile_K, x - 100, y + 15, -3, this);
+                Elements* tail2 = new Projectile(Projectile_K, x - 100, y + 125, -3, this);
+                scene->addElement(tail1);
+                scene->addElement(tail2);
             }
             break;
         case 3: // V attack
-            if (dir) pro = New_Projectile(Projectile_L, x + width, y + 10, 5, this);
-            else pro = New_Projectile(Projectile_L, x - 180, y + 10, -5, this);
-            _Register_elements(scene, pro);
+            if (dir) pro = new Projectile(Projectile_L, x + width, y + 10, 5, this);
+            else pro = new Projectile(Projectile_L, x - 180, y + 10, -5, this);
+            scene->addElement(pro);
             break;
     }
 }

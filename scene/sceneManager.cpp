@@ -20,7 +20,7 @@ void create_scene(SceneType type)
         break;
 
     case GameScene_L:
-        scene = New_GameScene(GameScene_L);
+        scene = new GameScene(GameScene_L);
         printf("[SceneManager] Created Game Scene.\n");
         break;
 

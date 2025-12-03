@@ -5,7 +5,7 @@
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
 #include "projectile.h"
-class Character {
+class Character : public Elements{
 public:
     enum State { STOP = 0, MOVE, ATK1 };
     enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };

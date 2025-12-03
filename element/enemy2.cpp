@@ -1,4 +1,4 @@
-#pragma once
+
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_image.h>
@@ -137,7 +137,7 @@ void Enemy2::Update(){
                 ? x + width - 100
                 : x + 20;
 
-            Elements* pro = New_Projectile2(
+            Elements* pro = new Projectile2(
                 Projectile2_L,
                 projectile_x,
                 y + height / 2 - 20,
@@ -146,7 +146,7 @@ void Enemy2::Update(){
 
             //===========TODO===============
             ((Projectile2 *)pro->pDerivedObj)->is_enemy_projectile = true;
-            _Register_elements(scene, pro);
+            scene->addElement(pro);
             //====
 
             active_proj = true;
@@ -204,45 +204,38 @@ void Enemy2::Interact()
 {
     if (!alive || dying) return;
 
-    for (int i = 0; i < MAX_ELEMENT; i++) {
-        EPNode* node = scene->ele_list[i];
-        while (node) {
-            Elements* obj = node->ele;
-            EPNode* next = node->next;
+    for (Elements* obj : scene->getAllElements()) {
+        if (obj->dele) continue;
+        // hit by projectile
+        if (obj->label == Projectile2_Right ||
+            obj->label == Projectile2_Left ||
+            obj->label == Projectile2_L)
+        {
+            Projectile2* proj = (Projectile2*)obj->pDerivedObj;
+            Shape* proj_hitbox = proj->hitbox;
 
-            // hit by projectile
-            if (obj->label == Projectile2_Right ||
-                obj->label == Projectile2_Left ||
-                obj->label == Projectile2_L)
-            {
-                Projectile2* proj = (Projectile2*)obj->pDerivedObj;
-                Shape* proj_hitbox = proj->hitbox;
+            if (proj->is_enemy_projectile) {
+                continue;
+            }
 
-                if (proj->is_enemy_projectile) {
-                    node = next;
-                    continue;
-                }
+            if (hitbox->overlap(*proj_hitbox)) {
 
-                if (hitbox->overlap(*proj_hitbox)) {
+                obj->dele = true;
 
-                    obj->dele = true;
+                hp--;
+                got_hit = true;
+                hit_time = al_get_time();
 
-                    hp--;
-                    got_hit = true;
-                    hit_time = al_get_time();
-
-                    if (hp <= 0 && !dying) {
-                        alive = false;
-                        dying = true;
-                        state = ENEMY2_DEAD;
-                        gif_status[ENEMY2_DEAD]->display_index = 0;
-                        gif_status[ENEMY2_DEAD]->done = false;
-                        death_time = al_get_time();
-                        return;
-                    }
+                if (hp <= 0 && !dying) {
+                    alive = false;
+                    dying = true;
+                    state = ENEMY2_DEAD;
+                    gif_status[ENEMY2_DEAD]->display_index = 0;
+                    gif_status[ENEMY2_DEAD]->done = false;
+                    death_time = al_get_time();
+                    return;
                 }
             }
-            node = next;
         }
     }
 }

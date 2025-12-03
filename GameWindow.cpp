@@ -131,7 +131,7 @@ bool game_update(Game *self)
         if (scene->scene_end && !scene_switched)
         {
             printf("[GameWindow] Switching scene... current window = %d\n", window);
-            scene->Destroy(scene);
+            scene->Destroy();
             scene = NULL;  // extremelly important so that the Update() not being recall again.
             scene_switched = true;
         }
@@ -139,7 +139,7 @@ bool game_update(Game *self)
         // if the scene still exist >> Update()
         if (scene != NULL)
         {
-            scene->Update(scene);
+            scene->Update();
         }
     }
     else if (scene == NULL && scene_switched)
@@ -189,7 +189,7 @@ void game_draw(Game *self)
 
     if (scene != NULL)
     {
-        scene->Draw(scene);
+        scene->Draw();
     }
     else
     {
@@ -207,7 +207,7 @@ void game_destroy(Game *self)
     al_destroy_display(self->display);
     if (scene != NULL)
     {
-        scene->Destroy(scene);
+        scene->Destroy();
     }
     free(self);
 }

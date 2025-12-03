@@ -17,7 +17,7 @@ public:
     virtual void Update();
     virtual void Interact();
 
-    Elements(int label): label(label), dele(false), inter_len(0), pDerivedObj(this){}
+    Elements(int label): pDerivedObj(this), label(label), id(0), inter_len(0), dele(false){}
     virtual ~Elements() = default;
 };
 

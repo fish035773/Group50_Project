@@ -1,23 +1,26 @@
-#ifndef FLOOR_H_INCLUDED
-#define FLOOR_H_INCLUDED
+#pragma once
+
 #include "element.h"
-/*
-   [floor object]
-*/
-typedef struct _Floor
+#include <allegro5/allegro.h>
+#include "charater.h"
+#include "Character2.h"
+class Floor : public Elements
 {
-    int x, y;          // the position of image
-    int width, height; // the width and height of image
-    ALLEGRO_BITMAP *img;
+public:
+    int x, y;
+    int width, height;
+    ALLEGRO_BITMAP* img = nullptr;
+
     int map_data[6][6];
-} Floor;
 
-Elements *New_Floor(int label);
-void Floor_update(Elements *self);
-void Floor_interact(Elements *self);
-void Floor_draw(Elements *self);
-void Floor_destory(Elements *self);
-void _Floor_load_map(Floor *floor);
-void _Floor_interact_Character(Elements *self, Elements *tar);
+    // constructor
+    Floor(int label);
+    ~Floor();
+    // override virtual functions from Elements
+    void Update() override;
+    void Interact() override;
+    void Draw() override;
 
-#endif
+    void LoadMap();
+    void InteractCharacter(Character* target);
+};

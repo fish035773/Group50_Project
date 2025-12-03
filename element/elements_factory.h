@@ -1,3 +1,4 @@
+/*
 #pragma once
 #include "charater.h"
 #include "Character2.h"
@@ -14,3 +15,4 @@ Elements* New_Floor(int label);
 Elements* New_Tree(int label);
 Elements* New_Teleport(int label);
 Elements* New_Ball(int label);
+*/

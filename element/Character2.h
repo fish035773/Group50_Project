@@ -6,7 +6,7 @@
 #include "../algif5/algif.h"
 #include "projectile.h"
 
-class Character2
+class Character2: public Elements
 {
 public:
     enum State2 { STOP = 0, MOVE, ATK };
@@ -16,18 +16,10 @@ public:
    // 建構子 / 解構子
     Character2();
     ~Character2();
-    // 更新角色狀態
+
     void update();
-
-    // 繪製角色
     void draw();
-
-    // 互動
     void interact();
-
-   
-
-    // 更新位置與 hitbox
     void update_position(int dx, int dy);
 
     // 成員變數

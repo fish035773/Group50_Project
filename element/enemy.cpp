@@ -143,7 +143,7 @@ void Enemy::Update(){
                 ? x + width - 100
                 : x + 20;
 
-            Elements* pro = New_Projectile2(
+            Elements* pro = new Projectile2(
                 Projectile2_L,
                 projectile_x,
                 y + height / 2 - 20,
@@ -152,7 +152,7 @@ void Enemy::Update(){
 
             //===========TODO===============
             ((Projectile2 *)pro->pDerivedObj)->is_enemy_projectile = true;
-            _Register_elements(scene, pro);
+            scene->addElement(pro);
             //====
 
             active_proj = true;
@@ -210,49 +210,46 @@ void Enemy::Draw(){
 void Enemy::Interact()
 {
     if (!alive || dying) return;
+    if (!scene) return;
 
-    for (int i = 0; i < MAX_ELEMENT; i++) {
-        EPNode* node = scene->ele_list[i];
-        while (node) {
-            Elements* obj = node->ele;
-            EPNode* next = node->next;
+    for (Elements* obj : scene->getAllElements()) {
 
-            // hit by projectile
-            if (obj->label == Projectile2_Right ||
-                obj->label == Projectile2_Left ||
-                obj->label == Projectile2_L)
-            {
-                Projectile2* proj = (Projectile2*)obj->pDerivedObj;
-                Shape* proj_hitbox = proj->hitbox;
+        if (obj->dele) continue;
 
-                if (proj->is_enemy_projectile) {
-                    node = next;
-                    continue;
-                }
+        // ---- find projectile (Projectile2) ----
+        Projectile2* proj = dynamic_cast<Projectile2*>(obj);
+        if (!proj) continue;
 
-                if (hitbox->overlap(*proj_hitbox)) {
+        // ignore if this projectile belongs to enemies
+        if (proj->is_enemy_projectile) 
+            continue;
 
-                    obj->dele = true;
+        // hitbox overlap check
+        if (hitbox->overlap(*proj->hitbox)) {
 
-                    hp--;
-                    got_hit = true;
-                    hit_time = al_get_time();
+            // projectile disappears
+            obj->dele = true;
 
-                    if (hp <= 0 && !dying) {
-                        alive = false;
-                        dying = true;
-                        state = ENEMY_DEAD;
-                        gif_status[ENEMY_DEAD]->display_index = 0;
-                        gif_status[ENEMY_DEAD]->done = false;
-                        death_time = al_get_time();
-                        return;
-                    }
-                }
+            // damage
+            hp--;
+            got_hit = true;
+            hit_time = al_get_time();
+
+            // death state transition
+            if (hp <= 0 && !dying) {
+                alive = false;
+                dying = true;
+                state = ENEMY_DEAD;
+
+                gif_status[ENEMY_DEAD]->display_index = 0;
+                gif_status[ENEMY_DEAD]->done = false;
+                death_time = al_get_time();
+                return;
             }
-            node = next;
         }
     }
 }
+
 
 Elements* New_Enemy(int label)
 {
