@@ -55,7 +55,6 @@ public:
 };
 
 void enemy_charater(int dx);
-Elements *New_Enemy2(int label);
 
 
 

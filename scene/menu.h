@@ -1,34 +1,35 @@
-#ifndef MENU_H_INCLUDED
-#define MENU_H_INCLUDED
-
+#pragma once
+#include "scene.h"
+#include "../global.h"
+#include "sceneManager.h"
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_font.h>
-#include "scene.h"
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
 
-// Sikka's version
-// TODO: adding button features in menu scene
-typedef struct Menu {
-    // Existing members, original part
+class Menu : public Scene {
+private:
     ALLEGRO_FONT* font;
     ALLEGRO_SAMPLE* song;
     ALLEGRO_SAMPLE_INSTANCE* sample_instance;
+
+    // Background
     ALLEGRO_BITMAP* background;
 
     // Title
     ALLEGRO_BITMAP* title_img;
-    float title_x, title_y;
+    float title_x;
+    float title_y;
 
-    // Start button
+    // Buttons
     ALLEGRO_BITMAP* btn_start;
     ALLEGRO_BITMAP* btn_start_hover;
 
-    // new update 16:57 2025/07/06
-    // About button 
     ALLEGRO_BITMAP* btn_about;
     ALLEGRO_BITMAP* btn_about_hover;
 
-    // Quit button
     ALLEGRO_BITMAP* btn_quit;
     ALLEGRO_BITMAP* btn_quit_hover;
 
@@ -43,12 +44,20 @@ typedef struct Menu {
     // Sound
     ALLEGRO_SAMPLE* click_sound;
 
-    // Button click logic
+    // Click delay
     bool button_clicked;
     int delay_counter;
-    int next_window;
+    SceneType next_window;
 
-} Menu;
+public:
+    Menu(int label);
+    virtual ~Menu();
 
-Scene *New_Menu(int label);
-#endif
+    virtual void Update() override;
+    virtual void Draw() override;
+    virtual void Destroy() override;
+
+private:
+    bool isHover(int x, int y, ALLEGRO_BITMAP* bmp);
+    bool isClicked();
+};

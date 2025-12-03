@@ -8,6 +8,7 @@
 #include "enemy3.h"
 #include "../shapes/Circle.h"
 #include "../scene/gamescene.h"
+#include "../scene/scene.h"
 #include "Character2.h"
 #include "charater.h"
 
@@ -127,23 +128,28 @@ void Projectile::Draw()
 
 void Projectile::interactEnemy(Elements* tar)
 {
-    Enemy* enemy = (Enemy*)tar;
-    if (enemy->hp <= 0) return;
+    Enemy* enemy = dynamic_cast<Enemy*>(tar);
+    if (!enemy) return;
 
-    enemy->hp -= damage;
-    if (enemy->hp <= 0) tar->dele = true;
+    if (enemy->hp > 0)
+        enemy->hp -= damage;
 
+    if (enemy->hp <= 0)
+        tar->dele = true;
+
+    // award owner EXP
     if (origin == 2)
         ((Character2*)owner)->levelup_points++;
     else
         ((Character*)owner)->levelup_points++;
 
-    printf("[Projectile] Enemy1 hit! Remaining HP = %d\n", enemy->hp);
+    printf("[Projectile] Enemy1 hit! HP = %d\n", enemy->hp);
 }
 
 void Projectile::interactEnemy2(Elements* tar)
 {
-    Enemy2* enemy = (Enemy2*)tar->pDerivedObj;
+    Enemy2* enemy = dynamic_cast<Enemy2*>(tar);
+    if (!enemy) return;
 
     if (enemy->hp > 0)
         enemy->hp -= damage;
@@ -156,12 +162,13 @@ void Projectile::interactEnemy2(Elements* tar)
     else
         ((Character*)owner)->levelup_points++;
 
-    printf("[Projectile] Enemy2 hit! Remaining HP = %d\n", enemy->hp);
+    printf("[Projectile] Enemy2 hit! HP = %d\n", enemy->hp);
 }
 
 void Projectile::interactEnemy3(Elements* tar)
 {
-    Enemy3* enemy = (Enemy3*)tar->pDerivedObj;
+    Enemy3* enemy = dynamic_cast<Enemy3*>(tar);
+    if (!enemy) return;
 
     if (enemy->hp > 0)
         enemy->hp -= damage;
@@ -174,5 +181,5 @@ void Projectile::interactEnemy3(Elements* tar)
     else
         ((Character*)owner)->levelup_points++;
 
-    printf("[Projectile] Enemy3 hit! Remaining HP = %d\n", enemy->hp);
+    printf("[Projectile] Enemy3 hit! HP = %d\n", enemy->hp);
 }

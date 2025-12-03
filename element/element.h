@@ -1,26 +1,21 @@
-#ifndef ELEMENT_H_INCLUDED
-#define ELEMENT_H_INCLUDED
+#pragma once
 #include "../global.h"
 
+class Scene;
+
 class Elements {
+public:
+    static Scene* scene;
+
+    int label;                    
+    int id;                       // scene 內 index
+    bool dele; 
 
 public:
-    void *pDerivedObj;
-    int label; // the class of the element
-    int id;    // the index in scene element list
-    int inter_len;
-    int inter_obj[MAX_ELEMENT]; // The label for the obj you want to interact
-    bool dele;                  // If the object need to be deleted
-
-    // interface for function
-    virtual void Draw();
-    virtual void Update();
-    virtual void Interact();
-
-    Elements(int label): pDerivedObj(this), label(label), id(0), inter_len(0), dele(false){}
+    Elements(int label);
     virtual ~Elements() = default;
+
+    virtual void Update() {}
+    virtual void Draw() {}
+    virtual void Interact() {}
 };
-
-Elements *New_Elements(int label);
-
-#endif

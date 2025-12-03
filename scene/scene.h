@@ -1,7 +1,9 @@
 #pragma once
+
 #include "../global.h"
 #include "../element/element.h"
 #include <vector>
+
 class Scene {
 public:
     int label;
@@ -13,6 +15,9 @@ protected:
 public:
     Scene(int label);
     virtual ~Scene();
+
+    bool next_scene_requested = false;
+    SceneType next_scene_type;
 
     // 基本行為（可被子類別 override）
     virtual void Update();

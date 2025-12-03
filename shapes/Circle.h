@@ -15,7 +15,6 @@ public:
 	void update_center_x(const double &x) { this->x = x; }
 	void update_center_y(const double &y) { this->y = y; }
 	const ShapeType getType() const { return ShapeType::CIRCLE; }
-public:
 	Circle() {}
 	Circle(double x, double y, double r) : x{x}, y{y}, r{r} {}
 	Circle(int x, int y, int r) :
@@ -23,6 +22,12 @@ public:
 		y{static_cast<double>(y)},
 		r{static_cast<double>(r)} {}
 	double x, y, r;
+
+	void update_position(double dx, double dy) override {
+		x += dx;
+		y += dy;
+	}
+
 };
 
 #endif

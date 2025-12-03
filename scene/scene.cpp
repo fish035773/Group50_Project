@@ -1,6 +1,5 @@
-
 #include "scene.h"
-#include "algorithm"
+#include <algorithm>
 
 Scene::Scene(int label)
     : label(label), scene_end(false) {}
@@ -10,17 +9,18 @@ Scene::~Scene() {
 }
 
 void Scene::Update() {
+    // 先更新所有元素
     for (auto* ele : elements) {
         if (ele && !ele->dele)
             ele->Update();
     }
+
     // 刪除 dele 的元素
     elements.erase(
         std::remove_if(elements.begin(), elements.end(),
             [](Elements* e) {
                 if (e->dele) {
-                    e->~Elements();
-                    delete e;
+                    delete e;       // ★ 只需要 delete
                     return true;
                 }
                 return false;
@@ -38,10 +38,7 @@ void Scene::Draw() {
 
 void Scene::Destroy() {
     for (auto* ele : elements) {
-        if (ele) {
-            ele->~Elements();
-            delete ele;
-        }
+        delete ele;     // ★ 只需要 delete
     }
     elements.clear();
 }
@@ -64,11 +61,9 @@ std::vector<Elements*> Scene::getAllElements() const {
 
 std::vector<Elements*> Scene::getElementsByLabel(int target_label) const {
     std::vector<Elements*> result;
-
     for (auto* ele : elements) {
         if (ele->label == target_label)
             result.push_back(ele);
     }
-
     return result;
 }

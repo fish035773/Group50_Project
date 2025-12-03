@@ -9,7 +9,8 @@
 #include "../shapes/Rectangle.h"
 #include "../algif5/algif.h"
 #include "../scene/gamescene.h"
-#include "../element/charater.h"
+#include "charater.h"
+#include "Character2.h"
 #include "../element/projectile2.h"
 #define maxhp 50
 /*
@@ -70,8 +71,7 @@ void Enemy::update_position(int dx, int dy){
     x += dx;
     y += dy;
 
-    hitbox->update_center_x(dx);
-    hitbox->update_center_y(dy);
+    hitbox->update_position(dx, dy);
 }
 
 int player_center_x1;
@@ -151,8 +151,9 @@ void Enemy::Update(){
             );
 
             //===========TODO===============
-            ((Projectile2 *)pro->pDerivedObj)->is_enemy_projectile = true;
-            scene->addElement(pro);
+            Projectile2* p = dynamic_cast<Projectile2*>(pro);
+            if (p) p->is_enemy_projectile = true;
+            scene->addElement(p);
             //====
 
             active_proj = true;
@@ -226,7 +227,7 @@ void Enemy::Interact()
 
         // hitbox overlap check
         if (hitbox->overlap(*proj->hitbox)) {
-
+            //printf("HURT\n");
             // projectile disappears
             obj->dele = true;
 

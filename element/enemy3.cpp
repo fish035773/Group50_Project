@@ -8,7 +8,8 @@
 #include "../shapes/Rectangle.h"
 #include "../algif5/algif.h"
 #include "../scene/gamescene.h"
-#include "../element/charater.h"
+#include "charater.h"
+#include "Character2.h"
 #include "../element/projectile3.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -37,7 +38,7 @@ Enemy3::Enemy3(int label): Elements(label){
     height = gif_status[0]->height;
 
     x = 500;
-    y = HEIGHT - height + 100;
+    y = HEIGHT - height - 20;
 
     hitbox = new Rectangle(
         x, y,
@@ -62,6 +63,17 @@ Enemy3::Enemy3(int label): Elements(label){
     chasing = false;
 }
 
+Enemy3::~Enemy3() {
+    if (hitbox) delete hitbox;
+
+    for (int i = 0; i < 4; i++) {
+        if (gif_status[i])
+            algif_destroy_animation(gif_status[i]);
+    }
+
+    if (atk_sound) al_destroy_sample_instance(atk_sound);
+}
+
 int player_center_x3;
 void enemy_charater3(int dx){
     player_center_x3 =  dx;
@@ -71,8 +83,7 @@ void Enemy3::update_position(int dx, int dy){
     x += dx;
     y += dy;
 
-    hitbox->update_center_x(dx);
-    hitbox->update_center_y(dy);
+    hitbox->update_position(dx, dy);
 }
 
 void Enemy3::Update(){
@@ -152,15 +163,16 @@ void Enemy3::Update(){
                 : x + 100;
 
             Elements* pro = new Projectile3(
-                Projectile2_L,
+                Projectile3_L,
                 projectile_x,
                 y + height / 2 - 20,
                 dir ? 5 : -5
             );
 
-            //===========TODO===============
-            ((Projectile3 *)pro->pDerivedObj)->is_enemy_projectile = true;
-            scene->addElement(pro);
+            Projectile3* p = dynamic_cast<Projectile3*>(pro);
+            if (p) p->is_enemy_projectile = true;
+            scene->addElement(p);
+            
             //====
             al_play_sample_instance(atk_sound);
             active_proj = true;
@@ -192,8 +204,9 @@ void Enemy3::Update(){
                 dir ? 5 : -5
             );
 
-            ((Projectile3*)pro->pDerivedObj)->is_enemy_projectile = true;
-            scene->addElement(pro);
+            Projectile3* p = dynamic_cast<Projectile3*>(pro);
+            if (p) p->is_enemy_projectile = true;
+            scene->addElement(p);
 
             al_play_sample_instance(throw_sound);
             active_proj = true;
@@ -217,7 +230,7 @@ void Enemy3::Draw(){
     if (!frame) return;
 
     int flags = dir ? 0 : ALLEGRO_FLIP_HORIZONTAL;
-    int draw_y = y + 50;
+    int draw_y = y;
  if (got_hit && al_get_time() - hit_time < 0.2)
         al_draw_tinted_bitmap(frame, al_map_rgba(255,0,0,200), x, draw_y, flags);
     else
@@ -240,7 +253,7 @@ void Enemy3::Interact(){
 
     for (Elements* obj : scene->getAllElements()) {
         if (obj->dele) continue;
-        Projectile3* proj = (Projectile3*)obj->pDerivedObj;
+        Projectile3* proj = dynamic_cast<Projectile3*>(obj);
 
         if ((obj->label == Projectile3_Right ||
                 obj->label == Projectile3_Left ||

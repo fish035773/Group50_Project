@@ -6,10 +6,7 @@
 #include "../element/element.h"
 #include "../element/charater.h"
 #include "../element/floor.h"
-#include "../element/teleport.h"
-#include "../element/tree.h"
 #include "../element/projectile.h"
-#include "../element/Ball.h"
 #include "../element/Character2.h"
 #include "../element/elements_factory.h"
 #include <allegro5/allegro_primitives.h>
@@ -72,7 +69,9 @@ GameScene::GameScene(int label)
     addElement(new Floor(Floor_L));
     addElement(new Character());
     addElement(new Character2());
-    addElement(new Ball(Ball_L));
+    printf("Added elements: \n");
+for (auto* e : elements)
+    printf(" - label = %d\n", e->label);
 
     printf("[GameScene] Constructor finished.\n");
 }
@@ -121,11 +120,10 @@ void GameScene::Update() {
             start_x = 500;
             spacing = 100;
             for (int i = 0; i < enemy_count; i++) {
-                Elements* enemy = New_Enemy(Enemy_L);
-                Enemy* e = (Enemy*)enemy->pDerivedObj;
+                 Enemy* e = new Enemy(Enemy_L);
                 e->x = start_x + i * spacing;
                 e->y = HEIGHT - e->height - 60;
-                addElement(enemy);
+                addElement(e);
             }
             break;
 
@@ -134,11 +132,10 @@ void GameScene::Update() {
             start_x = 400;
             spacing = 150;
             for (int i = 0; i < enemy_count; i++) {
-                Elements* enemy2 = New_Enemy2(Enemy2_L);
-                Enemy* e = (Enemy*)enemy2->pDerivedObj;
+                Enemy2* e = new Enemy2(Enemy2_L);
                 e->x = start_x + i * spacing;
                 e->y = HEIGHT - e->height - 60;
-                addElement(enemy2);
+                addElement(e);
             }
             break;
 
@@ -146,11 +143,10 @@ void GameScene::Update() {
             enemy_count = 1;
             start_x = 600;
             for (int i = 0; i < enemy_count; i++) {
-                Elements* enemy3 = New_Enemy3(Enemy3_L);
-                Enemy* e = (Enemy*)enemy3->pDerivedObj;
+                Enemy3* e = new Enemy3(Enemy3_L);
                 e->x = start_x;
                 e->y = HEIGHT - e->height - 60;
-                addElement(enemy3);
+                addElement(e);
             }
             break;
         }
@@ -279,6 +275,8 @@ void GameScene::Update() {
 
 
 void GameScene::Draw() {
+
+    //printf("GameScene::Draw elements size = %d\n", (int)elements.size());
 
     // === DRAW BACKGROUND ===
     al_clear_to_color(al_map_rgb(0, 0, 0));

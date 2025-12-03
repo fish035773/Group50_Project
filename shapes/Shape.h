@@ -24,6 +24,8 @@ public:
 	virtual void update_center_y(const double &y) = 0;
 	virtual const ShapeType getType() const = 0;
 	virtual ~Shape() {}
+	virtual void update_position(double dx, double dy) = 0;
+
 };
 
 #endif

@@ -6,10 +6,17 @@
 #include "../scene/gamescene.h" // for element label
 #include "../scene/sceneManager.h" // for scene variable
 
-Projectile3::Projectile3(int label, int x, int y, int v):  Elements(label), x(x), y(y), v(v){
+Projectile3::Projectile3(int label, int x, int y, int v)
+    : Elements(label), x(x), y(y), v(v)
+{
     img = al_load_bitmap("assets/image/projectile3.png");
-    width = al_get_bitmap_width(img);
-    height = al_get_bitmap_height(img);
+
+    if (!img) {
+        width = height = 16;
+    } else {
+        width = al_get_bitmap_width(img);
+        height = al_get_bitmap_height(img);
+    }
 
     damage = 5;
     is_enemy_projectile = true;
@@ -19,10 +26,6 @@ Projectile3::Projectile3(int label, int x, int y, int v):  Elements(label), x(x)
         y + height / 2,
         std::min(width, height) / 2
     );
-
-    inter_obj[inter_len++] = Floor_L;
-    inter_obj[inter_len++] = Character_L;
-    inter_obj[inter_len++] = Character2_L;
 }
 
 Projectile3::~Projectile3() {
@@ -90,14 +93,14 @@ void Projectile3::interact_Floor(Elements *tar) {
 void Projectile3::interact_Character(Elements *tar)
 {
     if (tar->label == Character_L) {
-        Character* p = (Character*)tar->pDerivedObj;
+        Character* p = dynamic_cast<Character*>(tar);
         if (p->hitbox->overlap(*hitbox) && p->blood > 0) {
             dele = true;
             p->blood -= damage;
         }
     }
     else if (tar->label == Character2_L) {
-        Character2* p2 = (Character2*)tar->pDerivedObj;
+        Character* p2 = dynamic_cast<Character*>(tar);
         if (p2->hitbox->overlap(*hitbox) && p2->blood > 0) {
             dele = true;
             p2->blood -= damage;

@@ -56,7 +56,7 @@ Character2::~Character2()
     delete hitbox;
 }
 
-void Character2::update()
+void Character2::Update()
 {
     if (blood <= 0) return; // dead
 
@@ -138,24 +138,28 @@ void Character2::update()
             if (gif_status[state]->done) state = STOP;
         } break;
 
-        case ATK:
-            if (gif_status[ATK]->display_index == 2 && !new_proj) {
+        case ATK: {
+            ALGIF_ANIMATION* a = gif_status[ATK];
+            int total = a->frames_count;
+
+            if (a->display_index == 2 && !new_proj) {
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-            if (gif_status[ATK]->done) {
-                state = is_jumping ? MOVE : STOP;
+
+            if (a->display_index >= total - 1) {
+                state = STOP;
                 new_proj = false;
                 atk_type = 0;
-                gif_status[ATK]->done = false; // 重設動畫結束旗標
-                gif_status[ATK]->display_index = 0; // 重設影格
+                a->display_index = 0;
                 break;
             }
             break;
+        }
     }
 }
 
-void Character2::draw()
+void Character2::Draw()
 {
     ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
     if (frame) {
@@ -163,7 +167,7 @@ void Character2::draw()
     }
 }
 
-void Character2::interact()
+void Character2::Interact()
 {
     // Placeholder
 }
@@ -174,7 +178,7 @@ void Character2::trigger_attack(int atk)
     Elements* pro = nullptr;
 
     switch (atk) {
-        case 1: // X attack
+        case 1:
             if (dir) pro = new Projectile(Projectile_J, x + width, y + 30, 2, this);
             else pro = new Projectile(Projectile_J, x - 150, y + 30, -2, this);
             scene->addElement(pro);

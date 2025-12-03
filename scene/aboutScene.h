@@ -1,13 +1,16 @@
-#ifndef ABOUTSCENE_H_INCLUDED
-#define ABOUTSCENE_H_INCLUDED
-
+#pragma once
 #include "scene.h"
+#include <allegro5/allegro.h>
 
-// Declare function-nya disini:
+class AboutScene : public Scene {
+private:
+    ALLEGRO_BITMAP* howtoplay_bg;
 
-Scene* New_AboutScene(int label);
-void about_scene_update(Scene* self);
-void about_scene_draw(Scene* self);
-void about_scene_destroy(Scene* self);
+public:
+    AboutScene(int label);
+    virtual ~AboutScene();
 
-#endif
+    virtual void Update() override;
+    virtual void Draw() override;
+    virtual void Destroy() override;
+};

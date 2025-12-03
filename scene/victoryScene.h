@@ -1,37 +1,41 @@
-#ifndef VICTORYSCENE_H_INCLUDED
-#define VICTORYSCENE_H_INCLUDED
-
+#pragma once
 #include "scene.h"
-#include "sceneManager.h"
 #include "../global.h"
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
+
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
-#include <stdbool.h>
 
-typedef struct _VictoryScene
-{
-    Scene *scene;
-    ALLEGRO_BITMAP *background;
-    ALLEGRO_SAMPLE *music;
-    ALLEGRO_SAMPLE_INSTANCE *sample_instance;
-    ALLEGRO_FONT *font;
-    ALLEGRO_BITMAP *you_win_img;
+class VictoryScene : public Scene {
+private:
+    ALLEGRO_BITMAP* background;
+    ALLEGRO_SAMPLE* music;
+    ALLEGRO_SAMPLE_INSTANCE* sample_instance;
+    ALLEGRO_FONT* font;
+
+    ALLEGRO_BITMAP* you_win_img;
+
     int timer;
 
-    // Return button:
-    ALLEGRO_BITMAP *return_btn_img;
-    ALLEGRO_BITMAP *return_btn_hover_img;
+    // Return button
+    ALLEGRO_BITMAP* return_btn_img;
+    ALLEGRO_BITMAP* return_btn_hover_img;
     int return_btn_x;
     int return_btn_y;
     bool return_hover;
-} VictoryScene;
 
-Scene *New_VictoryScene(int label);
-void victoryScene_update(Scene *self);
-void victoryScene_draw(Scene *self);
-void victoryScene_destroy(Scene *self);
+public:
+    VictoryScene(int label);
+    virtual ~VictoryScene();
 
-#endif
+    virtual void Update() override;
+    virtual void Draw() override;
+    virtual void Destroy() override;
+
+private:
+    bool isHover(int x, int y, ALLEGRO_BITMAP* bmp);
+    bool isClicked();
+};

@@ -16,10 +16,10 @@ public:
    // 建構子 / 解構子
     Character2();
     ~Character2();
-
-    void update();
-    void draw();
-    void interact();
+    
+    void Update() override;
+    void Draw() override;
+    void Interact() override;
     void update_position(int dx, int dy);
 
     // 成員變數

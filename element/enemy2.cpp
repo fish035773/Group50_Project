@@ -4,13 +4,13 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 #include "enemy2.h"
-
+#include "charater.h"
+#include "Character2.h"
 #include "projectile2.h"
 #include "../scene/sceneManager.h"
 #include "../shapes/Rectangle.h"
 #include "../algif5/algif.h"
 #include "../scene/gamescene.h"
-#include "../element/charater.h"
 #include "../element/projectile2.h"
 
 #define maxhp 50
@@ -60,6 +60,17 @@ Enemy2::Enemy2(int label): Elements(label){
     chasing = false;
 }
 
+Enemy2::~Enemy2() {
+    if (hitbox) delete hitbox;
+
+    for (int i = 0; i < 4; i++) {
+        if (gif_status[i])
+            algif_destroy_animation(gif_status[i]);
+    }
+
+    if (atk_sound) al_destroy_sample_instance(atk_sound);
+}
+
 int player_center_x2;
 void enemy2_charater(int dx){
     player_center_x2 =  dx;
@@ -69,8 +80,7 @@ void Enemy2::update_position(int dx, int dy){
     x += dx;
     y += dy;
 
-    hitbox->update_center_x(dx);
-    hitbox->update_center_y(dy);
+    hitbox->update_position(dx, dy);
 }
 
 void Enemy2::Update(){
@@ -145,8 +155,9 @@ void Enemy2::Update(){
             );
 
             //===========TODO===============
-            ((Projectile2 *)pro->pDerivedObj)->is_enemy_projectile = true;
-            scene->addElement(pro);
+             Projectile2* p = dynamic_cast<Projectile2*>(pro);
+            if (p) p->is_enemy_projectile = true;
+            scene->addElement(p);
             //====
 
             active_proj = true;
@@ -206,42 +217,36 @@ void Enemy2::Interact()
 
     for (Elements* obj : scene->getAllElements()) {
         if (obj->dele) continue;
+
         // hit by projectile
-        if (obj->label == Projectile2_Right ||
-            obj->label == Projectile2_Left ||
-            obj->label == Projectile2_L)
-        {
-            Projectile2* proj = (Projectile2*)obj->pDerivedObj;
-            Shape* proj_hitbox = proj->hitbox;
+        Projectile2* proj = dynamic_cast<Projectile2*>(obj);
+        if (!proj) continue;
 
-            if (proj->is_enemy_projectile) {
-                continue;
-            }
+        Shape* proj_hitbox = proj->hitbox;
 
-            if (hitbox->overlap(*proj_hitbox)) {
+        if (proj->is_enemy_projectile) {
+            continue;
+        }
 
-                obj->dele = true;
+        if (hitbox->overlap(*proj_hitbox)) {
 
-                hp--;
-                got_hit = true;
-                hit_time = al_get_time();
+            obj->dele = true;
 
-                if (hp <= 0 && !dying) {
-                    alive = false;
-                    dying = true;
-                    state = ENEMY2_DEAD;
-                    gif_status[ENEMY2_DEAD]->display_index = 0;
-                    gif_status[ENEMY2_DEAD]->done = false;
-                    death_time = al_get_time();
-                    return;
-                }
+            hp--;
+            got_hit = true;
+            hit_time = al_get_time();
+
+            if (hp <= 0 && !dying) {
+                alive = false;
+                dying = true;
+                state = ENEMY2_DEAD;
+                gif_status[ENEMY2_DEAD]->display_index = 0;
+                gif_status[ENEMY2_DEAD]->done = false;
+                death_time = al_get_time();
+                return;
             }
         }
     }
-}
-Elements* New_Enemy2(int label)
-{
-    return new Enemy2(label);
 }
 
 

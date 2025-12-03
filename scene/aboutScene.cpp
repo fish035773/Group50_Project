@@ -3,60 +3,49 @@
 #include "../global.h"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
 
-Scene* New_AboutScene(int label)
+AboutScene::AboutScene(int label)
+    : Scene(label), howtoplay_bg(nullptr)
 {
-    Scene* pObj = New_Scene(label);
-
-    // Load background image
-    ALLEGRO_BITMAP* howtoplay_bg = al_load_bitmap("assets/image/howtoplay.png");
-
-    // Simpan di pObj->pDerivedObj (boleh, atau langsung pakai global static variable)
-    pObj->pDerivedObj = howtoplay_bg;
-
-    // Assign function
-    pObj->Update = about_scene_update;
-    pObj->Draw = about_scene_draw;
-    pObj->Destroy = about_scene_destroy;
-
-    return pObj;
+    howtoplay_bg = al_load_bitmap("assets/image/howtoplay.png");
 }
 
-void about_scene_update(Scene* self)
+AboutScene::~AboutScene()
 {
-    // Tekan ESC atau mouse click → balik ke Menu
-    if (key_state[ALLEGRO_KEY_ESCAPE] || mouse_state[1])
-    {
+    Destroy();
+}
+
+void AboutScene::Update()
+{
+    // ESC 或滑鼠左鍵 → 回到 Menu
+    if (key_state[ALLEGRO_KEY_ESCAPE] || mouse_state[1]) {
         create_scene(Menu_L);
+        scene_end = true;
     }
 }
 
-void about_scene_draw(Scene* self)
+void AboutScene::Draw()
 {
-    // Clear screen
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
-    ALLEGRO_BITMAP* howtoplay_bg = (ALLEGRO_BITMAP*)(self->pDerivedObj);
-
-    // Draw scaled supaya FIT ke window
-    al_draw_scaled_bitmap(howtoplay_bg,
-        0, 0,
-        al_get_bitmap_width(howtoplay_bg), al_get_bitmap_height(howtoplay_bg),
-        0, 0,
-        WIDTH, HEIGHT,
-        0
-    );
+    if (howtoplay_bg) {
+        al_draw_scaled_bitmap(
+            howtoplay_bg,
+            0, 0,
+            al_get_bitmap_width(howtoplay_bg),
+            al_get_bitmap_height(howtoplay_bg),
+            0, 0,
+            WIDTH,
+            HEIGHT,
+            0
+        );
+    }
 }
 
-void about_scene_destroy(Scene* self)
+void AboutScene::Destroy()
 {
-    ALLEGRO_BITMAP* howtoplay_bg = (ALLEGRO_BITMAP*)(self->pDerivedObj);
-
-    if (howtoplay_bg)
+    if (howtoplay_bg) {
         al_destroy_bitmap(howtoplay_bg);
-
-    free(self);
+        howtoplay_bg = nullptr;
+    }
 }

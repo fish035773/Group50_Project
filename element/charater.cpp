@@ -56,7 +56,7 @@ Character::~Character()
     delete hitbox;
 }
 
-void Character::update()
+void Character::Update()
 {
     if (blood <= 0) return; // dead
     
@@ -110,7 +110,7 @@ void Character::update()
     }
 
     // State machine
-    printf("Current State: %d\n", state);
+    //printf("Current State: %d\n", state);
     switch (state) {
         case STOP:
             if (key_state[ALLEGRO_KEY_X] && cool_X == 0) { state = ATK1; atk_type = 1; new_proj = false; cool_X = cool_x; }
@@ -158,13 +158,15 @@ void Character::update()
                 break;
             }
 
+            /*
             printf("[DEBUG] ATK1 state: display_index=%d, done=%d, new_proj=%d\n",
                    gif_status[ATK1]->display_index, gif_status[ATK1]->done, new_proj);
+            */
             break;
     }
 }
 
-void Character::draw()
+void Character::Draw()
 {
     ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
     if (frame) {
@@ -172,7 +174,7 @@ void Character::draw()
     }
 }
 
-void Character::interact()
+void Character::Interact()
 {
     // Placeholder
 }

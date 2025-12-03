@@ -1,21 +1,9 @@
-#ifndef SCENEMANAGER_H_INCLUDED
-#define SCENEMANAGER_H_INCLUDED
-#include "scene.h"
+#pragma once
+#include "../global.h"
+class Scene;
 
-typedef enum SceneType
-{
-    Menu_L = 0,
-    GameScene_L = 1,
-    StartScene_L = 2,
-    VictoryScene_L = 3,
-    DeathScene_L = 4,
-    CreditScene_L = 5,
-    // new update 16:57 2025/07/06
-    //About scene
-    About_L = 6    
-} SceneType;
-extern Scene *scene;
-extern int window;
+// 當前場景（指標指向 Scene 的子類）
+extern Scene* current_scene;
 
+// 建立場景（會自動 delete 舊場景）
 void create_scene(SceneType type);
-#endif

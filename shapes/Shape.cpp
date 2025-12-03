@@ -65,3 +65,4 @@ bool Circle::overlap(const Shape &s) const {
 	}
 	GAME_ASSERT(false, "Unknown ShapeType.");
 }
+

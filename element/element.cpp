@@ -1,8 +1,8 @@
 #include "element.h"
-/*
-   [Element function]
-*/
+#include "../scene/sceneManager.h"
+Scene* Elements::scene = nullptr;
 
-Elements* New_Elements(int label) {
-    return new Elements(label);
+Elements::Elements(int label)
+    : label(label), id(0), dele(false)
+{
 }

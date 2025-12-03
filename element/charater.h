@@ -40,9 +40,10 @@ public:
     ~Character();
 
     // 成員函式
-    void update();
-    void draw();
-    void interact();
+    void Update() override;
+    void Draw() override;
+    void Interact() override;
+
     void update_position(int dx, int dy);
 private:
     void trigger_attack(int atk_type);

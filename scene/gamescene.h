@@ -12,23 +12,23 @@
    [Element Types] — Keep enum
 */
 enum EleType {
-    Floor_L,
-    Teleport_L,
-    Tree_L,
-    Character_L,
-    Ball_L,
-    Character2_L,
-    Projectile_L,
-    Projectile_K,
-    Projectile_J,
-    Enemy_L,
-    Projectile_V,
-    Projectile_C,
-    Projectile_X,
-    Projectile2_L,
-    Projectile3_L,
-    Enemy3_L,
-    Enemy2_L
+   Floor_L,
+   Teleport_L,
+   Tree_L,
+   Character_L,
+   Ball_L,
+   Character2_L,
+   Projectile_L,
+   Projectile_K,
+   Projectile_J,
+   Enemy_L,
+   Projectile_V,
+   Projectile_C,
+   Projectile_X,
+   Projectile2_L,
+   Projectile3_L,
+   Enemy3_L,
+   Enemy2_L
 };
 
 /*

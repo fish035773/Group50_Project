@@ -20,8 +20,16 @@ public:
 		double dy = y - center_y();
 		y1 += dy, y2 += dy;
 	}
+
+	void update_position(double dx, double dy) {
+		x1 += dx;
+		x2 += dx;
+		y1 += dy;
+		y2 += dy;
+	}
+
 	const ShapeType getType() const { return ShapeType::RECTANGLE; }
-public:
+
 	Rectangle() {}
 	Rectangle(double x1, double y1, double x2, double y2) : x1{x1}, y1{y1}, x2{x2}, y2{y2} {}
 	Rectangle(int x1, int y1, int x2, int y2) :
