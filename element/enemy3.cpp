@@ -112,7 +112,7 @@ void enemy_charater3(int dx){
 }
 void Enemy3_update(Elements *self) {
     Enemy3 *enemy3 = (Enemy3 *)(self->pDerivedObj);
-    extern Elements *player;
+   
     int speed = 5;
     
 
