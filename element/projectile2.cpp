@@ -16,6 +16,7 @@ Elements *New_Projectile2(int label, int x, int y, int v)
     Elements *pObj = New_Elements(label);
     // setting derived object member
     pDerivedObj->img = al_load_bitmap("assets/image/projectile2.png");
+    //printf("[Projectile2] Loaded image for label=%d\n", label);
     pDerivedObj->width = al_get_bitmap_width(pDerivedObj->img);
     pDerivedObj->height = al_get_bitmap_height(pDerivedObj->img);
     pDerivedObj->x = x;

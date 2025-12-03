@@ -13,6 +13,7 @@ public:
     ~Projectile();
     enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };
     int x, y;
+    int label;
     int width, height;
     ALLEGRO_BITMAP* img;
     // core behaviour (call from wrapper function)
@@ -35,7 +36,7 @@ private:
     void interactCharacter2(Elements* tar);
 
 private:
-    int label;          // Projectile label (Projectile_X ...)
+              // Projectile label (Projectile_X ...)
            
     
     int v;              // velocity (x direction)

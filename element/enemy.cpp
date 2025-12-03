@@ -94,7 +94,7 @@ void Enemy_update(Elements *self)
 {
     // use the idea of finite state machine to deal with different state
     Enemy *enemy = ((Enemy *)(self->pDerivedObj));
-    extern Elements *player;
+   
   
     if(enemy->hp > 0){
     int speed = 2;

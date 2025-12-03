@@ -114,14 +114,14 @@ void Enemy3_update(Elements *self) {
     Enemy3 *enemy3 = (Enemy3 *)(self->pDerivedObj);
     extern Elements *player;
     int speed = 5;
-    printf("Enemy3_update\n");
+    
 
 
     int enemy3_center_x = enemy3->x + enemy3->width / 2;
    
     int dx = player_center_x3 - enemy3_center_x;
 
-     printf("Enemy3_update _ __A\n");
+     
     double current_time = al_get_time();
     if (!enemy3->can_attack && current_time - enemy3->spawn_time >= 1.0)
         enemy3->can_attack = true;
@@ -144,7 +144,7 @@ void Enemy3_update(Elements *self) {
         }
     }
 
-    printf("Enemy3_update _ __B\n");
+    
     if (enemy3->state == ENEMY3_DEAD) {
         if (enemy3->death_time == 0)
             enemy3->death_time = al_get_time();
@@ -186,7 +186,7 @@ void Enemy3_update(Elements *self) {
             return;
         }
     }
-    printf("Enemy3_update _ __C\n");
+    
 
     // If chasing is true, move toward player
     enemy3->dir = dx >= 0;
@@ -271,7 +271,7 @@ void Enemy3_update(Elements *self) {
 void Enemy3_draw(Elements *self) {
     Enemy3 *enemy3 = (Enemy3 *)(self->pDerivedObj);
     ALLEGRO_BITMAP *frame = algif_get_bitmap(enemy3->gif_status[enemy3->state], al_get_time());
-    printf("draw_A\n");
+    
     if(enemy3->hp > 0){
     if (frame) {
         int flags = enemy3->dir ? 0 : ALLEGRO_FLIP_HORIZONTAL;
@@ -286,7 +286,7 @@ void Enemy3_draw(Elements *self) {
         }
     }
 
-    printf("draw_B");
+    
     // HP bar (adjust Y to match)
     int bar_width = 100;
     int bar_height = 10;

@@ -100,7 +100,7 @@ Scene *New_GameScene(int label)
 
 
     // Load round BGM
-    pDerivedObj->round_bgm[0] = al_load_sample("assets/sound/game_music.mp3");
+    pDerivedObj->round_bgm[0] = al_load_sample("assets/sound/bgm_round1.mp3");
     pDerivedObj->round_bgm[1] = al_load_sample("assets/sound/bgm_round2.mp3");
     pDerivedObj->round_bgm[2] = al_load_sample("assets/sound/bgm_round3.mp3");
 
@@ -470,14 +470,14 @@ void game_scene_update(Scene *self)
             al_attach_sample_instance_to_mixer(gs->round_bgm_instance, al_get_default_mixer());
             al_set_sample_instance_gain(gs->round_bgm_instance, 1.0f);
             al_play_sample_instance(gs->round_bgm_instance);
-            printf("[GameScene] Round %d BGM playing.\n", gs->round_counter);
+           // printf("[GameScene] Round %d BGM playing.\n", gs->round_counter);
         }
 
 
         // PLAY NEW ROUND SOUND (THIS IS THE FIX!)
         if (gs->round_counter <= 3 && gs->round_sounds[gs->round_counter - 1]) {
             al_play_sample(gs->round_sounds[gs->round_counter - 1], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-            printf("[GameScene] Round %d SOUND playing.\n", gs->round_counter);
+           // printf("[GameScene] Round %d SOUND playing.\n", gs->round_counter);
         }
 
 
@@ -489,7 +489,7 @@ void game_scene_update(Scene *self)
         gs->round_locked = false;
 
 
-        printf("[GameScene] Advanced to Round %d.\n", gs->round_counter);
+       // printf("[GameScene] Advanced to Round %d.\n", gs->round_counter);
             
         }
     }

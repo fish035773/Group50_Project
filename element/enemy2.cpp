@@ -63,6 +63,8 @@ Elements *New_Enemy2(int label)
     pObj->Update = Enemy2_update;
     pObj->Interact = Enemy2_interact;
     pObj->Destroy = Enemy2_destroy;
+    
+    // initial other member
 
 
     pDerivedObj->hp = maxhp ;              
@@ -71,12 +73,13 @@ Elements *New_Enemy2(int label)
     pDerivedObj->hit_time = 0;
     pDerivedObj->dying = false;
     pDerivedObj->death_time = 0;
+   
 
 
     pDerivedObj->spawn_time = al_get_time();
     pDerivedObj->can_attack = false;
     pDerivedObj->chasing = false;
-    printf("enemy2 inited");
+    
     return pObj;
 }
 int player_center_x2;
@@ -88,7 +91,7 @@ void Enemy2_update(Elements *self)
 {
     // use the idea of finite state machine to deal with different state
     Enemy2 *enemy2 = ((Enemy2 *)(self->pDerivedObj));
-    extern Elements *player;
+    
     if(enemy2->hp > 0){
 
     int speed = 3;
@@ -105,6 +108,7 @@ void Enemy2_update(Elements *self)
     double current_time = al_get_time();
     if (!enemy2->can_attack && current_time - enemy2->spawn_time >= 1.0) {
         enemy2->can_attack = true; // allow attacking after 1 second
+        
     }
 
 
@@ -154,6 +158,7 @@ void Enemy2_update(Elements *self)
         enemy2->dir = (dx >= 0);
         int move_speed = (dx > 0) ? speed : -speed;
         _Enemy2_update_position(self, move_speed, 0);
+        
     } else {
         // Normal patrol between 400 and 700
         if (enemy2->dir == false) {
@@ -200,6 +205,7 @@ void Enemy2_update(Elements *self)
             ((Projectile2 *)pro->pDerivedObj)->is_enemy_projectile = true;
             _Register_elements(scene, pro);
             enemy2->active_proj = true;
+            printf("[Enemy2] Launched projectile at frame 2\n");
         }
         // When attack animation finishes, transition based on distance
         if (enemy2->gif_status[ENEMY2_ATK]->done)
@@ -217,6 +223,7 @@ void Enemy2_update(Elements *self)
             else {
                 enemy2->chasing = true; // still chasing
                 enemy2->state = ENEMY2_MOVE; // go chase the player
+                printf("[Enemy2] chase");
             }
         }
     }
@@ -260,6 +267,7 @@ void Enemy2_draw(Elements *self)
     if (enemy2->state == ENEMY2_ATK && enemy2->gif_status[enemy2->state]->display_index == 2)
     {
         al_play_sample_instance(enemy2->atk_sound);
+        printf("play sound");
     }
 
 
@@ -297,6 +305,7 @@ void _Enemy2_update_position(Elements *self, int dx, int dy)
     Shape *hitbox = enemy2->hitbox;
     hitbox->update_center_x(hitbox, dx);
     hitbox->update_center_y(hitbox, dy);
+   // printf("Enemy2 position updated to (%d, %d)\n", enemy2->x, enemy2->y);
 }
 
 
@@ -314,6 +323,7 @@ void Enemy2_interact(Elements *self)
         while (node != NULL) {
             Elements *obj = node->ele;
             EPNode *next_node = node->next;
+         //   printf("[Enemy2] Checking interaction with element label=%d\n", obj->label);
 
 
             if (obj->label == Projectile2_Right || obj->label == Projectile2_Left || obj->label == Projectile2_L) {
@@ -351,7 +361,7 @@ void Enemy2_interact(Elements *self)
                         enemy2->gif_status[ENEMY2_DEAD]->display_index = 0;
                         enemy2->gif_status[ENEMY2_DEAD]->done = false;
                         enemy2->death_time = al_get_time();
-                        return;
+                       // printf("[Enemy2] Enemy2 died\n");
                     }
                     return;
                 }
