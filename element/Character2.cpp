@@ -112,7 +112,7 @@ void Character2::update()
             state = ATK;
             trigger_attack(atk_type);
             new_proj = true;
-            printf("[Character2::update] Triggered attack type=%d while jumping\n", atk_type);
+            //printf("[Character2::update] Triggered attack type=%d while jumping\n", atk_type);
         }
         return;
     }
@@ -121,7 +121,7 @@ void Character2::update()
     switch (state) {
         case STOP:
             if (key_state[ALLEGRO_KEY_J] && cool_J == 0) { state = ATK; atk_type = 1; new_proj = false; cool_J = cool_j;  }
-            else if (key_state[ALLEGRO_KEY_K] && cool_K == 0) { state = ATK; atk_type = 2; new_proj = false; cool_K = cool_k;printf("[Character2::update] STOP state: switching to ATK type=2\n"); }
+            else if (key_state[ALLEGRO_KEY_K] && cool_K == 0) { state = ATK; atk_type = 2; new_proj = false; cool_K = cool_k; }
             else if (key_state[ALLEGRO_KEY_L] && cool_L == 0) { state = ATK; atk_type = 3; new_proj = false; cool_L = cool_l; }
             else if (key_state[ALLEGRO_KEY_LEFT]) { dir = false; state = MOVE; }
             else if (key_state[ALLEGRO_KEY_RIGHT] || key_state[ALLEGRO_KEY_UP] || key_state[ALLEGRO_KEY_DOWN]) { dir = true; state = MOVE; }
@@ -199,7 +199,7 @@ void Character2::trigger_attack(int atk)
             // --- debug print ---
             if (pro && pro->pDerivedObj) {
                 Projectile* p = (Projectile*)pro->pDerivedObj;
-                printf("[Character2::trigger_attack] J attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
+               // printf("[Character2::trigger_attack] J attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
             } else {
                 printf("[Character2::trigger_attack] J attack projectile creation FAILED\n");
             }
@@ -212,32 +212,30 @@ void Character2::trigger_attack(int atk)
                 _Register_elements(scene, pro);
                
                 Elements* tail1 = New_Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
-                printf("[Character2::trigger_attack] K attack tail1 projectile created\n");
+               // printf("[Character2::trigger_attack] K attack tail1 projectile created\n");
                 Elements* tail2 = New_Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
-                printf("[Character2::trigger_attack] K attack tail2 projectile created\n");
+                //printf("[Character2::trigger_attack] K attack tail2 projectile created\n");
                 _Register_elements(scene, tail1);
-                printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
+               // printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
                 _Register_elements(scene, tail2);
-                printf("[Character2::trigger_attack] K attack tail2 projectile registered\n");
+               // printf("[Character2::trigger_attack] K attack tail2 projectile registered\n");
 
-                printf("[Character2::trigger_attack] K attack projectiles created: main=%p, tail1=%p, tail2=%p\n",
-                       pro, tail1, tail2);
+               
             } else {
                 pro = New_Projectile(Projectile_K, x - 120, y + 80, -5, this);
-                printf("[Character2::trigger_attack] K attack main projectile created\n");
+              //  printf("[Character2::trigger_attack] K attack main projectile created\n");
                 _Register_elements(scene, pro);
-                printf("[Character2::trigger_attack] K attack main projectile created\n");
+               
                 Elements* tail1 = New_Projectile(Projectile_K, x - 100, y + 15, -3, this);
-                printf("[Character2::trigger_attack] K attack tail1 projectile created\n");
+              
                 Elements* tail2 = New_Projectile(Projectile_K, x - 100, y + 125, -3, this);
-                printf("[Character2::trigger_attack] K attack tail2 projectile created\n");
+              
                 _Register_elements(scene, tail1);
-                printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
+               // printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
                 _Register_elements(scene, tail2);
-                printf("[Character2::trigger_attack] K attack tail2 projectile registered\n");
+                //printf("[Character2::trigger_attack] K attack tail2 projectile registered\n");
 
-                printf("[Character2::trigger_attack] K attack projectiles created: main=%p, tail1=%p, tail2=%p\n",
-                       pro, tail1, tail2);
+              
             }
             break;
 
@@ -249,7 +247,7 @@ void Character2::trigger_attack(int atk)
             
             break;
     }
-    printf("[Character2::trigger_attack] total projectiles in container: %d\n", scene->ele_num);
+   
 
 }
 

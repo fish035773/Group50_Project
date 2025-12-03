@@ -118,7 +118,7 @@ void creditScene_update(Scene *self)
         obj->scroll_pos = HEIGHT;
         printf("[CreditScene] Restarting scroll.\n");
 
-        // Auto return ke menu setelah ~15 detik
+        // Auto return to menu after one full scroll
         if (obj->scene_timer > 15.0f) {
             self->scene_end = true;
             window = Menu_L;

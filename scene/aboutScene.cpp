@@ -13,8 +13,8 @@ Scene* New_AboutScene(int label)
 
     // Load background image
     ALLEGRO_BITMAP* howtoplay_bg = al_load_bitmap("assets/image/howtoplay.png");
-
-    // Simpan di pObj->pDerivedObj (boleh, atau langsung pakai global static variable)
+    
+    // Assign derived object
     pObj->pDerivedObj = howtoplay_bg;
 
     // Assign function

@@ -63,7 +63,7 @@ Elements *New_Enemy2(int label)
     pObj->Update = Enemy2_update;
     pObj->Interact = Enemy2_interact;
     pObj->Destroy = Enemy2_destroy;
-    printf("enemy2 created\n");
+    
     // initial other member
 
 
@@ -73,13 +73,13 @@ Elements *New_Enemy2(int label)
     pDerivedObj->hit_time = 0;
     pDerivedObj->dying = false;
     pDerivedObj->death_time = 0;
-    printf("[enemy2] hp inited");
+   
 
 
     pDerivedObj->spawn_time = al_get_time();
     pDerivedObj->can_attack = false;
     pDerivedObj->chasing = false;
-    printf("enemy2 inited");
+    
     return pObj;
 }
 int player_center_x2;
@@ -91,7 +91,7 @@ void Enemy2_update(Elements *self)
 {
     // use the idea of finite state machine to deal with different state
     Enemy2 *enemy2 = ((Enemy2 *)(self->pDerivedObj));
-    extern Elements *player;
+    
     if(enemy2->hp > 0){
 
     int speed = 3;
@@ -108,7 +108,7 @@ void Enemy2_update(Elements *self)
     double current_time = al_get_time();
     if (!enemy2->can_attack && current_time - enemy2->spawn_time >= 1.0) {
         enemy2->can_attack = true; // allow attacking after 1 second
-        printf("[Enemy2] can_attack set to true\n");
+        
     }
 
 
@@ -158,7 +158,7 @@ void Enemy2_update(Elements *self)
         enemy2->dir = (dx >= 0);
         int move_speed = (dx > 0) ? speed : -speed;
         _Enemy2_update_position(self, move_speed, 0);
-        printf("[Enemy2] Chasing player, moving %d\n", move_speed);
+        
     } else {
         // Normal patrol between 400 and 700
         if (enemy2->dir == false) {
