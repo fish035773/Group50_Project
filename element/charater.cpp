@@ -192,7 +192,7 @@ void Character::trigger_attack(int atk)
             // --- debug print ---
             if (pro && pro->pDerivedObj) {
                 Projectile* p = (Projectile*)pro->pDerivedObj;
-                printf("[DEBUG] X attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
+               // printf("[DEBUG] X attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
             } else {
                 printf("[DEBUG] X attack projectile creation FAILED\n");
             }
@@ -207,8 +207,7 @@ void Character::trigger_attack(int atk)
                 _Register_elements(scene, tail1);
                 _Register_elements(scene, tail2);
 
-                printf("[DEBUG] C attack projectiles created: main=%p, tail1=%p, tail2=%p\n",
-                       pro, tail1, tail2);
+              
             } else {
                 pro = New_Projectile(Projectile_C, x - 120, y + 80, -5, this);
                 _Register_elements(scene, pro);
@@ -217,8 +216,7 @@ void Character::trigger_attack(int atk)
                 _Register_elements(scene, tail1);
                 _Register_elements(scene, tail2);
 
-                printf("[DEBUG] C attack projectiles created: main=%p, tail1=%p, tail2=%p\n",
-                       pro, tail1, tail2);
+               
             }
             break;
 

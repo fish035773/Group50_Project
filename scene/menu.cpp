@@ -16,13 +16,46 @@ void menu_update(Scene *self);
 void menu_draw(Scene *self);
 void menu_destroy(Scene *self);
 
+void draw_glow_text(
+    ALLEGRO_FONT* font,
+    const char* text,
+    float x, float y,
+    float glow_size        // 推薦值：4 ~ 12
+) {
+    // 光暈顏色（冰藍 + 半透明）
+    ALLEGRO_COLOR glow = al_map_rgba(160, 220, 255, 90);
+    ALLEGRO_COLOR glow2 = al_map_rgba(120, 240, 255, 70); // 第二層顏色
+
+    // ---- 光暈外層（大範圍） ----
+    for (int i = 1; i <= glow_size; i++) {
+        float o = i * 0.5;   // 擴散系數
+        al_draw_text(font, glow2, x - o, y - o, 0, text);
+        al_draw_text(font, glow2, x + o, y - o, 0, text);
+        al_draw_text(font, glow2, x - o, y + o, 0, text);
+        al_draw_text(font, glow2, x + o, y + o, 0, text);
+    }
+
+    // ---- 光暈內層（集中亮） ----
+    for (int i = 1; i <= glow_size / 2; i++) {
+        float o = i * 0.1;
+        al_draw_text(font, glow, x - o, y, 0, text);
+        al_draw_text(font, glow, x + o, y, 0, text);
+        al_draw_text(font, glow, x, y - o, 0, text);
+        al_draw_text(font, glow, x, y + o, 0, text);
+    }
+
+    // ---- 主文字（亮白） ----
+    al_draw_text(font, al_map_rgb(255, 255, 255), x, y, 0, text);
+}
+
 Scene* New_Menu(int label)
 {
     Menu* pDerivedObj = (Menu*)malloc(sizeof(Menu));
     Scene* pObj = New_Scene(label);
 
-    pDerivedObj->font = al_load_ttf_font("assets/font/pirulen.ttf", 18, 0);
+    pDerivedObj->font = al_load_ttf_font("assets/font/pirulen.ttf", 50, 0);
     pDerivedObj->background = al_load_bitmap("assets/image/main_menu.png");
+    
 
     pDerivedObj->title_img = al_load_bitmap("assets/image/title.png");
     pDerivedObj->btn_start = al_load_bitmap("assets/image/start.png");
@@ -125,22 +158,30 @@ void menu_draw(Scene* self)
 
     // START BUTTON
     if (mx >= Obj->btn_x && mx <= Obj->btn_x + button_target_width && my >= Obj->btn_start_y && my <= Obj->btn_start_y + button_target_height)
-        al_draw_bitmap(Obj->btn_start_hover, Obj->btn_x, Obj->btn_start_y, 0);
+        //al_draw_bitmap(Obj->btn_start_hover, Obj->btn_x, Obj->btn_start_y, 0);
+       draw_glow_text(Obj->font, "START", Obj->btn_x+10 , Obj->btn_start_y , 4);
+
+
     else
-        al_draw_bitmap(Obj->btn_start, Obj->btn_x, Obj->btn_start_y, 0);
+       // al_draw_bitmap(Obj->btn_start, Obj->btn_x, Obj->btn_start_y, 0);
+       al_draw_text(Obj->font, al_map_rgb(255, 255, 255), Obj->btn_x+10, Obj->btn_start_y, 0, "START");
     // new update 16:57 2025/07/06
     // ABOUT BUTTON
     if (mx >= Obj->btn_about_x && mx <= Obj->btn_about_x + button_target_width &&
         my >= Obj->btn_about_y && my <= Obj->btn_about_y + button_target_height)
-        al_draw_bitmap(Obj->btn_about_hover, Obj->btn_about_x, Obj->btn_about_y, 0);
+       // al_draw_bitmap(Obj->btn_about_hover, Obj->btn_about_x, Obj->btn_about_y, 0);
+        draw_glow_text(Obj->font, "ABOUT", Obj->btn_about_x+10 , Obj->btn_about_y , 4);
     else
-        al_draw_bitmap(Obj->btn_about, Obj->btn_about_x, Obj->btn_about_y, 0);
+        //al_draw_bitmap(Obj->btn_about, Obj->btn_about_x, Obj->btn_about_y, 0);
+        al_draw_text(Obj->font, al_map_rgb(255, 255, 255), Obj->btn_x+10, Obj->btn_about_y, 0, "ABOUT");
 
     // QUIT BUTTON
     if (mx >= Obj->btn_quit_x && mx <= Obj->btn_quit_x + button_target_width && my >= Obj->btn_quit_y && my <= Obj->btn_quit_y + button_target_height)
-        al_draw_bitmap(Obj->btn_quit_hover, Obj->btn_quit_x, Obj->btn_quit_y, 0);
+        //al_draw_bitmap(Obj->btn_quit_hover, Obj->btn_quit_x, Obj->btn_quit_y, 0);
+        draw_glow_text(Obj->font, "QUIT", Obj->btn_x+10 , Obj->btn_quit_y , 4);
     else
-        al_draw_bitmap(Obj->btn_quit, Obj->btn_quit_x, Obj->btn_quit_y, 0);
+        //al_draw_bitmap(Obj->btn_quit, Obj->btn_quit_x, Obj->btn_quit_y, 0);
+        al_draw_text(Obj->font, al_map_rgb(255, 255, 255), Obj->btn_x+10, Obj->btn_quit_y, 0, "QUIT");
 
     // Play music
     al_play_sample_instance(Obj->sample_instance);
