@@ -17,11 +17,12 @@
 #include "../element/enemy.h"
 #include "../element/enemy2.h"
 #include "../element/enemy3.h"
+#include <algorithm>
 #define FPS 60
 #define barlong 510
 Scene *current_game_scene = NULL; //pointer to reference active scene
 int i = 0;
-
+int enemy_count = 0;
 GameScene::GameScene(int label)
     : Scene(label)
 {
@@ -83,11 +84,18 @@ void GameScene::Update() {
     for (auto* ele : elements)
         ele->Interact();
 
-    // remove elements marked delete
-    for (auto* ele : elements) {
-        if (ele->dele)
-            Scene::removeElement(ele);
-    }
+        // SAFE DELETE ELEMENTS
+        elements.erase(
+            std::remove_if(elements.begin(), elements.end(),
+                [&](Elements* ele){
+                    if (ele->dele) {
+                        delete ele;
+                        return true;
+                    }
+                    return false;
+                }),
+            elements.end()
+    );
 
     // =====================================================
     // 1. ROUND DISPLAY PHASE ("ROUND X" 從畫面淡出)
@@ -109,8 +117,6 @@ void GameScene::Update() {
     // =====================================================
     if (!enemies_spawned && !round_locked) {
         printf("[GameScene] Spawning enemies for round %d...\n", round_counter);
-
-        int enemy_count = 0;
         int start_x = 0;
         int spacing = 0;
 
@@ -162,25 +168,45 @@ void GameScene::Update() {
     if (enemies_spawned && !enemy_defeated) {
         int enemy_label = 0;
         switch (round_counter) {
-        case 1: enemy_label = Enemy_L; break;
-        case 2: enemy_label = Enemy2_L; break;
-        case 3: enemy_label = Enemy3_L; break;
+            case 1: enemy_label = Enemy_L; break;
+            case 2: enemy_label = Enemy2_L; break;
+            case 3: enemy_label = Enemy3_L; break;
         }
 
         bool all_defeated = true;
-
+    
         for (Elements* ele : elements) {
-            if (ele->label == enemy_label) {
-                Enemy* e = dynamic_cast<Enemy*>(ele);
-
-                if (e && e->hp > 0) {
-                    all_defeated = false;
+            switch (ele->label) {
+                case Enemy_L: {
+                    Enemy* e = dynamic_cast<Enemy*>(ele);
+                    if (e && e->hp > 0) {
+                        all_defeated = false;
+                        break;
+                    }
+                    break;
+                }
+                case Enemy2_L: {
+                    Enemy2* e2 = dynamic_cast<Enemy2*>(ele);
+                    if (e2 && e2->hp > 0) {
+                        all_defeated = false;
+                        break;
+                    }
+                    break;
+                }
+                case Enemy3_L: {
+                    Enemy3* e3 = dynamic_cast<Enemy3*>(ele);
+                    if (e3 && e3->hp > 0) {
+                        all_defeated = false;
+                        break;
+                    }
                     break;
                 }
             }
+            if (!all_defeated) break; // 有活的敵人 → 停止搜尋
         }
 
         if (all_defeated) {
+            printf("DEFEATED, %d\n", enemy_count);
             enemy_defeated = true;
             round_locked = true;
             round_advancing = true;
@@ -203,7 +229,6 @@ void GameScene::Update() {
     // 5. ROUND ADVANCING (BGM fade-out)
     // =====================================================
     if (round_advancing) {
-
         // BGM fade out
         if (round_bgm_instance) {
             float volume = 1.0f - (advance_timer / (float)(FPS * 2));
@@ -229,7 +254,7 @@ void GameScene::Update() {
                 // === ALL ROUNDS FINISHED ===
                 printf("[GameScene] All rounds completed!\n");
                 scene_end = true;
-                window = VictoryScene_L;
+                create_scene(VictoryScene_L);
                 return;
             }
 
@@ -261,18 +286,17 @@ void GameScene::Update() {
     // =====================================================
     if (key_state[ALLEGRO_KEY_Q]) {
         scene_end = true;
-        window = VictoryScene_L;
+        create_scene(VictoryScene_L);
     }
     if (key_state[ALLEGRO_KEY_E]) {
         scene_end = true;
-        window = DeathScene_L;
+        create_scene(DeathScene_L);
     }
     if (key_state[ALLEGRO_KEY_Z]) {
         scene_end = true;
-        window = CreditScene_L;
+        create_scene(CreditScene_L);
     }
 }
-
 
 void GameScene::Draw() {
 

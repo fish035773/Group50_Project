@@ -79,134 +79,155 @@ void enemy_charater(int dx){
     player_center_x1 = dx;
 }
 
-void Enemy::Update(){
-    extern Elements *player;
-    
-    if(hp < 0) return;
-    int speed = 2;
+void Enemy::Update() {
+    if (hp <= 0) return;
 
+    int speed = 2;
     int enemy_center_x = x + width / 2;
     int dx = player_center_x1 - enemy_center_x;
 
     double current_time = al_get_time();
-    if (!can_attack && current_time - spawn_time >= 1.0) {
-        can_attack = true; // allow attacking after 1 second
-    }
+    if (!can_attack && current_time - spawn_time >= 1.0)
+        can_attack = true;
 
-    if (can_attack && abs(dx) <= ENEMY_ATTACK_RANGE){
+    if (can_attack && abs(dx) <= ENEMY_ATTACK_RANGE) {
         dir = dx >= 0;
 
-        // If not already attacking, switch to attack
-        if (state != ENEMY_ATK){   
+        if (state != ENEMY_ATK) {
             state = ENEMY_ATK;
             active_proj = false;
-            move_counter = 0;
+            al_play_sample_instance(atk_sound);
         }
     }
 
-    if (state == ENEMY_DEAD) {
-        if (death_time == 0) death_time = al_get_time(); // mark when death started
-        else if (gif_status[ENEMY_DEAD]->done && al_get_time() - death_time >= 1.0) // wait 1 second
-            dele = true;
-        return;
-    }else if (state == ENEMY_IDLE){
-        if (abs(dx) <= ENEMY_ATTACK_RANGE){
-            chasing = true;
-            state = ENEMY_ATK;
-            active_proj = false;
-            move_counter = 0;
-        }else{
-            state = ENEMY_MOVE;
-        }
-    }else if (state == ENEMY_MOVE){
-        if (chasing) {
-            // Chase player regardless of patrol area
-            dir = (dx >= 0);
-            int move_speed = (dx > 0) ? speed : -speed;
-            update_position(move_speed, 0);
-        }else {
-            // Normal patrol between 400 and 700
-            if (!dir) {
-                update_position(-speed, 0);
-                if (x < 400) dir = true;
-            } else {
-                update_position(speed, 0);
-                if (x > 700) dir = false;
-            }
-        }  
-    }else if (state == ENEMY_ATK){
-        int current_frame = gif_status[ENEMY_ATK]->display_index;
+    switch (state) {
 
-        // Launch projectile once at frame 2
-        if (current_frame == 2 && !active_proj){
-            int projectile_x = dir
-                ? x + width - 100
-                : x + 20;
-
-            Elements* pro = new Projectile2(
-                Projectile2_L,
-                projectile_x,
-                y + height / 2 - 20,
-                dir ? 5 : -5
-            );
-
-            //===========TODO===============
-            Projectile2* p = dynamic_cast<Projectile2*>(pro);
-            if (p) p->is_enemy_projectile = true;
-            scene->addElement(p);
-            //====
-
-            active_proj = true;
-        }
-
-        // When attack animation finishes, transition based on distance
-        if (gif_status[ENEMY_ATK]->done) {
-            gif_status[ENEMY_ATK]->done = false;
-            gif_status[ENEMY_ATK]->display_index = 0;
-            active_proj = false;
-
-            if (std::abs(dx) <= ENEMY_ATTACK_RANGE) {
-                chasing = true;
+        case ENEMY_IDLE:
+            printf("IDLE\n");
+            if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
+                dir = dx >= 0;
                 state = ENEMY_ATK;
-            }
-            else {
-                chasing = true;
+                active_proj = false;
+                al_play_sample_instance(atk_sound);
+            } else {
                 state = ENEMY_MOVE;
             }
+            break;
+
+        case ENEMY_MOVE:
+            //printf("MOVE%d\n", can_attack);
+            if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
+                dir = dx >= 0;
+                state = ENEMY_ATK;
+                active_proj = false;
+                al_play_sample_instance(atk_sound);
+            } else {
+                if (chasing) {
+                    dir = (dx >= 0);
+                    int move_speed = (dx > 0) ? speed : -speed;
+                    update_position(move_speed, 0);
+                } else {
+                    if (!dir) {
+                        update_position(-speed, 0);
+                        if (x < 400) dir = true;
+                    } else {
+                        update_position(speed, 0);
+                        if (x > 700) dir = false;
+                    }
+                }
+            }
+            break;
+
+        case ENEMY_ATK: {
+            
+            int frame = gif_status[ENEMY_ATK]->display_index;
+
+            if (frame == 2 && !active_proj) {
+                //printf("ATK\n");
+                int projectile_x = dir ?
+                    x + width - 100 :
+                    x + 20;
+
+                Elements* pro = new Projectile2(
+                    Projectile2_L,
+                    projectile_x,
+                    y + height/2 - 20,
+                    dir ? 5 : -5
+                );
+
+                Projectile2* p = dynamic_cast<Projectile2*>(pro);
+                if (p) p->is_enemy_projectile = true;
+                scene->addElement(p);
+
+                active_proj = true;
+            }
+
+            if (gif_status[ENEMY_ATK]->done) {
+                gif_status[ENEMY_ATK]->done = false;
+                gif_status[ENEMY_ATK]->display_index = 0;
+                active_proj = false;
+                //printf("DONE\n");
+                if (abs(dx) <= ENEMY_ATTACK_RANGE)
+                    state = ENEMY_IDLE;
+                else
+                    state = ENEMY_MOVE;
+            }
+            break;
         }
+
+        case ENEMY_DEAD:
+            if (death_time == 0) death_time = al_get_time();
+            else if (gif_status[ENEMY_DEAD]->done &&
+                    al_get_time() - death_time >= 1.0)
+                dele = true;
+            break;
     }
 }
 
-void Enemy::Draw(){
-    if(hp <= 0) return;
-    
-    ALLEGRO_BITMAP *frame = algif_get_bitmap(gif_status[state], al_get_time());
-    if(!frame) return;
+void Enemy::Draw() {
+    if (hp <= 0) return;
 
-    if (frame){
-        al_draw_bitmap(frame, x, y, (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
-    }
-    if (state == ENEMY_ATK && gif_status[state]->display_index == 2){
+    ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
+    if (!frame) return;
+
+    // 基本繪製
+    al_draw_bitmap(frame, x, y, (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
+
+    if (state == ENEMY_ATK && gif_status[state]->display_index == 2)
         al_play_sample_instance(atk_sound);
-    }
-    
-    // Draw the red HP bar
+
+    // HP bar
     int bar_width = 100;
     int bar_height = 10;
     int bar_x = x + 80;
-    int bar_y = y; // position above the enemy
+    int bar_y = y;
 
-    float hp_ratio = (float)hp / maxhp; // max HP = 3, change if needed
+    float hp_ratio = (float)hp / maxhp;
 
-    al_draw_filled_rectangle(bar_x, bar_y, bar_x + (int)(bar_width * 1), bar_y + bar_height, al_map_rgb(225, 225, 225));
-    al_draw_filled_rectangle(bar_x, bar_y, bar_x + (int)(bar_width * hp_ratio), bar_y + bar_height, al_map_rgb(150, 0, 0));
-   
+    al_draw_filled_rectangle(
+        bar_x, bar_y,
+        bar_x + bar_width,
+        bar_y + bar_height,
+        al_map_rgb(225, 225, 225)
+    );
+
+    al_draw_filled_rectangle(
+        bar_x, bar_y,
+        bar_x + (int)(bar_width * hp_ratio),
+        bar_y + bar_height,
+        al_map_rgb(150, 0, 0)
+    );
+
     if (got_hit && al_get_time() - hit_time < 0.2) {
-        al_draw_tinted_bitmap(frame, al_map_rgba(255, 0, 0, 200), x, y, (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
-    } else {
-        al_draw_bitmap(frame, x, y, (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
+        al_draw_tinted_bitmap(
+            frame,
+            al_map_rgba(255, 0, 0, 200),
+            x, y,
+            (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL)
+        );
     }
 }
+
 
 void Enemy::Interact()
 {
@@ -241,7 +262,7 @@ void Enemy::Interact()
                 alive = false;
                 dying = true;
                 state = ENEMY_DEAD;
-
+                printf("DIED\n");
                 gif_status[ENEMY_DEAD]->display_index = 0;
                 gif_status[ENEMY_DEAD]->done = false;
                 death_time = al_get_time();

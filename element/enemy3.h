@@ -8,7 +8,7 @@
 extern Elements* player;
 extern Elements* player2;
 
-#define ENEMY3_ATTACK_RANGE 300
+#define ENEMY3_ATTACK_RANGE 100
 #define ENEMY3_MELEE_RANGE 200
 enum Enemy3State {
     ENEMY3_IDLE = 0,

@@ -1,5 +1,6 @@
 #include "Character2.h"
 #include "projectile.h"
+#include "projectile2.h"
 #include "../shapes/Rectangle.h"
 #include "../scene/gamescene.h"
 #include "enemy.h"
@@ -66,13 +67,10 @@ void Character2::Update()
         level++;
         blood += add_blood;
     }
-
-    // Cooldowns
     if (cool_J > 0) --cool_J;
     if (cool_K > 0) --cool_K;
     if (cool_L > 0) --cool_L;
 
-    // Enemy AI call (if needed)
     enemy_charater(x);
 
     // Jumping
@@ -167,10 +165,10 @@ void Character2::Draw()
     }
 }
 
-void Character2::Interact()
-{
-    // Placeholder
+void Character2::Interact(){
 }
+
+
 
 void Character2::trigger_attack(int atk)
 {
@@ -213,7 +211,5 @@ void Character2::update_position(int dx, int dy)
 {
     x += dx;
     y += dy;
-
-    hitbox->update_center_x(hitbox->center_x() + dx);
-    hitbox->update_center_y(hitbox->center_y() + dy);
+    hitbox->update_position(dx, dy);
 }
