@@ -13,6 +13,10 @@
 #define cool_l 10 * 80
 #define cool_k 8 * 80
 #define cool_j 5 * 80
+#define ProjectileK_main_speed 4
+#define ProjectileK_tail_speed 2
+#define J_speed 1
+#define L_speed 4
 // 建立角色的 wrapper 函式
 
 Character2::Character2()
@@ -191,9 +195,9 @@ void Character2::trigger_attack(int atk)
     Elements* pro = nullptr;
 
     switch (atk) {
-        case 1: // X attack
-            if (dir) pro = New_Projectile(Projectile_J, x + width, y + 30, 2, this);
-            else pro = New_Projectile(Projectile_J, x - 150, y + 30, -2, this);
+        case 1: // J attack
+            if (dir) pro = New_Projectile(Projectile_J, x + width, y + 30, J_speed, this);
+            else pro = New_Projectile(Projectile_J, x - 150, y + 30, -J_speed, this);
             _Register_elements(scene, pro);
 
             // --- debug print ---
@@ -207,13 +211,13 @@ void Character2::trigger_attack(int atk)
 
         case 2: // K attack
             if (dir) {
-                pro = New_Projectile(Projectile_K, x + width + 10, y + 70, 5, this);
+                pro = New_Projectile(Projectile_K, x + width + 10, y + 70, ProjectileK_main_speed, this);
                
                 _Register_elements(scene, pro);
                
-                Elements* tail1 = New_Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
+                Elements* tail1 = New_Projectile(Projectile_K, x + width + 30, y + 15, ProjectileK_tail_speed, this);
                // printf("[Character2::trigger_attack] K attack tail1 projectile created\n");
-                Elements* tail2 = New_Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
+                Elements* tail2 = New_Projectile(Projectile_K, x + width + 30, y + 125, ProjectileK_tail_speed, this);
                 //printf("[Character2::trigger_attack] K attack tail2 projectile created\n");
                 _Register_elements(scene, tail1);
                // printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
@@ -222,13 +226,13 @@ void Character2::trigger_attack(int atk)
 
                
             } else {
-                pro = New_Projectile(Projectile_K, x - 120, y + 80, -5, this);
+                pro = New_Projectile(Projectile_K, x - 120, y + 80, -ProjectileK_main_speed, this);
               //  printf("[Character2::trigger_attack] K attack main projectile created\n");
                 _Register_elements(scene, pro);
                
-                Elements* tail1 = New_Projectile(Projectile_K, x - 100, y + 15, -3, this);
+                Elements* tail1 = New_Projectile(Projectile_K, x - 100, y + 15, -ProjectileK_tail_speed, this);
               
-                Elements* tail2 = New_Projectile(Projectile_K, x - 100, y + 125, -3, this);
+                Elements* tail2 = New_Projectile(Projectile_K, x - 100, y + 125, -ProjectileK_tail_speed, this);
               
                 _Register_elements(scene, tail1);
                // printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
@@ -240,8 +244,8 @@ void Character2::trigger_attack(int atk)
             break;
 
         case 3: // L attack
-            if (dir) pro = New_Projectile(Projectile_L, x + width, y + 10, 5, this);
-            else pro = New_Projectile(Projectile_L, x - 180, y + 10, -5, this);
+            if (dir) pro = New_Projectile(Projectile_L, x + width, y + 10, L_speed, this);
+            else pro = New_Projectile(Projectile_L, x - 180, y + 10, -L_speed, this);
             _Register_elements(scene, pro);
 
             

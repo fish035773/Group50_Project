@@ -14,7 +14,10 @@
 #define cool_c 8 * 80
 #define cool_x 5 * 80
 // 建立角色的 wrapper 函式
-
+#define ProjectileC_main_speed 4
+#define ProjectileC_tail_speed 2
+#define X_speed 1
+#define V_speed 4
 Character::Character()
     : x(30), y(0), width(0), height(0),
       blood(100), level(0), levelup_points(0), add_blood(10),
@@ -185,8 +188,8 @@ void Character::trigger_attack(int atk)
 
     switch (atk) {
         case 1: // X attack
-            if (dir) pro = New_Projectile(Projectile_X, x + width, y + 30, 2, this);
-            else pro = New_Projectile(Projectile_X, x - 150, y + 30, -2, this);
+            if (dir) pro = New_Projectile(Projectile_X, x + width, y + 30, X_speed, this);
+            else pro = New_Projectile(Projectile_X, x - 150, y + 30, -X_speed, this);
             _Register_elements(scene, pro);
 
             // --- debug print ---
@@ -200,19 +203,19 @@ void Character::trigger_attack(int atk)
 
         case 2: // C attack
             if (dir) {
-                pro = New_Projectile(Projectile_C, x + width + 10, y + 70, 5, this);
+                pro = New_Projectile(Projectile_C, x + width + 10, y + 70, ProjectileC_main_speed, this);
                 _Register_elements(scene, pro);
-                Elements* tail1 = New_Projectile(Projectile_C, x + width + 30, y + 15, 3, this);
-                Elements* tail2 = New_Projectile(Projectile_C, x + width + 30, y + 125, 3, this);
+                Elements* tail1 = New_Projectile(Projectile_C, x + width + 30, y + 15,ProjectileC_tail_speed, this);
+                Elements* tail2 = New_Projectile(Projectile_C, x + width + 30, y + 125, ProjectileC_tail_speed, this);
                 _Register_elements(scene, tail1);
                 _Register_elements(scene, tail2);
 
               
             } else {
-                pro = New_Projectile(Projectile_C, x - 120, y + 80, -5, this);
+                pro = New_Projectile(Projectile_C, x - 120, y + 80, -ProjectileC_main_speed, this);
                 _Register_elements(scene, pro);
-                Elements* tail1 = New_Projectile(Projectile_C, x - 100, y + 15, -3, this);
-                Elements* tail2 = New_Projectile(Projectile_C, x - 100, y + 125, -3, this);
+                Elements* tail1 = New_Projectile(Projectile_C, x - 100, y + 15, -ProjectileC_tail_speed, this);
+                Elements* tail2 = New_Projectile(Projectile_C, x - 100, y + 125, -ProjectileC_tail_speed, this);
                 _Register_elements(scene, tail1);
                 _Register_elements(scene, tail2);
 
@@ -221,8 +224,8 @@ void Character::trigger_attack(int atk)
             break;
 
         case 3: // V attack
-            if (dir) pro = New_Projectile(Projectile_V, x + width, y + 10, 5, this);
-            else pro = New_Projectile(Projectile_V, x - 180, y + 10, -5, this);
+            if (dir) pro = New_Projectile(Projectile_V, x + width, y + 10, V_speed, this);
+            else pro = New_Projectile(Projectile_V, x - 180, y + 10, -V_speed, this);
             _Register_elements(scene, pro);
 
             
