@@ -11,6 +11,7 @@
 #include "../scene/scene.h"
 #include "Character2.h"
 #include "charater.h"
+#include <allegro5/allegro_primitives.h>
 
 // Damage constants
 /*
@@ -76,11 +77,10 @@ Projectile::~Projectile()
 void Projectile::Update()
 {
     if (dele) return;
-
     x += v;
-
+    
     if (hitbox)
-        hitbox->update_center_x(v);
+        hitbox->update_position(v, 0);
 
     if (x < 0 || x > 900) {
         dele = true;
@@ -93,7 +93,6 @@ void Projectile::Interact()
     if (dele || !scene) return;
 
     for (Elements* obj : scene->getAllElements()) {
-
         if (obj->dele) continue;
         if (obj == owner) continue;
 
@@ -132,6 +131,19 @@ void Projectile::Draw()
         al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
     else
         al_draw_bitmap(img, x, y, 0);
+
+    // Debug hitbox circle
+if (hitbox) {
+    Circle* c = static_cast<Circle*>(hitbox);
+    al_draw_circle(
+        c->x,
+        c->y,
+        c->r,
+        al_map_rgb(255, 0, 0),
+        2
+    );
+}
+
 }
 
 void Projectile::interactEnemy(Elements* tar)

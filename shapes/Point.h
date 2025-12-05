@@ -1,5 +1,4 @@
-#ifndef POINT_H_INCLUDED
-#define POINT_H_INCLUDED
+#pragma once
 
 #include "Shape.h"
 #include <cmath>
@@ -20,8 +19,8 @@ public:
 	bool overlap(const Shape &s) const;
 	double center_x() const { return x; }
 	double center_y() const { return y; }
-	void update_center_x(const double &x) { this->x = x; }
-	void update_center_y(const double &y) { this->y = y; }
+	//void update_center_x(const double &x) { this->x = x; }
+	//void update_center_y(const double &y) { this->y = y; }
 	const ShapeType getType() const { return ShapeType::POINT; }
 	void update_position(double dx, double dy) override {
         x += dx;
@@ -36,5 +35,3 @@ public:
 		y{static_cast<double>(y)} {}
 	double x, y;
 };
-
-#endif

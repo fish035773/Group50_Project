@@ -1,6 +1,4 @@
-#ifndef RECTANGLE_H_INCLUDED
-#define RECTANGLE_H_INCLUDED
-
+#pragma once
 #include "Shape.h"
 
 /**
@@ -12,6 +10,8 @@ public:
 	bool overlap(const Shape &s) const;
 	double center_x() const { return (x1 + x2) / 2; }
 	double center_y() const { return (y1 + y2) / 2; }
+
+	/*
 	void update_center_x(const double &x) {
 		double dx = x - center_x();
 		x1 += dx, x2 += dx;
@@ -19,7 +19,7 @@ public:
 	void update_center_y(const double &y) {
 		double dy = y - center_y();
 		y1 += dy, y2 += dy;
-	}
+	}*/
 
 	void update_position(double dx, double dy) {
 		x1 += dx;
@@ -39,5 +39,3 @@ public:
 		y2{static_cast<double>(y2)} {}
 	double x1, y1, x2, y2;
 };
-
-#endif

@@ -4,7 +4,7 @@
 #include <allegro5/allegro_primitives.h>
 #include "enemy.h"
 #include "projectile2.h"
-
+#include <math.h>
 #include "../scene/sceneManager.h"
 #include "../shapes/Rectangle.h"
 #include "../algif5/algif.h"
@@ -74,19 +74,58 @@ void Enemy::update_position(int dx, int dy){
     hitbox->update_position(dx, dy);
 }
 
-int player_center_x1;
-void enemy_charater(int dx){
-    player_center_x1 = dx;
-}
-
 void Enemy::Update() {
     if (hp <= 0) return;
 
+    int c1_pos = INT_MAX, c2_pos = INT_MAX;
+    int nearest_player_center = 0;
     int speed = 2;
     int enemy_center_x = x + width / 2;
-    int dx = player_center_x1 - enemy_center_x;
+
+    // 找最近的玩家
+    Elements* target = nullptr;
+    int bestDist = INT_MAX;
+
+    for (Elements* ele : scene->getAllElements()) {
+        if (ele->label == Character_L || ele->label == Character2_L) {
+
+            int px = 0;
+
+            if (ele->label == Character_L) {
+                Character* c = dynamic_cast<Character*>(ele);
+                if (!c) continue;
+                px = c->x + c->width / 2;
+            }
+            else {
+                Character2* c2 = dynamic_cast<Character2*>(ele);
+                if (!c2) continue;
+                px = c2->x + c2->width / 2;
+            }
+
+            int dist = abs(px - enemy_center_x);
+            if (dist < bestDist) {
+                bestDist = dist;
+                target = ele;
+            }
+        }
+    }
+
+    if (!target) return;
+
+    int player_center_x = 0;
+
+    if (target->label == Character_L) {
+        Character* c = dynamic_cast<Character*>(target);
+        player_center_x = c->x + c->width / 2;
+    } else {
+        Character2* c2 = dynamic_cast<Character2*>(target);
+        player_center_x = c2->x + c2->width / 2;
+    }
+
+    int dx = player_center_x - enemy_center_x;
 
     double current_time = al_get_time();
+    printf("DFSA\n");
     if (!can_attack && current_time - spawn_time >= 1.0)
         can_attack = true;
 
@@ -101,7 +140,6 @@ void Enemy::Update() {
     }
 
     switch (state) {
-
         case ENEMY_IDLE:
             printf("IDLE\n");
             if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
@@ -139,7 +177,6 @@ void Enemy::Update() {
             break;
 
         case ENEMY_ATK: {
-            
             int frame = gif_status[ENEMY_ATK]->display_index;
 
             if (frame == 2 && !active_proj) {
@@ -227,7 +264,6 @@ void Enemy::Draw() {
         );
     }
 }
-
 
 void Enemy::Interact()
 {

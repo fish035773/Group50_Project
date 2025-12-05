@@ -37,7 +37,7 @@ Character::Character()
     height = gif_status[0]->height;
     y = HEIGHT - height - 20;
     ground_y = y;
-
+    
     // Create hitbox
     hitbox = new Rectangle(x, y, x + width, y + height);
 
@@ -71,9 +71,6 @@ void Character::Update()
     if (cool_C > 0) --cool_C;
     if (cool_V > 0) --cool_V;
     if (cool_X > 0) --cool_X;
-
-    // Enemy AI call (if needed)
-    enemy_charater(x);
 
     // Jumping
     if (is_jumping) {

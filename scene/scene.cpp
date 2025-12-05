@@ -14,7 +14,6 @@ void Scene::Update() {
         if (ele && !ele->dele)
             ele->Update();
     }
-
     // 刪除 dele 的元素
     elements.erase(
         std::remove_if(elements.begin(), elements.end(),

@@ -71,8 +71,6 @@ void Character2::Update()
     if (cool_K > 0) --cool_K;
     if (cool_L > 0) --cool_L;
 
-    enemy_charater(x);
-
     // Jumping
     if (is_jumping) {
         double elapsed = al_get_time() - jump_start_time;
@@ -177,23 +175,26 @@ void Character2::trigger_attack(int atk)
 
     switch (atk) {
         case 1:
-            if (dir) pro = new Projectile(Projectile_J, x + width, y + 30, 2, this);
+            if (dir) pro = new Projectile(Projectile_J, x + width / 2, y + 30, 2, this);
             else pro = new Projectile(Projectile_J, x - 150, y + 30, -2, this);
             scene->addElement(pro);
             break;
         case 2: 
             if (dir) {
-                pro = new Projectile(Projectile_K, x + width + 10, y + 70, 5, this);
+                pro = new Projectile(Projectile_K, x + width / 2, y + 70, 5, this);
                 scene->addElement(pro);
-                Elements* tail1 = new Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
-                Elements* tail2 = new Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
+                printf("ADDED PRO\n");
+                Elements* tail1 = new Projectile(Projectile_K, x + width / 2 + 10, y + 15, 3, this);
+                Elements* tail2 = new Projectile(Projectile_K, x + width / 2 + 10, y + 125, 3, this);
                 scene->addElement(tail1);
+                printf("ADDED tail1\n");
                 scene->addElement(tail2);
+                printf("ADDED PRO\n");
             } else {
-                pro = new Projectile(Projectile_K, x - 120, y + 80, -5, this);
+                pro = new Projectile(Projectile_K, x - 10, y + 80, -5, this);
                 scene->addElement(pro);
-                Elements* tail1 = new Projectile(Projectile_K, x - 100, y + 15, -3, this);
-                Elements* tail2 = new Projectile(Projectile_K, x - 100, y + 125, -3, this);
+                Elements* tail1 = new Projectile(Projectile_K, x - 30, y + 15, -3, this);
+                Elements* tail2 = new Projectile(Projectile_K, x - 30, y + 125, -3, this);
                 scene->addElement(tail1);
                 scene->addElement(tail2);
             }

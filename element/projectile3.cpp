@@ -40,9 +40,7 @@ void Projectile3::Update() {
 void Projectile3::update_position(int dx, int dy) {
     x += dx;
     y += dy;
-
-    hitbox->update_center_x(dx);
-    hitbox->update_center_y(dy);
+    hitbox->update_position(dx, 0);
 }
 
 void Projectile3::Interact()
