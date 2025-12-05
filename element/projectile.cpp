@@ -127,23 +127,15 @@ void Projectile::Draw()
 {
     if (dele || !img) return;
 
-    if (v > 0)
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
-    else
-        al_draw_bitmap(img, x, y, 0);
+    int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);
 
-    // Debug hitbox circle
-if (hitbox) {
-    Circle* c = static_cast<Circle*>(hitbox);
-    al_draw_circle(
-        c->x,
-        c->y,
-        c->r,
-        al_map_rgb(255, 0, 0),
-        2
-    );
-}
+    al_draw_bitmap(img, x, y, flags);
+    //al_draw_rectangle(x, y, x+width, y+height, al_map_rgb(0,255,0), 2);
 
+    if (hitbox) {
+        Circle* c = static_cast<Circle*>(hitbox);
+        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
+    }
 }
 
 void Projectile::interactEnemy(Elements* tar)

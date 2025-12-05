@@ -37,13 +37,13 @@ Enemy3::Enemy3(int label): Elements(label){
     width = gif_status[0]->width;
     height = gif_status[0]->height;
 
-    x = 500;
-    y = HEIGHT - height - 20;
+    x = 200;
+    y = HEIGHT - width + 20;
 
     hitbox = new Rectangle(
-        x, y,
-        x + width,
-        y + height
+        x * 1.3, y * 1.0,
+        x + width * 0.8,
+        y + height * 0.9
     );
 
     dir = true;
@@ -243,6 +243,16 @@ void Enemy3::Draw(){
 
     al_draw_filled_rectangle(bar_x, bar_y, bar_x + 100, bar_y+10, al_map_rgb(255,255,255));
     al_draw_filled_rectangle(bar_x, bar_y, bar_x + (100*ratio), bar_y+10, al_map_rgb(150,0,0));
+    if (hitbox) {
+        if (hitbox->getType() == ShapeType::RECTANGLE) {
+            Rectangle* r = static_cast<Rectangle*>(hitbox);
+            al_draw_rectangle(
+                r->x1, r->y1,
+                r->x2, r->y2,
+                al_map_rgb(0, 255, 0), 2
+            );
+        }
+    }
 }
 
 void Enemy3::Interact(){

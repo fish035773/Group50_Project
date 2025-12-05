@@ -33,13 +33,13 @@ Enemy::Enemy(int label): Elements(label){
     width = gif_status[0]->width;
     height = gif_status[0]->height;
 
-    x = 400;
-    y = HEIGHT - height - 60;
+    x = 200;
+    y = HEIGHT - height - 30;
 
     hitbox = new Rectangle(
-        x, y,
-        x + width,
-        y + height
+        x * 1.0, y * 1.0,
+        x + width*0.8,
+        y + height*1.0
     );
 
     dir = true;
@@ -75,6 +75,8 @@ void Enemy::update_position(int dx, int dy){
 }
 
 void Enemy::Update() {
+    Rectangle* b = (Rectangle*)dynamic_cast<Rectangle*>(hitbox);
+    printf("%d %d\n", x, b->get_pos_x());
     if (hp <= 0) return;
 
     int c1_pos = INT_MAX, c2_pos = INT_MAX;
@@ -125,7 +127,7 @@ void Enemy::Update() {
     int dx = player_center_x - enemy_center_x;
 
     double current_time = al_get_time();
-    printf("DFSA\n");
+    
     if (!can_attack && current_time - spawn_time >= 1.0)
         can_attack = true;
 
@@ -141,7 +143,7 @@ void Enemy::Update() {
 
     switch (state) {
         case ENEMY_IDLE:
-            printf("IDLE\n");
+            //printf("IDLE\n");
             if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
                 dir = dx >= 0;
                 state = ENEMY_ATK;
@@ -151,7 +153,6 @@ void Enemy::Update() {
                 state = ENEMY_MOVE;
             }
             break;
-
         case ENEMY_MOVE:
             //printf("MOVE%d\n", can_attack);
             if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
@@ -175,7 +176,6 @@ void Enemy::Update() {
                 }
             }
             break;
-
         case ENEMY_ATK: {
             int frame = gif_status[ENEMY_ATK]->display_index;
 
@@ -262,6 +262,17 @@ void Enemy::Draw() {
             x, y,
             (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL)
         );
+    }
+
+    if (hitbox) {
+        if (hitbox->getType() == ShapeType::RECTANGLE) {
+            Rectangle* r = static_cast<Rectangle*>(hitbox);
+            al_draw_rectangle(
+                r->x1, r->y1,
+                r->x2, r->y2,
+                al_map_rgb(0, 255, 0), 2
+            );
+        }
     }
 }
 

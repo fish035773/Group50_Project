@@ -34,13 +34,13 @@ Enemy2::Enemy2(int label): Elements(label){
     width = gif_status[0]->width;
     height = gif_status[0]->height;
 
-    x = 400;
-    y = HEIGHT - height - 60;
+    x = 200;
+    y = HEIGHT - width - 30;
 
     hitbox = new Rectangle(
-        x, y,
-        x + width,
-        y + height
+        x * 1.2, y * 1.0,
+        x + width * 0.8,
+        y + height * 1.0
     );
 
     dir = true;
@@ -202,6 +202,16 @@ void Enemy2::Draw() {
 
     if (got_hit && al_get_time() - hit_time < 0.2)
         al_draw_tinted_bitmap(frame, al_map_rgba(255,0,0,200), x, y, (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
+    if (hitbox) {
+        if (hitbox->getType() == ShapeType::RECTANGLE) {
+            Rectangle* r = static_cast<Rectangle*>(hitbox);
+            al_draw_rectangle(
+                r->x1, r->y1,
+                r->x2, r->y2,
+                al_map_rgb(0, 255, 0), 2
+            );
+        }
+    }
 }
 
 

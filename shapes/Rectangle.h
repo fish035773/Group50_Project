@@ -37,5 +37,10 @@ public:
 		y1{static_cast<double>(y1)},
 		x2{static_cast<double>(x2)},
 		y2{static_cast<double>(y2)} {}
+
 	double x1, y1, x2, y2;
+
+	int get_pos_x(){
+		return x1;
+	}
 };

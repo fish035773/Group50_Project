@@ -117,41 +117,34 @@ void GameScene::Update() {
     // =====================================================
     if (!enemies_spawned && !round_locked) {
         printf("[GameScene] Spawning enemies for round %d...\n", round_counter);
-        int start_x = 0;
         int spacing = 0;
 
         switch (round_counter) {
         case 1:
             enemy_count = 3;
-            start_x = 500;
             spacing = 100;
             for (int i = 0; i < enemy_count; i++) {
-                 Enemy* e = new Enemy(Enemy_L);
-                e->x = start_x + i * spacing;
-                e->y = HEIGHT - e->height - 60;
+                Enemy* e = new Enemy(Enemy_L);
+                e->update_position(i * spacing, 0);
                 addElement(e);
             }
             break;
 
         case 2:
             enemy_count = 2;
-            start_x = 400;
             spacing = 150;
             for (int i = 0; i < enemy_count; i++) {
                 Enemy2* e = new Enemy2(Enemy2_L);
-                e->x = start_x + i * spacing;
-                e->y = HEIGHT - e->height - 60;
+                e->update_position(i * spacing, 0);
                 addElement(e);
             }
             break;
 
         case 3:
             enemy_count = 1;
-            start_x = 600;
             for (int i = 0; i < enemy_count; i++) {
                 Enemy3* e = new Enemy3(Enemy3_L);
-                e->x = start_x;
-                e->y = HEIGHT - e->height - 60;
+                e->update_position(i * spacing, 0);
                 addElement(e);
             }
             break;

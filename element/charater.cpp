@@ -35,7 +35,7 @@ Character::Character()
 
     width = gif_status[0]->width;
     height = gif_status[0]->height;
-    y = HEIGHT - height - 20;
+    y = HEIGHT - height - 30;
     ground_y = y;
     
     // Create hitbox
