@@ -276,6 +276,11 @@ void GameScene::Update() {
     // =====================================================
     if (key_state[ALLEGRO_KEY_Q]) {
         scene_end = true;
+        if (round_bgm_instance) {
+            al_stop_sample_instance(round_bgm_instance);
+            al_destroy_sample_instance(round_bgm_instance);
+            round_bgm_instance = NULL;
+        }
         create_scene(VictoryScene_L);
     }
     if (key_state[ALLEGRO_KEY_E]) {
