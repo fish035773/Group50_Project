@@ -8,13 +8,12 @@
 #include "../algif5/algif.h"
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
-
 #include "../element/elements_factory.h"
 
 #include <iostream>
-#define cool_l 600
-#define cool_k 480
-#define cool_j 300
+#define cool_l 10 * 80
+#define cool_k 8 * 80
+#define cool_j 5 * 80
 // 建立角色的 wrapper 函式
 
 Character2::Character2()
@@ -29,8 +28,10 @@ Character2::Character2()
     for (int i = 0; i < 3; ++i) {
         std::string path = "assets/image/chara2_" + std::string(states[i]) + ".gif";
         gif_status[i] = algif_load_animation(path.c_str());
+       // printf("[Character2] Loading GIF: %s\n", path.c_str());
         if (!gif_status[i]) {
             std::cerr << "Failed to load GIF: " << path << std::endl;
+            break;
         }
     }
 
@@ -44,9 +45,11 @@ Character2::Character2()
 
     // Load attack sound
     ALLEGRO_SAMPLE* sample = al_load_sample("assets/sound/atk_sound.wav");
+    //printf("[Character2] Loading attack sound from assets/sound/atk_sound.wav\n");
     atk_Sound = al_create_sample_instance(sample);
     al_set_sample_instance_playmode(atk_Sound, ALLEGRO_PLAYMODE_ONCE);
     al_attach_sample_instance_to_mixer(atk_Sound, al_get_default_mixer());
+    //printf("[Character2] Created Character2 at (%d, %d) with width=%d, height=%d\n", x, y, width, height);
 }
 
 Character2::~Character2()
@@ -69,6 +72,7 @@ void Character2::Update()
         levelup_points -= (level + 1) * 10;
         level++;
         blood += add_blood;
+        //printf("[Character2] Leveled up to %d, blood increased to %d\n", level, blood);
     }
     if (cool_J > 0) --cool_J;
     if (cool_K > 0) --cool_K;
@@ -92,6 +96,7 @@ void Character2::Update()
             y = ground_y;
             is_jumping = false;
             update_position(0, 0);
+          //  printf("[Character2::update] Finished jumping, landed at y=%d\n", y);
         }
 
         int new_atk_type = 0;
@@ -104,6 +109,7 @@ void Character2::Update()
             state = ATK;
             trigger_attack(atk_type);
             new_proj = true;
+            //printf("[Character2::update] Triggered attack type=%d while jumping\n", atk_type);
         }
         return;
     }
@@ -111,7 +117,7 @@ void Character2::Update()
     // State machine
     switch (state) {
         case STOP:
-            if (key_state[ALLEGRO_KEY_J] && cool_J == 0) { state = ATK; atk_type = 1; new_proj = false; cool_J = cool_j; }
+            if (key_state[ALLEGRO_KEY_J] && cool_J == 0) { state = ATK; atk_type = 1; new_proj = false; cool_J = cool_j;  }
             else if (key_state[ALLEGRO_KEY_K] && cool_K == 0) { state = ATK; atk_type = 2; new_proj = false; cool_K = cool_k; }
             else if (key_state[ALLEGRO_KEY_L] && cool_L == 0) { state = ATK; atk_type = 3; new_proj = false; cool_L = cool_l; }
             else if (key_state[ALLEGRO_KEY_LEFT]) { dir = false; state = MOVE; }
@@ -127,14 +133,16 @@ void Character2::Update()
             if (key_state[ALLEGRO_KEY_UP] && !is_jumping && y == ground_y) {
                 is_jumping = true;
                 jump_start_time = al_get_time();
+             
                 return;
             }
 
             if (key_state[ALLEGRO_KEY_J] && cool_J == 0) { state = ATK; atk_type = 1; new_proj = false; cool_J = cool_j; }
-            else if (key_state[ALLEGRO_KEY_K] && cool_K == 0) { state = ATK; atk_type = 2; new_proj = false; cool_K = cool_k; }
+            else if (key_state[ALLEGRO_KEY_K] && cool_K == 0) { state = ATK; atk_type = 2; new_proj = false; cool_K = cool_k;  }
             else if (key_state[ALLEGRO_KEY_L] && cool_L == 0) { state = ATK; atk_type = 3; new_proj = false; cool_L = cool_l; }
 
             if (gif_status[state]->done) state = STOP;
+          
         } break;
 
         case ATK: {
@@ -156,10 +164,12 @@ void Character2::Update()
             break;
         }
     }
+    //printf("[Character2::update] End update: position=(%d,%d), state=%d\n", x, y, state);
 }
 
 void Character2::Draw()
 {
+   
     ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
     if (frame) {
         al_draw_bitmap(frame, x, y, dir ? ALLEGRO_FLIP_HORIZONTAL : 0);
@@ -203,6 +213,8 @@ void Character2::trigger_attack(int atk)
             break;
         }
     }
+   
+
 }
 
 void Character2::update_position(int dx, int dy)

@@ -11,9 +11,9 @@
 #include <allegro5/allegro_acodec.h>
 #include "../element/elements_factory.h"
 #include <iostream>
-#define cool_v 600
-#define cool_c 480
-#define cool_x 300
+#define cool_v 10 * 80
+#define cool_c 8 * 80
+#define cool_x 5 * 80
 // 建立角色的 wrapper 函式
 
 Character::Character()
@@ -96,9 +96,18 @@ void Character::Update()
         }
 
         int new_atk_type = 0;
-        if (key_state[ALLEGRO_KEY_X] && cool_X == 0) { new_atk_type = 1; cool_X = cool_x; }
-        else if (key_state[ALLEGRO_KEY_C]) new_atk_type = 2;
-        else if (key_state[ALLEGRO_KEY_V]) new_atk_type = 3;
+        if (key_state[ALLEGRO_KEY_X] && cool_X == 0) {
+            new_atk_type = 1;
+            cool_X = cool_x;
+        }
+        else if (key_state[ALLEGRO_KEY_C] && cool_C == 0) {
+            new_atk_type = 2;
+            cool_C = cool_c;
+        }
+        else if (key_state[ALLEGRO_KEY_V] && cool_V == 0) {
+            new_atk_type = 3;
+            cool_V = cool_v;
+        }
 
         if (!new_proj && new_atk_type != 0) {
             atk_type = new_atk_type;
@@ -117,7 +126,7 @@ void Character::Update()
             else if (key_state[ALLEGRO_KEY_C] && cool_C == 0) { state = ATK1; atk_type = 2; new_proj = false; cool_C = cool_c; }
             else if (key_state[ALLEGRO_KEY_V] && cool_V == 0) { state = ATK1; atk_type = 3; new_proj = false; cool_V = cool_v; }
             else if (key_state[ALLEGRO_KEY_A]) { dir = false; state = MOVE; }
-            else if (key_state[ALLEGRO_KEY_D] || key_state[ALLEGRO_KEY_W] || key_state[ALLEGRO_KEY_S]) { dir = true; state = MOVE; }
+            else if (key_state[ALLEGRO_KEY_D] || key_state[ALLEGRO_KEY_W] ) { dir = true; state = MOVE; }
             break;
 
         case MOVE: {
