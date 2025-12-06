@@ -1,97 +1,68 @@
 #include "scene.h"
-#include <stdbool.h>
-/*
-   [Scene function]
-*/
-void _Remove_elements(Scene *scene, Elements *ele)
-{
-    EPNode *ptr = scene->ele_list[ele->label];
-    EPNode *parent_ptr = NULL;
-    while (ptr)
-    {
-        if (ptr->id == ele->id)
-        {
-            if (parent_ptr == NULL)
-            {
-                scene->ele_list[ele->label] = ptr->next;
-                free(ptr);
-                break;
-            }
-            else
-            {
-                parent_ptr->next = ptr->next;
-                free(ptr);
-                break;
-            }
-        }
-        parent_ptr = ptr;
-        ptr = ptr->next;
-    }
-    scene->ele_num--;
+#include <algorithm>
+
+Scene::Scene(int label)
+    : label(label), scene_end(false) {}
+
+Scene::~Scene() {
+    Destroy();
 }
-void _Register_elements(Scene *scene, Elements *ele)
-{
-    EPNode *ptr = scene->ele_list[ele->label];
-    EPNode *new_node = (EPNode *)malloc(sizeof(EPNode));
-    new_node->id = scene->ele_num++;
-    new_node->ele = ele;
-    new_node->next = NULL;
-    ele->id = new_node->id;
-    if (ptr == NULL)
-    {
-        scene->ele_list[ele->label] = new_node;
+
+void Scene::Update() {
+    // 先更新所有元素
+    for (auto* ele : elements) {
+        if (ele && !ele->dele)
+            ele->Update();
     }
-    else
-    {
-        while (ptr->next != NULL)
-            ptr = ptr->next;
-        ptr->next = new_node;
+    // 刪除 dele 的元素
+    elements.erase(
+        std::remove_if(elements.begin(), elements.end(),
+            [](Elements* e) {
+                if (e->dele) {
+                    delete e;       // ★ 只需要 delete
+                    return true;
+                }
+                return false;
+            }),
+        elements.end()
+    );
+}
+
+void Scene::Draw() {
+    for (auto* ele : elements) {
+        if (ele && !ele->dele)
+            ele->Draw();
     }
 }
 
-ElementVec _Get_all_elements(Scene *scene)
-{
-    ElementVec res;
-    int size = 0;
-    for (int i = 0; i < MAX_ELEMENT; i++)
-    {
-        if (scene->ele_list[i] == NULL)
-            continue;
-        EPNode *ptr = scene->ele_list[i];
-        while (ptr)
-        {
-            res.arr[size++] = ptr->ele;
-            ptr = ptr->next;
-        }
-        if (size == scene->ele_num)
-            break;
+void Scene::Destroy() {
+    for (auto* ele : elements) {
+        delete ele;     // ★ 只需要 delete
     }
-    res.len = scene->ele_num;
-    return res;
+    elements.clear();
 }
-ElementVec _Get_label_elements(Scene *scene, int label)
-{
-    EPNode *ptr = scene->ele_list[label];
-    ElementVec res;
-    int size = 0;
-    while (ptr)
-    {
-        res.arr[size++] = ptr->ele;
-        ptr = ptr->next;
+
+void Scene::addElement(Elements* ele) {
+    if (ele)
+        elements.push_back(ele);
+}
+
+void Scene::removeElement(Elements* ele) {
+    elements.erase(
+        std::remove(elements.begin(), elements.end(), ele),
+        elements.end()
+    );
+}
+
+std::vector<Elements*> Scene::getAllElements() const {
+    return elements;
+}
+
+std::vector<Elements*> Scene::getElementsByLabel(int target_label) const {
+    std::vector<Elements*> result;
+    for (auto* ele : elements) {
+        if (ele->label == target_label)
+            result.push_back(ele);
     }
-    res.len = size;
-    return res;
-}
-Scene *New_Scene(int label)
-{
-    Scene *pObj;
-    pObj = (Scene *)malloc(sizeof(Scene));
-    // setting object member
-    pObj->label = label;
-    pObj->scene_end = false;
-    pObj->ele_num = 0;
-    for (int i = 0; i < MAX_ELEMENT; i++)
-        pObj->ele_list[i] = NULL;
-    pObj->pDerivedObj = pObj;
-    return pObj;
+    return result;
 }

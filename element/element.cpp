@@ -1,16 +1,8 @@
 #include "element.h"
-#include <stdbool.h>
-/*
-   [Element function]
-*/
-Elements *New_Elements(int label)
+#include "../scene/sceneManager.h"
+Scene* Elements::scene = nullptr;
+
+Elements::Elements(int label)
+    : label(label), id(0), dele(false)
 {
-    Elements *pObj;
-    pObj = (Elements *)malloc(sizeof(Elements));
-    pObj->inter_len = 0;
-    pObj->dele = false;
-    // setting object member
-    pObj->label = label;
-    pObj->pDerivedObj = pObj;
-    return pObj;
 }

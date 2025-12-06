@@ -1,7 +1,8 @@
 #include "Character2.h"
 #include "projectile.h"
+#include "projectile2.h"
 #include "../shapes/Rectangle.h"
-
+#include "../scene/gamescene.h"
 #include "enemy.h"
 #include "../scene/sceneManager.h"
 #include "../algif5/algif.h"
@@ -16,7 +17,7 @@
 // 建立角色的 wrapper 函式
 
 Character2::Character2()
-    : x(30), y(0), width(0), height(0),
+    :Elements(Character2_L), x(30), y(0), width(0), height(0),
       blood(100), level(0), levelup_points(0), add_blood(10),
       dir(false), is_jumping(false), jump_start_time(0.0), ground_y(0),
       cool_J(0), cool_K(0), cool_L(0),
@@ -36,11 +37,11 @@ Character2::Character2()
 
     width = gif_status[0]->width;
     height = gif_status[0]->height;
-    y = HEIGHT - height - 20;
+    y = HEIGHT - height - 30;
     ground_y = y;
 
     // Create hitbox
-    hitbox = New_Rectangle(x, y, x + width, y + height);
+    hitbox = new Rectangle(x, y, x + width, y + height);
 
     // Load attack sound
     ALLEGRO_SAMPLE* sample = al_load_sample("assets/sound/atk_sound.wav");
@@ -59,11 +60,13 @@ Character2::~Character2()
     delete hitbox;
 }
 
-void Character2::update()
+void Character2::Update()
 {
-   
-    if (blood <= 0) return; // dead
-   
+    if (blood <= 0) {
+        create_scene(DeathScene_L);
+        return;
+    }
+
     // Level up
     if (levelup_points >= (level + 1) * 10) {
         levelup_points -= (level + 1) * 10;
@@ -71,14 +74,9 @@ void Character2::update()
         blood += add_blood;
         //printf("[Character2] Leveled up to %d, blood increased to %d\n", level, blood);
     }
-
-    // Cooldowns
     if (cool_J > 0) --cool_J;
     if (cool_K > 0) --cool_K;
     if (cool_L > 0) --cool_L;
-
-    // Enemy AI call (if needed)
-    enemy_charater(x);
 
     // Jumping
     if (is_jumping) {
@@ -102,10 +100,9 @@ void Character2::update()
         }
 
         int new_atk_type = 0;
-        if (key_state[ALLEGRO_KEY_J] && cool_J == 0) { new_atk_type = 1; cool_J = cool_j; }
-        else if (key_state[ALLEGRO_KEY_K] && cool_K == 0){new_atk_type = 2; cool_K = cool_k; }
-        else if (key_state[ALLEGRO_KEY_L] && cool_L == 0) { new_atk_type = 3; cool_L = cool_l; }
-       
+        if (key_state[ALLEGRO_KEY_J]) {new_atk_type = 1; cool_J = cool_j;}
+        else if (key_state[ALLEGRO_KEY_K]) {new_atk_type = 2; cool_K = cool_k;}
+        else if (key_state[ALLEGRO_KEY_L]) {new_atk_type = 3; cool_L = cool_l;}
 
         if (!new_proj && new_atk_type != 0) {
             atk_type = new_atk_type;
@@ -148,27 +145,29 @@ void Character2::update()
           
         } break;
 
-        case ATK:{
-            if (gif_status[ATK]->display_index == 2 && !new_proj) {
+        case ATK: {
+            ALGIF_ANIMATION* a = gif_status[ATK];
+            int total = a->frames_count;
+
+            if (a->display_index == 2 && !new_proj) {
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-            
-            if (gif_status[ATK]->display_index == 4) {
-                state = is_jumping ? MOVE : STOP;
+
+            if (a->display_index >= total - 1) {
+                state = STOP;
                 new_proj = false;
                 atk_type = 0;
+                a->display_index = 0;
                 break;
-
-            }
-           
             }
             break;
+        }
     }
     //printf("[Character2::update] End update: position=(%d,%d), state=%d\n", x, y, state);
 }
 
-void Character2::draw()
+void Character2::Draw()
 {
    
     ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
@@ -177,89 +176,50 @@ void Character2::draw()
     }
 }
 
-
-
-
-void Character2::interact()
-{
-    // Placeholder
+void Character2::Interact(){
 }
 
 void Character2::trigger_attack(int atk)
 {
     al_play_sample_instance(atk_Sound);
-    Elements* pro = nullptr;
 
     switch (atk) {
-        case 1: // X attack
-            if (dir) pro = New_Projectile(Projectile_J, x + width, y + 30, 2, this);
-            else pro = New_Projectile(Projectile_J, x - 150, y + 30, -2, this);
-            _Register_elements(scene, pro);
+        case 1: {
+            int px = dir ? (x + width) : (x - 150);
+            int vx = dir ? 2 : -2;
 
-            // --- debug print ---
-            if (pro && pro->pDerivedObj) {
-                Projectile* p = (Projectile*)pro->pDerivedObj;
-               // printf("[Character2::trigger_attack] J attack projectile created at (%d,%d), img=%p\n", p->x, p->y, p->img);
-            } else {
-                printf("[Character2::trigger_attack] J attack projectile creation FAILED\n");
-            }
+            Projectile* pro = new Projectile(Projectile_J, px, y + 30, vx, this);
+            scene->addElement(pro);
             break;
+        }
+        case 2: {
+            int px = dir ? (x + width) : (x - 20);
 
-        case 2: // K attack
-            if (dir) {
-                pro = New_Projectile(Projectile_K, x + width + 10, y + 70, 5, this);
-               
-                _Register_elements(scene, pro);
-               
-                Elements* tail1 = New_Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
-               // printf("[Character2::trigger_attack] K attack tail1 projectile created\n");
-                Elements* tail2 = New_Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
-                //printf("[Character2::trigger_attack] K attack tail2 projectile created\n");
-                _Register_elements(scene, tail1);
-               // printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
-                _Register_elements(scene, tail2);
-               // printf("[Character2::trigger_attack] K attack tail2 projectile registered\n");
+            Projectile* main = new Projectile(Projectile_K, px, y + 70, dir ? 5 : -5, this);
+            Projectile* tail1 = new Projectile(Projectile_K, px, y + 15, dir ? 3 : -3, this);
+            Projectile* tail2 = new Projectile(Projectile_K, px, y + 125, dir ? 3 : -3, this);
 
-               
-            } else {
-                pro = New_Projectile(Projectile_K, x - 120, y + 80, -5, this);
-              //  printf("[Character2::trigger_attack] K attack main projectile created\n");
-                _Register_elements(scene, pro);
-               
-                Elements* tail1 = New_Projectile(Projectile_K, x - 100, y + 15, -3, this);
-              
-                Elements* tail2 = New_Projectile(Projectile_K, x - 100, y + 125, -3, this);
-              
-                _Register_elements(scene, tail1);
-               // printf("[Character2::trigger_attack] K attack tail1 projectile registered\n");
-                _Register_elements(scene, tail2);
-                //printf("[Character2::trigger_attack] K attack tail2 projectile registered\n");
-
-              
-            }
+            scene->addElement(main);
+            scene->addElement(tail1);
+            scene->addElement(tail2);
             break;
+        }
+        case 3: {
+            int px = dir ? (x + width) : (x - 20);
+            int vx = dir ? 5 : -5;
 
-        case 3: // L attack
-            if (dir) pro = New_Projectile(Projectile_L, x + width, y + 10, 5, this);
-            else pro = New_Projectile(Projectile_L, x - 180, y + 10, -5, this);
-            _Register_elements(scene, pro);
-
-            
+            Projectile* pro = new Projectile(Projectile_L, px, y + 10, vx, this);
+            scene->addElement(pro);
             break;
+        }
     }
    
 
 }
 
-
 void Character2::update_position(int dx, int dy)
 {
     x += dx;
     y += dy;
-
-    if (hitbox) {
-        hitbox->update_center_x(hitbox, dx); // 傳入 self + dx
-        hitbox->update_center_y(hitbox, dy); // 傳入 self + dy
-        //printf("[Character2] Position updated to (%d, %d)\n", x, y);
-    }
+    hitbox->update_position(dx, dy);
 }

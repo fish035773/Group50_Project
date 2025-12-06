@@ -1,8 +1,7 @@
+/*
 #include "tree.h"
 #include "../shapes/Rectangle.h"
-/*
-   [tree function]
-*/
+
 Elements *New_Tree(int label)
 {
     Tree *pDerivedObj = (Tree *)malloc(sizeof(Tree));
@@ -42,4 +41,4 @@ void Tree_destory(Elements *self)
     free(Obj->hitbox);
     free(Obj);
     free(self);
-}
+}*/

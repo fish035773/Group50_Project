@@ -1,11 +1,10 @@
+/*
 #include "teleport.h"
 #include "../scene/gamescene.h" // for element label
 #include "../scene/sceneManager.h" // for scene variable
 #include "charater.h"
 #include <stdbool.h>
-/*
-   [teleport function]
-*/
+
 Elements *New_Teleport(int label)
 {
     Teleport *pDerivedObj = (Teleport *)malloc(sizeof(Teleport));
@@ -74,4 +73,4 @@ void Teleport_destory(Elements *self)
     al_destroy_bitmap(Obj->img);
     free(Obj);
     free(self);
-}
+}*/

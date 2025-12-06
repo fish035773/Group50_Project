@@ -1,17 +1,20 @@
 #include "Projectile.h"
 #include <allegro5/allegro.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "../scene/sceneManager.h" 
 #include "enemy.h"
 #include "enemy2.h"
 #include "enemy3.h"
 #include "../shapes/Circle.h"
 #include "../scene/gamescene.h"
-#include "../scene/sceneManager.h"
+#include "../scene/scene.h"
 #include "Character2.h"
 #include "charater.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <allegro5/allegro_primitives.h>
 
-// damage constants (same as你原本的 define)
+// Damage constants
+
 static const int DAMAGE_V = 10;
 static const int DAMAGE_L = 10;
 static const int DAMAGE_K = 5;
@@ -19,276 +22,180 @@ static const int DAMAGE_C = 5;
 static const int DAMAGE_J = 5;
 static const int DAMAGE_X = 5;
 
+/*
+static const int DAMAGE_V = 100;
+static const int DAMAGE_L = 100;
+static const int DAMAGE_K = 500;
+static const int DAMAGE_C = 500;
+static const int DAMAGE_J = 500;
+static const int DAMAGE_X = 500;
+*/
 Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
-: label(label_), x(x_), y(y_), v(v_), owner(owner_), img(nullptr), hitbox(nullptr),
-  element_wrapper(nullptr)
+    : Elements(label_), x(x_), y(y_), width(0), height(0),
+      img(nullptr), v(v_), damage(0), origin(0),
+      owner(owner_), hitbox(nullptr)
 {
     const char* path = nullptr;
-    switch (label) {
+
+    switch (label_) {
         case Projectile_K: path = "assets/image/projectile_k.png"; damage = DAMAGE_K; origin = 2; break;
         case Projectile_L: path = "assets/image/projectile_l.png"; damage = DAMAGE_L; origin = 2; break;
         case Projectile_J: path = "assets/image/projectile_j.png"; damage = DAMAGE_J; origin = 2; break;
         case Projectile_V: path = "assets/image/projectile_v.png"; damage = DAMAGE_V; origin = 1; break;
         case Projectile_C: path = "assets/image/projectile_c.png"; damage = DAMAGE_C; origin = 1; break;
         case Projectile_X: path = "assets/image/projectile_x.png"; damage = DAMAGE_X; origin = 1; break;
-        default: path = nullptr; damage = 1; origin = 1; break;
     }
-    //element_wrapper->dele = false;
-    //printf("[Projectile] Creating projectile label=%d at (%d,%d) with v=%d\n", label, x, y, v);
-    if (path) img = al_load_bitmap(path);
+
+    printf("[Projectile] Creating projectile label=%d at (%d,%d)\n", label_, x_, y_);
+
+    if (path)
+        img = al_load_bitmap(path);
+    else printf("[Projectile] ERROR loading image for projectile label=%d\n", label_);
 
     if (!img) {
-        //printf("[Projectile] ERROR: Failed to load image for label=%d, path='%s'\n", label, path ? path : "null");
+        printf("[Projectile] ERROR loading image for projectile label=%d\n", label_);
+        width = height = 16;
     } else {
         width = al_get_bitmap_width(img);
         height = al_get_bitmap_height(img);
-       
+        printf("[Projectile] Loaded image size = %d x %d\n", width, height);
     }
 
-    if (!img) width = height = 16;
-
-    // 建立圓形 hitbox
-    hitbox = New_Circle(x + width/2, y + height/2, (min(width, height)/2));
+    // hitbox
+    hitbox = new Circle(x + width / 2, y + height / 2, (std::min(width, height) / 2));
 }
 
 Projectile::~Projectile()
 {
-   
-    // element_wrapper 由 wrapper 的 Destroy 處理 (會 free)
-    if (img) al_destroy_bitmap(img);
+    if (img)
+        al_destroy_bitmap(img);
+    if (hitbox)
+        delete hitbox;
 
-    if (hitbox) free(hitbox);
+    printf("[Projectile] Destroyed projectile label=%d\n", label);
 }
 
-// Move and update hitbox
 void Projectile::Update()
-{   
-   
-    if (element_wrapper && element_wrapper->dele) {
-    //printf("[Projectile::Update] Skipping action because dele=1 for label=%d\n", label);
-    return;
-    }
-    
-    
-
-    if (element_wrapper && element_wrapper->dele) {
-        //printf("[Projectile::Update] Skipping Update because dele=1 for label=%d\n", label);
-        return;
-    }
-
+{
+    if (dele) return;
     x += v;
-    //printf("(Projectile update) label=%d x=%d v=%d\n", label, x, v);
-    // update hitbox: 你現有 Shape 的實作似乎是 function pointer style:
-    if (hitbox && hitbox->update_center_x) {
-        hitbox->update_center_x(hitbox, v);
-        // vertical dy = 0 so no update_center_y call necessary unless needed
-    }
-    // 如果超出遊戲邊界 → 標記刪除
+    
+    if (hitbox)
+        hitbox->update_position(v, 0);
+
     if (x < 0 || x > 900) {
-        if (element_wrapper) element_wrapper->dele = true;
-        //printf("[Projectile] Out of bounds, marked for deletion label=%d\n", label);
+        dele = true;
+        printf("[Projectile] Out of bounds → dele set to true\n");
+    }else {
+        Circle* c = static_cast<Circle*>(hitbox);
+        //printf("X: %d, %lf Y: %d, %lf\n", x, c->center_x(), y, c->center_y());
     }
 }
 
-// Interaction: scan labels that original projectiles used and apply effects.
-// 因為我們在 wrapper 中把 pObj->inter_obj 填好，所以這邊為方便把交互放在 wrapper 的 Interact 呼叫中。
-// 但如果你直接 call Projectile::Interact()，我們仍需使用全域 scene 和 _Get_label_elements。
 void Projectile::Interact()
-{   
-   
-    if (element_wrapper && element_wrapper->dele) {
-        //printf("[Projectile] (Interact)Skipping action because dele=1 for label=%d\n", label);
-        return;
+{
+    if (dele || !scene) return;
+
+    for (Elements* obj : scene->getAllElements()) {
+        if (obj->dele) continue;
+        if (obj == owner) continue;
+
+        Enemy* e1  = dynamic_cast<Enemy*>(obj);
+        Enemy2* e2 = dynamic_cast<Enemy2*>(obj);
+        Enemy3* e3 = dynamic_cast<Enemy3*>(obj);
+
+        if (!e1 && !e2 && !e3)
+            continue;
+
+        Shape* enemy_hitbox =
+            e1 ? e1->hitbox :
+            e2 ? e2->hitbox :
+            e3 ? e3->hitbox : nullptr;
+
+        if (!enemy_hitbox)
+            continue;
+
+        if (hitbox->overlap(*enemy_hitbox)) {
+            dele = true;
+
+            if (e1) interactEnemy(e1);
+            if (e2) interactEnemy2(e2);
+            if (e3) interactEnemy3(e3);
+
+            return;
+        }
     }
-
-    // 逐類別檢查（沿用你原本邏輯）
-
-    // Enemy
-   ElementVec enemies = _Get_label_elements(scene, Enemy_L);
-    for (int i = 0; i < enemies.len; ++i) interactEnemy(enemies.arr[i]);
-    //printf("[Projectile] (Interact) Checked interaction with %d enemies for label=%d\n ", enemies.len, label);
-    // Enemy2
-    ElementVec enemies2 = _Get_label_elements(scene, Enemy2_L);
-    for (int i = 0; i < enemies2.len; ++i) interactEnemy2(enemies2.arr[i]);
-   // printf("[Projectile] (Interact) Checked interaction with %d enemy2 for label=%d\n", enemies2.len, label);
-    //Enemy3
-    ElementVec enemies3 = _Get_label_elements(scene, Enemy3_L);
-    for (int i = 0; i < enemies3.len; ++i) interactEnemy3(enemies3.arr[i]);
-   // printf("[Projectile] (Interact) Checked interaction with %d enemy3 for label=%d\n", enemies3.len, label);
-    
-    
-    
 }
 
 void Projectile::Draw()
-{   
+{
+    if (dele) return;
     
-
-    if (element_wrapper && element_wrapper->dele) {
-        //printf("[Projectile] (Draw) Skipping action because dele=1 for label=%d\n", label);
-        return;
+    if (hitbox) {
+        Circle* c = static_cast<Circle*>(hitbox);
+        //al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
     }
 
-    if (!img) return;
-    if (v > 0) al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
-    else al_draw_bitmap(img, x, y, 0);
+    int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);
+
+    al_draw_bitmap(img, x, y, flags);
+    //al_draw_rectangle(x, y, x+width, y+height, al_map_rgb(0,255,0), 2);
 }
 
-
-void Projectile::Destroy()
-{
-   
-    
-  
-
-    //printf("[Projectile] Destroy called for label=%d, x=%d, y=%d\n", label, x, y);
-    if (element_wrapper) element_wrapper->dele = true; // 標記
-    if (img) { al_destroy_bitmap(img); img = nullptr; }
-    if (hitbox) { free(hitbox); hitbox = nullptr; }
-
-}
-/* ---------- interaction helpers ---------- */
-
-
-
-// 只在真正碰撞時才標記 dele
 void Projectile::interactEnemy(Elements* tar)
 {
-    
-    Enemy* enemy = (Enemy*)tar->pDerivedObj;
-    if (enemy->hp <= 0) return;
+    Enemy* enemy = dynamic_cast<Enemy*>(tar);
+    if (!enemy) return;
 
-    bool hit = enemy->hitbox->overlap(enemy->hitbox, hitbox);
-    if (hit) {
+    if (enemy->hp > 0)
         enemy->hp -= damage;
-        element_wrapper->dele = true;
-        if (enemy->hp <= 0) tar->dele = true;
 
-        if (origin == 2) ((Character2*)owner)->levelup_points++;
-        else ((Character*)owner)->levelup_points++;
+    if (enemy->hp <= 0)
+        tar->dele = true;
 
-        //printf("[Projectile] Enemy hit! Enemy HP: %d\n", enemy->hp);
-    }
-}
-void Projectile::interactEnemy2(Elements* tar) {
-    
-    if (element_wrapper && element_wrapper->dele) return;
-    element_wrapper->dele = true; // ✅ 立刻標記，防止下一行訪問 hitbox
-    Enemy2* enemy = (Enemy2*)tar->pDerivedObj;
-    if (origin == 2) {
-        Character2* ch2 = (Character2*)owner;
-        if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch2->blood > 0 && enemy->hp > 0) {
-            element_wrapper->dele = true;
-           // printf("[Projectile] Enemy2 hit by Character2's projectile. Enemy2 HP before: %d\n", enemy->hp);
-            enemy->hp -= damage;
-            if (enemy->hp <= 0) tar->dele = true;
-            ch2->levelup_points++;
-            //printf("[Projectile] Enemy2 HP after: %d, Character2 Levelup Points: %d\n", enemy->hp, ch2->levelup_points);
-            return; // ✅ 立刻跳出，不要再訪問 hitbox
-        }
-    } else {
-        Character* ch = (Character*)owner;
-        if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch->blood > 0 && enemy->hp > 0) {
-            element_wrapper->dele = true;
-           // printf("[Projectile] Enemy2 hit by Character's projectile. Enemy2 HP before: %d\n", enemy->hp);
-            enemy->hp -= damage;
-            //printf("[Projectile] Enemy2 hit by Character's projectile. Enemy2 HP before: %d\n", enemy->hp);
-            if (enemy->hp <= 0) tar->dele = true;
-            ch->levelup_points++;
-            //printf("[Projectile] Enemy2 HP after: %d, Character Levelup Points: %d\n", enemy->hp, ch->levelup_points);
-            return; // ✅ 立刻跳出，不要再訪問 hitbox
-        }
-    }
-}
-void Projectile::interactEnemy3(Elements* tar) {
-    
-    if (element_wrapper && element_wrapper->dele) return;
-    element_wrapper->dele = true; // ✅ 立刻標記，防止下一行訪問 hitbox
-    Enemy3* enemy = (Enemy3*)tar->pDerivedObj;
-    if (origin == 2) {
-       // printf("[Projectile] Checking hit on Enemy3 by Character2's projectile. Enemy3 HP before: %d\n", enemy->hp);
-        Character2* ch2 = (Character2*)owner;
-        if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch2->blood > 0 && enemy->hp > 0) {
-            element_wrapper->dele = true;
-            enemy->hp -= damage;
-            if (enemy->hp <= 0) tar->dele = true;
-            ch2->levelup_points++;
-            
-            return; // ✅ 立刻跳出，不要再訪問 hitbox
-        }
-    } else {
-        Character* ch = (Character*)owner;
-        if (enemy->hitbox->overlap(enemy->hitbox, hitbox) && ch->blood > 0 && enemy->hp > 0) {
-            element_wrapper->dele = true;
-            enemy->hp -= damage;
-            if (enemy->hp <= 0) tar->dele = true;
-            ch->levelup_points++;
-           
-            return; // ✅ 立刻跳出，不要再訪問 hitbox
-        }
-    }
+    // award owner EXP
+    if (origin == 2)
+        ((Character2*)owner)->levelup_points++;
+    else
+        ((Character*)owner)->levelup_points++;
+
+    printf("[Projectile] Enemy1 hit! HP = %d\n", enemy->hp);
 }
 
-
-
-/* ---------- wrapper: create Elements that forward to this object ---------- */
-
-Elements* Projectile::toElements()
+void Projectile::interactEnemy2(Elements* tar)
 {
-    
-    //printf("[Projectile] (toElements) Called for label=%d at (%d,%d)\n", label, x, y);
-    if (element_wrapper) return element_wrapper;
+    Enemy2* enemy = dynamic_cast<Enemy2*>(tar);
+    if (!enemy) return;
 
-    element_wrapper = New_Elements(label);
-    // fill interaction labels same as original C implementation
- 
-    element_wrapper->inter_obj[element_wrapper->inter_len++] = Enemy_L;
-    element_wrapper->inter_obj[element_wrapper->inter_len++] = Enemy2_L;
-    element_wrapper->inter_obj[element_wrapper->inter_len++] = Enemy3_L;
-    element_wrapper->inter_obj[element_wrapper->inter_len++] = Character_L;
-    element_wrapper->inter_obj[element_wrapper->inter_len++] = Character2_L;
-    //printf("[Projectile] (toElements) Set up interaction labels for label=%d\n", label);
+    if (enemy->hp > 0)
+        enemy->hp -= damage;
 
-    element_wrapper->pDerivedObj = this; // store pointer to this object
+    if (enemy->hp <= 0)
+        tar->dele = true;
 
-    // assign C-style function pointers that call C++ methods
-    element_wrapper->Update = [](Elements* e) {
-        Projectile* p = (Projectile*)e->pDerivedObj;
-        p->Update();
-    };
-    element_wrapper->Interact = [](Elements* e) {
-        Projectile* p = (Projectile*)e->pDerivedObj;
-        p->Interact();
-        //printf("[Projectile](toElements) (Wrapper Interact) Called for label=%d\n", p->label);
-    };
-    element_wrapper->Draw = [](Elements* e) {
-        Projectile* p = (Projectile*)e->pDerivedObj;
-        p->Draw();
-    };
-    element_wrapper->Destroy = [](Elements* e) {
-    Projectile* p = (Projectile*)e->pDerivedObj;
-    if (p->element_wrapper) 
-        p->element_wrapper->dele = true;  // ✅ 先標記 dele
-    p->Destroy();  // 釋放 bitmap / hitbox
-    delete p;      // 刪除 C++ 對象
-    free(e);       // 刪除 wrapper
-    //printf("[Projectile] (Wrapper Destroy) Called and cleaned up\n");
-};
+    if (origin == 2)
+        ((Character2*)owner)->levelup_points++;
+    else
+        ((Character*)owner)->levelup_points++;
 
-    // map internal numeric fields into element if needed (for other systems reading them)
-    // e.g., store rendering pos in derived object? But we already keep p->x/p->y internally.
-
-    return element_wrapper;
+    printf("[Projectile] Enemy2 hit! HP = %d\n", enemy->hp);
 }
 
-/* ---------- convenience C-style factory (跟你現有程式碼呼叫相同名稱) ---------- */
-
-// 保留你原本程式碼呼叫方式： New_Projectile(label, x, y, v, owner)
-Elements* New_Projectile(int label, int x, int y, int v, void* owner)
+void Projectile::interactEnemy3(Elements* tar)
 {
-    
-    Projectile* p = new Projectile(label, x, y, v, owner);
-    Elements* e = p->toElements();
-   
-    return e;
+    Enemy3* enemy = dynamic_cast<Enemy3*>(tar);
+    if (!enemy) return;
+
+    if (enemy->hp > 0)
+        enemy->hp -= damage;
+
+    if (enemy->hp <= 0)
+        tar->dele = true;
+
+    if (origin == 2)
+        ((Character2*)owner)->levelup_points++;
+    else
+        ((Character*)owner)->levelup_points++;
+
+    printf("[Projectile] Enemy3 hit! HP = %d\n", enemy->hp);
 }

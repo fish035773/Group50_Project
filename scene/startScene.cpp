@@ -1,115 +1,123 @@
 #include "startScene.h"
 #include "sceneManager.h"
 #include "../global.h"
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
+#include <cstdio>
 
-Scene *New_StartScene(int label)
+StartScene::StartScene(int label)
+    : Scene(label),
+      background(nullptr),
+      music(nullptr),
+      sample_instance(nullptr),
+      font(nullptr),
+      timer(0)
 {
-    StartScene *pDerivedObj = (StartScene *)malloc(sizeof(StartScene));
-    Scene *pObj = New_Scene(label);
-
-    printf("[StartScene] Creating Start Scene...\n");
+    printf("[Start] Creating Start Scene...\n");
 
     // Load background
-    pDerivedObj->background = al_load_bitmap("assets/image/start_bg.png");  // ganti sesuai file kamu
-    if (pDerivedObj->background)
-        printf("[StartScene] Background loaded OK.\n");
+    background = al_load_bitmap("assets/image/start_bg.png");
+    if (background)
+        printf("[Start] Background loaded OK.\n");
     else
-        printf("WARNING: StartScene background NOT FOUND!\n");
+        printf("WARNING: Start background NOT FOUND!\n");
 
     // Load music
-    pDerivedObj->music = al_load_sample("assets/sound/start_music.mp3");  // ganti sesuai file kamu
-    if (pDerivedObj->music) {
-        printf("[StartScene] Start music loaded OK.\n");
-        pDerivedObj->sample_instance = al_create_sample_instance(pDerivedObj->music);
-        if (pDerivedObj->sample_instance) {
-            al_set_sample_instance_playmode(pDerivedObj->sample_instance, ALLEGRO_PLAYMODE_ONCE);
-            al_attach_sample_instance_to_mixer(pDerivedObj->sample_instance, al_get_default_mixer());
-            al_play_sample_instance(pDerivedObj->sample_instance);
-            printf("[StartScene] Music instance playing.\n");
+    music = al_load_sample("assets/sound/start_music.mp3");
+    if (music) {
+        printf("[Start] Start music loaded OK.\n");
+        sample_instance = al_create_sample_instance(music);
+        if (sample_instance) {
+            al_set_sample_instance_playmode(sample_instance, ALLEGRO_PLAYMODE_ONCE);
+            al_attach_sample_instance_to_mixer(sample_instance, al_get_default_mixer());
+            al_play_sample_instance(sample_instance);
+            printf("[Start] Music playing.\n");
         } else {
             printf("WARNING: Failed to create sample instance!\n");
         }
     } else {
-        printf("WARNING: StartScene music NOT FOUND!\n");
-        pDerivedObj->sample_instance = NULL;
+        printf("WARNING: Start music NOT FOUND!\n");
     }
 
     // Load font
-    pDerivedObj->font = al_load_ttf_font("assets/font/pirulen.ttf", 28, 0);
-    if (pDerivedObj->font)
-        printf("[StartScene] Font loaded OK.\n");
+    font = al_load_ttf_font("assets/font/pirulen.ttf", 28, 0);
+    if (font)
+        printf("[Start] Font loaded OK.\n");
     else
-        printf("WARNING: StartScene font NOT FOUND!\n");
+        printf("WARNING: Start font NOT FOUND!\n");
 
-    // Timer setup
-    pDerivedObj->timer = 0;
+    timer = 0;
 
-    // Set scene functions
-    pObj->pDerivedObj = pDerivedObj;
-    pObj->Update = startScene_update;
-    pObj->Draw = startScene_draw;
-    pObj->Destroy = startScene_destroy;
-
-    printf("[StartScene] Scene created successfully!\n");
-
-    return pObj;
+    printf("[Start] Scene created successfully!\n");
 }
 
-void startScene_update(Scene *self)
+StartScene::~StartScene()
 {
-    StartScene *obj = (StartScene *)(self->pDerivedObj);
-    obj->timer++;
+    Destroy();
+}
 
-    // Manual TEST — tekan S untuk mulai GameScene
+void StartScene::Update()
+{
+    timer++;
+
+    // PRESS S → ENTER GAME
     if (key_state[ALLEGRO_KEY_S]) {
-        self->scene_end = true;
-        window = GameScene_L;
-        printf("[StartScene] Switching to Game Scene!\n");
+        printf("[Start] S pressed — Switching to GameScene\n");
+        create_scene(GameScene_L);
+        scene_end = true;
+        return;
     }
 
-    // Auto balik ke Menu setelah 10 sec
-    if (obj->timer > FPS * 10)
-    {
-        self->scene_end = true;
-        window = Menu_L;
-        printf("[StartScene] Returning to Menu...\n");
+    // Auto return to Menu after 10 sec
+    if (timer > FPS * 10) {
+        printf("[Start] Auto-return to Menu\n");
+        create_scene(Menu_L);
+        scene_end = true;
     }
 }
 
-void startScene_draw(Scene *self)
+void StartScene::Draw()
 {
-    StartScene *obj = (StartScene *)(self->pDerivedObj);
-
     // Draw background
-    if (obj->background) {
-        al_draw_bitmap(obj->background, 0, 0, 0);
-    } else {
-        al_clear_to_color(al_map_rgb(0, 0, 0));  // fallback clear screen
-    }
+    if (background)
+        al_draw_bitmap(background, 0, 0, 0);
+    else
+        al_clear_to_color(al_map_rgb(0,0,0));
 
-    // Draw "Press S to Start" text
-    if (obj->font) {
-        al_draw_text(obj->font, al_map_rgb(255, 255, 0), WIDTH / 2, HEIGHT / 2 + 100, ALLEGRO_ALIGN_CENTER, "Press [S] to Start Game");
+    // Draw text
+    if (font) {
+        al_draw_text(
+            font,
+            al_map_rgb(255, 255, 0),
+            WIDTH / 2,
+            HEIGHT / 2 + 100,
+            ALLEGRO_ALIGN_CENTER,
+            "Press [S] to Start Game"
+        );
     }
 }
 
-void startScene_destroy(Scene *self)
+void StartScene::Destroy()
 {
-    StartScene *obj = (StartScene *)(self->pDerivedObj);
+    printf("[Start] Destroying Start Scene...\n");
 
-    printf("[StartScene] Destroying scene...\n");
+    if (background) {
+        al_destroy_bitmap(background);
+        background = nullptr;
+    }
 
-    if (obj->background) al_destroy_bitmap(obj->background);
-    if (obj->music) al_destroy_sample(obj->music);
-    if (obj->sample_instance) al_destroy_sample_instance(obj->sample_instance);
-    if (obj->font) al_destroy_font(obj->font);
+    if (music) {
+        al_destroy_sample(music);
+        music = nullptr;
+    }
 
-    free(obj);
-    free(self);
+    if (sample_instance) {
+        al_destroy_sample_instance(sample_instance);
+        sample_instance = nullptr;
+    }
 
-    printf("[StartScene] Scene destroyed.\n");
+    if (font) {
+        al_destroy_font(font);
+        font = nullptr;
+    }
+
+    printf("[Start] Scene destroyed.\n");
 }

@@ -1,42 +1,33 @@
-#ifndef SCENE_H_INCLUDED
-#define SCENE_H_INCLUDED
+#pragma once
+
 #include "../global.h"
 #include "../element/element.h"
-#include <stdbool.h>
+#include <vector>
 
-/*
-   [scene object]
-*/
-typedef struct EPNode
-{
-    int id;
-    Elements *ele;
-    struct EPNode *next;
-} EPNode;
-typedef struct Element_vector
-{
-    Elements *arr[MAX_ELEMENT];
-    int len;
-} ElementVec;
-typedef struct _Scene Scene;
-typedef void (*fptrUpdate)(Scene *);
-typedef void (*fptrDraw)(Scene *);
-typedef void (*fptrDestroy)(Scene *);
-struct _Scene
-{
+class Scene {
+public:
     int label;
-    void *pDerivedObj;
     bool scene_end;
-    int ele_num;
-    EPNode *ele_list[MAX_ELEMENT];
-    // interface for function
-    fptrUpdate Update;
-    fptrDraw Draw;
-    fptrDestroy Destroy;
+
+protected:
+    std::vector<Elements*> elements;
+
+public:
+    Scene(int label);
+    virtual ~Scene();
+
+    bool next_scene_requested = false;
+    SceneType next_scene_type;
+
+    // 基本行為（可被子類別 override）
+    virtual void Update();
+    virtual void Draw();
+    virtual void Destroy();
+
+    // 元素操作（新增 / 移除 / 查詢）
+    void addElement(Elements* ele);
+    void removeElement(Elements* ele);
+
+    std::vector<Elements*> getAllElements() const;
+    std::vector<Elements*> getElementsByLabel(int target_label) const;
 };
-Scene *New_Scene(int label);
-void _Register_elements(Scene *scene, Elements *ele);
-void _Remove_elements(Scene *scene, Elements *ele);
-ElementVec _Get_all_elements(Scene *scene);
-ElementVec _Get_label_elements(Scene *scene, int label);
-#endif

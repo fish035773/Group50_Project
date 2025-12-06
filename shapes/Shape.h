@@ -1,38 +1,28 @@
 #ifndef SHAPE_H_INCLUDED
 #define SHAPE_H_INCLUDED
-#include <stdlib.h>
-#include <stdbool.h>
 
-typedef enum ShapeType
-{
-	POINT,
-	RECTANGLE,
-	CIRCLE
-} ShapeType;
+class Point;
+class Rectangle;
+class Circle;
+
+enum class ShapeType {
+	POINT, RECTANGLE, CIRCLE
+};
 
 /**
  * @brief Base shape class.
- * @details The functions of its derived classes are all defined in Shape.c.
- * @see Shape.c
+ * @details A "Shape" can be useful in many ways - you can treat Shape as a bounding box, attack range, colliding detection, and many other things. Basically if you want to make objects interact to each other, the Shape is indispensable.
+ * @see Shape.cpp
  */
-
-typedef struct _Shape Shape;
-typedef bool (*fptrOverlap)(Shape *, Shape *);
-typedef double (*fptrCenterX)(Shape *);
-typedef double (*fptrCenterY)(Shape *);
-typedef void (*fptrUpdateCenterX)(Shape *, int);
-typedef void (*fptrUpdateCenterY)(Shape *, int);
-typedef ShapeType (*fptrGetType)();
-struct _Shape
+class Shape
 {
-	void *pDerivedObj;
-	fptrOverlap overlap;
-	fptrCenterX center_x;
-	fptrCenterY center_y;
-	fptrUpdateCenterX update_center_x;
-	fptrUpdateCenterY update_center_y;
-	fptrGetType getType;
+public:
+	virtual bool overlap(const Shape &s) const = 0;
+	//virtual void update_center_x(const double &x) = 0;
+	//virtual void update_center_y(const double &y) = 0;
+	virtual const ShapeType getType() const = 0;
+	virtual void update_position(double dx, double dy) = 0;
+	virtual ~Shape() {};
 };
-Shape *New_Shape();
 
 #endif

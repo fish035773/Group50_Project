@@ -1,3 +1,4 @@
+/*
 #pragma once
 #include "charater.h"
 #include "Character2.h"
@@ -5,7 +6,7 @@
 #include "tree.h"
 #include "teleport.h"
 #include "ball.h"
-#include "../scene/gamescene.h" // 如果需要 scene 指標
+#include "../scene/gamescene.h" 
 
 // wrapper functions
 Elements* New_Character(int label);
@@ -14,3 +15,4 @@ Elements* New_Floor(int label);
 Elements* New_Tree(int label);
 Elements* New_Teleport(int label);
 Elements* New_Ball(int label);
+*/

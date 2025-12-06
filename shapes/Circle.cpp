@@ -1,46 +1,81 @@
-#include <stdbool.h>
-#include "Circle.h"
 
-/**
- * @see Shape.cpp
- */
+/*#include "Circle.h"
+#include "Point.h"
+#include "Rectangle.h"
+#include "../GAME_ASSERT.h"
+
+Circle::Circle(double x, double y, double r): x(x), y(y), r(r){}
+
+Circle* Circle::Circle_Self() 
+{
+    return this;
+}
+
+double Circle::center_x()
+{
+    return x;
+}
+
+double Circle::center_y()
+{
+    return y;
+}
+
+void Circle::update_center_x(int dx)
+{
+    x += dx;
+}
+
+void Circle::update_center_y(int dy)
+{
+    y += dy;
+}
+
+ShapeType Circle::getType()
+{
+    return CIRCLE;
+}
+
+bool Circle::overlap(Shape* tar)
+{
+    switch (tar->getType())
+    {
+    case POINT:
+    {
+        Point* p = static_cast<Point*>(tar);
+        return (r * r) >= p->Point_dist2(new Point(x, y));
+    }
+    case RECTANGLE:
+    {
+        Rectangle* rct = static_cast<Rectangle*>(tar);
+        double cx = std::max(rct->x1, std::min(x, rct->x2));
+        double cy = std::max(rct->y1, std::min(y, rct->y2));
+        Point cpt(x, y);
+        Point rpt(cx, cy);
+        return (r * r) >= cpt.Point_dist2(&rpt);
+    }
+    case CIRCLE:
+    {
+        Circle* c = static_cast<Circle*>(tar);
+        Point p1(x, y);
+        Point p2(c->x, c->y);
+        double dist2 = p1.Point_dist2(&p2);
+        double R = r + c->r;
+        return (R * R) >= dist2;
+    }
+    }
+
+    GAME_ASSERT(false, "Unknown ShapeType.");
+    return false;
+}
+
 Circle *Circle_Self(Shape *self)
 {
     return (Circle *)self->pDerivedObj;
 }
-Shape *New_Circle(double x, double y, double r)
+// factory
+Shape* New_Circle(double x, double y, double r)
 {
-    Circle *pDerivedObj = (Circle *)malloc(sizeof(Circle));
-    pDerivedObj->x = x;
-    pDerivedObj->y = y;
-    pDerivedObj->r = r;
-    Shape *pObj = New_Shape();
-    pObj->overlap = Circle_overlap;
-    pObj->center_x = Circle_center_x;
-    pObj->center_y = Circle_center_y;
-    pObj->update_center_x = Circle_update_center_x;
-    pObj->update_center_y = Circle_update_center_y;
-    pObj->getType = Circle_getType;
-    pObj->pDerivedObj = pDerivedObj;
-    return pObj;
+    return new Circle(x, y, r);
 }
-double Circle_center_x(Shape *self)
-{
-    return Circle_Self(self)->x;
-}
-double Circle_center_y(Shape *self)
-{
-    return Circle_Self(self)->y;
-}
-void Circle_update_center_x(Shape *self, int x)
-{
-    Circle_Self(self)->x += x;
-}
-void Circle_update_center_y(Shape *self, int y)
-{
-    Circle_Self(self)->y += y;
-}
-ShapeType Circle_getType()
-{
-    return CIRCLE;
-}
+*/

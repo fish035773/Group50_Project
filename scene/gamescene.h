@@ -1,85 +1,80 @@
-#ifndef GAMESCENE_H_INCLUDED
-#define GAMESCENE_H_INCLUDED
+#pragma once
 #include "scene.h"
+#include "../element/element.h"
+
+#include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+
 /*
-   [game scene object]
+   [Element Types] — Keep enum
 */
-typedef enum EleType
+enum EleType {
+   Floor_L,
+   Teleport_L,
+   Tree_L,
+   Character_L,
+   Ball_L,
+   Character2_L,
+   Projectile_L,
+   Projectile_K,
+   Projectile_J,
+   Enemy_L,
+   Projectile_V,
+   Projectile_C,
+   Projectile_X,
+   Projectile2_L,
+   Projectile3_1_L,
+   Projectile3_2_L,
+   Enemy3_L,
+   Enemy2_L
+};
+
+/*
+   [GameScene] — Pure C++ Class
+   Inherits from Scene
+*/
+class GameScene : public Scene
 {
-    Floor_L,
-    Teleport_L,
-    Tree_L,
-    Character_L,
-    Ball_L,
-    Character2_L,
-    Projectile_L,
-    Projectile_K,
-    Projectile_J,
-    Enemy_L,
-    Projectile_V,
-    Projectile_C,
-    Projectile_X,
-  
-    Projectile2_L,
-    Projectile3_L,
-    Enemy3_L,
-    Enemy2_L
-} EleType;
-typedef struct _GameScene
-{
- 
-    ALLEGRO_FONT *font;  // 👈 新增這行
-    // background
-    ALLEGRO_BITMAP *background;
+public:
 
+   // ===== UI Font =====
+   ALLEGRO_FONT* font = nullptr;
 
-    // round images
-    ALLEGRO_BITMAP *round_images[3];
+   // ===== Background =====
+   ALLEGRO_BITMAP* background[3] = {nullptr};
 
+   // ===== Round Images =====
+   ALLEGRO_BITMAP* round_images[3] = {nullptr};
 
-    // sounds
-    ALLEGRO_SAMPLE *round_sounds[3];
-    ALLEGRO_SAMPLE *round_bgm[3];
-    ALLEGRO_SAMPLE_INSTANCE *round_bgm_instance;
+   // ===== Sounds =====
+   ALLEGRO_SAMPLE* round_sounds[3] = {nullptr};
+   ALLEGRO_SAMPLE* round_bgm[3]    = {nullptr};
+   ALLEGRO_SAMPLE_INSTANCE* round_bgm_instance = nullptr;
 
+   // ===== Element images inside the scene =====
+   ALLEGRO_BITMAP* box_image = nullptr;
+   ALLEGRO_BITMAP* gentong_image = nullptr;
 
-    // box & gentong (Element images inside the gamescene).
-    ALLEGRO_BITMAP *box_image;
-    ALLEGRO_BITMAP *gentong_image;
+   // ===== Round state =====
+   int  round_counter   = 1;
+   bool round_triggered = true;
+   int  round_timer     = 0;
 
+   bool enemy_defeated  = false;
+   int  enemy_defeated_timer = 0;
 
-    // round state
-    int round_counter;
-    bool round_triggered;
-    int round_timer;
-    bool enemy_defeated;
+   bool round_advancing = false;
+   int  advance_timer   = 0;
    
+   bool round_locked = false;     // freezing player when round changes
+   bool enemies_spawned = false;
 
-int enemy_defeated_timer;
+   GameScene(int label);
+   virtual ~GameScene();
 
-    bool round_advancing;
-    int advance_timer;
-
-
-    bool round_locked; // freezing the player when the round is changed.
-  
-
-
-    bool enemies_spawned;
-   
-    
-    // scene ptr
-    Scene *scene;
-
-
-} GameScene;
-Scene *New_GameScene(int label);
-void game_scene_update(Scene *self);
-void game_scene_draw(Scene *self);
-void game_scene_destroy(Scene *self);
-void Add_Elements_to_GameScene(Elements *elem);
-#endif
+   void Update() override;
+   void Draw() override;
+};

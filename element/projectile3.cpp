@@ -6,130 +6,103 @@
 #include "../scene/gamescene.h" // for element label
 #include "../scene/sceneManager.h" // for scene variable
 
-
-/*
-   [Projectile function]
-*/
-Elements *New_Projectile3(int label, int x, int y, int v)
+Projectile3::Projectile3(int label, int x, int y, int v)
+    : Elements(label), x(x), y(y), v(v)
 {
-    Projectile3 *pDerivedObj = (Projectile3 *)malloc(sizeof(Projectile3));
-    Elements *pObj = New_Elements(label);
-    // setting derived object member
-    pDerivedObj->img = al_load_bitmap("assets/image/projectile3.png");
-    pDerivedObj->width = al_get_bitmap_width(pDerivedObj->img);
-    pDerivedObj->height = al_get_bitmap_height(pDerivedObj->img);
-    pDerivedObj->x = x;
-    pDerivedObj->y = y;
-    pDerivedObj->v = v;
-    pDerivedObj->damage = 5;
-    pDerivedObj->hitbox = New_Circle(pDerivedObj->x + pDerivedObj->width / 2,
-                                     pDerivedObj->y + pDerivedObj->height / 2,
-                                     min(pDerivedObj->width, pDerivedObj->height) / 2);
-    // setting the interact object
-    pObj->inter_obj[pObj->inter_len++] = Floor_L;
-    pObj->inter_obj[pObj->inter_len++] = Character_L;
-    pObj->inter_obj[pObj->inter_len++] = Character2_L;
+    if(label == Projectile3_1_L){
+        img = al_load_bitmap("assets/image/projectile3.png");
+        damage = 5;
+    }else if(label == Projectile3_2_L){
+        img = al_load_bitmap("assets/image/projectile2.png");
+        damage = 8;
+    }
 
+    if (!img) {
+        width = height = 16;
+    } else {
+        width = al_get_bitmap_width(img);
+        height = al_get_bitmap_height(img);
+    }
 
-    pDerivedObj->is_enemy_projectile = true;
+    is_enemy_projectile = true;
 
-
-    // setting derived object function
-    pObj->pDerivedObj = pDerivedObj;
-    pObj->Update = Projectile3_update;
-    pObj->Interact = Projectile3_interact;
-    pObj->Draw = Projectile3_draw;
-    pObj->Destroy = Projectile3_destroy;
-   
-    return pObj;
+    hitbox = new Circle(
+        x + width / 2,
+        y + height / 2,
+        std::min(width, height) / 2
+    );
 }
 
-
-void Projectile3_update(Elements *self)
-{
-    Projectile3 *Obj = ((Projectile3 *)(self->pDerivedObj));
-    _Projectile3_update_position(self, Obj->v, 0);
+Projectile3::~Projectile3() {
+    if (img) al_destroy_bitmap(img);
+    if (hitbox) delete hitbox;
 }
 
-
-void _Projectile3_update_position(Elements *self, int dx, int dy)
-{
-    Projectile3 *Obj = ((Projectile3 *)(self->pDerivedObj));
-    Obj->x += dx;
-    Obj->y += dy;
-    Shape *hitbox = Obj->hitbox;
-    hitbox->update_center_x(hitbox, dx);
-    hitbox->update_center_y(hitbox, dy);
+void Projectile3::Update() {
+    update_position(v, 0);
 }
 
+void Projectile3::update_position(int dx, int dy) {
+    x += dx;
+    y += dy;
+    hitbox->update_position(dx, 0);
+}
 
-void Projectile3_interact(Elements *self)
+void Projectile3::Interact()
 {
-    for (int j = 0; j < self->inter_len; j++)
-    {
-        int inter_label = self->inter_obj[j];
-        ElementVec labelEle = _Get_label_elements(scene, inter_label);
-        for (int i = 0; i < labelEle.len; i++)
-        {    // printf("DEBUG: inter_label = %d\n", inter_label); // 加這行！
+    if (dele || !scene) return;
 
+    for (Elements* ele : scene->getAllElements()) {
+        if (ele->dele) continue;
+        if (ele->label != Character_L && ele->label != Character2_L) continue;
 
-            if(inter_label == Character_L){
-               _Projectile3_interact_Character(self, labelEle.arr[i]);
+        if (Character* c1 = dynamic_cast<Character*>(ele)) {
+            if (hitbox->overlap(*c1->hitbox)){
+                dele = true;
+                interact_Character(c1);
+                return;
             }
-            else if(inter_label == Character2_L){
-               _Projectile3_interact_Character(self, labelEle.arr[i]);
+        }
+        if (Character2* c2 = dynamic_cast<Character2*>(ele)) {
+            if (hitbox->overlap(*c2->hitbox)){
+                dele = true;
+                interact_Character2(c2);
+                return;
             }
+            continue;
         }
     }
 }
 
-
-void _Projectile3_interact_Floor(Elements *self, Elements *tar)
-{
-    Projectile3 *Obj = ((Projectile3 *)(self->pDerivedObj));
-    if (Obj->x < 0 - Obj->width)
-        self->dele = true;
-    else if (Obj->x > WIDTH + Obj->width)
-        self->dele = true;
+void Projectile3::interact_Floor(Elements *tar) {
+    if (x < -width)
+        dele = true;
+    else if (x > WIDTH + width)
+        dele = true;
 }
 
+void Projectile3::interact_Character(Elements *tar){
+    Character* ch = dynamic_cast<Character*>(tar);
+    if(!ch) return;
 
-void _Projectile3_interact_Character(Elements *self, Elements *tar)
-{
-    Projectile3 *Obj = ((Projectile3 *)(self->pDerivedObj));
-    if (tar->label == Character_L) {
-        Character *player = (Character *)(tar->pDerivedObj);
-        if (player->hitbox->overlap(player->hitbox, Obj->hitbox) && player->blood > 0) {
-            self->dele = true;
-            player->blood -= Obj->damage;
-        }
-    }
-    else if (tar->label == Character2_L) {
-        Character2 *player2 = (Character2 *)(tar->pDerivedObj);
-        if (player2->hitbox->overlap(player2->hitbox, Obj->hitbox) && player2->blood > 0) {
-            self->dele = true;
-            player2->blood -= Obj->damage;
-        }
-    }  
+    ch->blood -= damage;
+    
+    printf("[Projectile] Character1 hit! HP = %d\n", ch->blood);
 }
 
+void Projectile3::interact_Character2(Elements *tar){
+    Character2* ch = dynamic_cast<Character2*>(tar);
+    if(!ch) return;
 
-void Projectile3_draw(Elements *self)
-{
-    Projectile3 *Obj = ((Projectile3 *)(self->pDerivedObj));
-    if (Obj->v < 0)
-        al_draw_bitmap(Obj->img, Obj->x, Obj->y, ALLEGRO_FLIP_HORIZONTAL);
+    ch->blood -= damage;
+
+    printf("[Projectile] Character2 hit! HP = %d\n", ch->blood);
+}
+
+void Projectile3::Draw() {
+    if (v < 0)
+        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
     else
-        al_draw_bitmap(Obj->img, Obj->x, Obj->y, 0);
-}
-
-
-void Projectile3_destroy(Elements *self)
-{
-    Projectile3 *Obj = ((Projectile3 *)(self->pDerivedObj));
-    al_destroy_bitmap(Obj->img);
-    free(Obj->hitbox);
-    free(Obj);
-    free(self);
+        al_draw_bitmap(img, x, y, 0);
 }
 

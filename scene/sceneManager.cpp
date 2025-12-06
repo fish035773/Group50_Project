@@ -2,56 +2,50 @@
 #include "../global.h"
 #include "menu.h"
 #include "gamescene.h"
+#include "scene.h"
 #include "victoryScene.h"
 #include "deathScene.h"
 #include "creditScene.h"
 #include "startScene.h"
 #include "aboutScene.h"
 
-Scene *scene = NULL;
+Scene* current_scene = nullptr;
 
 void create_scene(SceneType type)
 {
     switch (type)
     {
     case Menu_L:
-        scene = New_Menu(Menu_L);
-        printf("[SceneManager] Created Menu Scene.\n");
+        current_scene = new Menu(Menu_L);
         break;
 
     case GameScene_L:
-        scene = New_GameScene(GameScene_L);
-        printf("[SceneManager] Created Game Scene.\n");
+        current_scene = new GameScene(GameScene_L);
         break;
 
     case StartScene_L:
-        scene = New_StartScene(StartScene_L);
-        printf("[SceneManager] Created Start Scene.\n");
+        current_scene = new StartScene(StartScene_L);
         break;
 
     case VictoryScene_L:
-        scene = New_VictoryScene(VictoryScene_L);
-        printf("[SceneManager] Created Victory Scene.\n");
+        current_scene = new VictoryScene(VictoryScene_L);
         break;
 
     case DeathScene_L:
-        scene = New_DeathScene(DeathScene_L);
-        printf("[SceneManager] Created Death Scene.\n");
+        current_scene = new DeathScene(DeathScene_L);
         break;
 
     case CreditScene_L:
-        scene = New_CreditScene(CreditScene_L);
-        printf("[SceneManager] Created Credit Scene.\n");
-        break;
-    // new update 16:57 2025/07/06
-    case About_L:    
-        scene = New_AboutScene(About_L);
-        printf("[SceneManager] Created About Scene.\n");
+        current_scene = new CreditScene(CreditScene_L);
         break;
 
-    default:
-        printf("WARNING: Unknown SceneType %d!\n", type);
-        scene = NULL;
+    case About_L:
+        current_scene = new AboutScene(About_L);
+        break;
+    case Exit_L:
+        // Handled elsewhere
         break;
     }
+
+    Elements::scene = current_scene;
 }

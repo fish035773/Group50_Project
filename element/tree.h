@@ -1,11 +1,10 @@
+/*
 #ifndef TREE_H_INCLUDED
 #define TREE_H_INCLUDED
 #include "element.h"
 #include "../scene/gamescene.h" // for element label
 #include "../shapes/Shape.h"
-/*
-   [tree object]
-*/
+
 typedef struct _Tree
 {
     int x, y;          // the position of image
@@ -20,3 +19,4 @@ void Tree_draw(Elements *self);
 void Tree_destory(Elements *self);
 
 #endif
+*/
