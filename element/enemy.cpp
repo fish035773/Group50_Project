@@ -17,7 +17,7 @@
    [Character function]
 */
 
-Enemy::Enemy(int label): Elements(label){
+Enemy::Enemy(int label, int speed): Elements(label), speed(speed){
     char state_string[4][10] = {"stop", "move", "attack", "dead"};
     for (int i = 0; i < 4; i++){
         char buffer[100];
@@ -76,12 +76,11 @@ void Enemy::update_position(int dx, int dy){
 
 void Enemy::Update() {
     Rectangle* b = (Rectangle*)dynamic_cast<Rectangle*>(hitbox);
-    printf("%d %d\n", x, b->get_pos_x());
+    //printf("%d %d\n", x, b->get_pos_x());
     if (hp <= 0) return;
 
     int c1_pos = INT_MAX, c2_pos = INT_MAX;
     int nearest_player_center = 0;
-    int speed = 2;
     int enemy_center_x = x + width / 2;
 
     // 找最近的玩家
@@ -163,7 +162,7 @@ void Enemy::Update() {
             } else {
                 if (chasing) {
                     dir = (dx >= 0);
-                    int move_speed = (dx > 0) ? speed : -speed;
+                    int move_speed = (dx > 0) ? speed * 0.8 : -speed * 0.8;
                     update_position(move_speed, 0);
                 } else {
                     if (!dir) {
@@ -177,10 +176,15 @@ void Enemy::Update() {
             }
             break;
         case ENEMY_ATK: {
+            /*
+            printf("ATK FRAME = %d DONE = %d\n",
+            gif_status[ENEMY_ATK]->display_index,
+            gif_status[ENEMY_ATK]->done);*/
+
             int frame = gif_status[ENEMY_ATK]->display_index;
+            int last = gif_status[ENEMY_ATK]->frames_count - 1;
 
             if (frame == 2 && !active_proj) {
-                //printf("ATK\n");
                 int projectile_x = dir ?
                     x + width - 100 :
                     x + 20;
@@ -199,11 +203,10 @@ void Enemy::Update() {
                 active_proj = true;
             }
 
-            if (gif_status[ENEMY_ATK]->done) {
-                gif_status[ENEMY_ATK]->done = false;
+            if (frame == last) {
                 gif_status[ENEMY_ATK]->display_index = 0;
                 active_proj = false;
-                //printf("DONE\n");
+
                 if (abs(dx) <= ENEMY_ATTACK_RANGE)
                     state = ENEMY_IDLE;
                 else
@@ -211,12 +214,15 @@ void Enemy::Update() {
             }
             break;
         }
-
         case ENEMY_DEAD:
+            //printf("DEAD\n");
             if (death_time == 0) death_time = al_get_time();
             else if (gif_status[ENEMY_DEAD]->done &&
                     al_get_time() - death_time >= 1.0)
                 dele = true;
+            break;
+        default:
+            //printf("DEF\n");
             break;
     }
 }
@@ -277,50 +283,4 @@ void Enemy::Draw() {
 }
 
 void Enemy::Interact()
-{
-    if (!alive || dying) return;
-    if (!scene) return;
-
-    for (Elements* obj : scene->getAllElements()) {
-
-        if (obj->dele) continue;
-
-        // ---- find projectile (Projectile2) ----
-        Projectile2* proj = dynamic_cast<Projectile2*>(obj);
-        if (!proj) continue;
-
-        // ignore if this projectile belongs to enemies
-        if (proj->is_enemy_projectile) 
-            continue;
-
-        // hitbox overlap check
-        if (hitbox->overlap(*proj->hitbox)) {
-            //printf("HURT\n");
-            // projectile disappears
-            obj->dele = true;
-
-            // damage
-            hp--;
-            got_hit = true;
-            hit_time = al_get_time();
-
-            // death state transition
-            if (hp <= 0 && !dying) {
-                alive = false;
-                dying = true;
-                state = ENEMY_DEAD;
-                printf("DIED\n");
-                gif_status[ENEMY_DEAD]->display_index = 0;
-                gif_status[ENEMY_DEAD]->done = false;
-                death_time = al_get_time();
-                return;
-            }
-        }
-    }
-}
-
-
-Elements* New_Enemy(int label)
-{
-    return new Enemy(label);
-}
+{}

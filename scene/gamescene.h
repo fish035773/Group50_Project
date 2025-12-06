@@ -26,7 +26,8 @@ enum EleType {
    Projectile_C,
    Projectile_X,
    Projectile2_L,
-   Projectile3_L,
+   Projectile3_1_L,
+   Projectile3_2_L,
    Enemy3_L,
    Enemy2_L
 };

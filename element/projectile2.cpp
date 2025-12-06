@@ -7,6 +7,7 @@
 #include "../scene/sceneManager.h"
 #include "../scene/gamescene.h"
 #include "element.h"
+#include <allegro5/allegro_primitives.h>
 
 // ----------------------------------------
 // Constructor
@@ -34,82 +35,81 @@ Projectile2::Projectile2(int label, int x, int y, int v)
 Projectile2::~Projectile2() {
     if (img) al_destroy_bitmap(img);
     delete hitbox;
+    printf("[Projectile] Destroyed projectile label=%d\n", label);
 }
 
 void Projectile2::Update() {
+    if (dele) return;
     x += v;
-    hitbox->update_position(v, 0);
+    
+    if (hitbox)
+        hitbox->update_position(v, 0);
 
-    if (x < -width || x > WIDTH + width)
+    if (x < 0 || x > 900) {
         dele = true;
+        printf("[Projectile] Out of bounds → dele set to true\n");
+    }else {
+        Circle* c = static_cast<Circle*>(hitbox);
+        //printf("X: %d, %lf Y: %d, %lf\n", x, c->center_x(), y, c->center_y());
+    }
 }
 
 // ----------------------------------------
 // Interact: C++ 版本正確 hitbox 判定
 // ----------------------------------------
-void Projectile2::Interact()
-{
+void Projectile2::Interact(){
     if (dele || !scene) return;
 
     for (Elements* ele : scene->getAllElements()) {
-
         if (ele->dele) continue;
-        if (ele == this) continue;
+        if (ele->label != Character_L && ele->label != Character2_L) continue;
 
-        // ----- 玩家 1 -----
         if (Character* c1 = dynamic_cast<Character*>(ele)) {
-
-            // 如果這是敵人射的，才打玩家
-            if (is_enemy_projectile &&
-                hitbox->overlap(*c1->hitbox))
-            {
-                c1->blood -= damage;
+            if (hitbox->overlap(*c1->hitbox)){
                 dele = true;
+                interact_Character(c1);
                 return;
             }
-
-            continue;
         }
-
-        // ----- 玩家 2 -----
         if (Character2* c2 = dynamic_cast<Character2*>(ele)) {
-
-            if (is_enemy_projectile &&
-                hitbox->overlap(*c2->hitbox))
-            {
-                c2->blood -= damage;
+            if (hitbox->overlap(*c2->hitbox)){
                 dele = true;
+                interact_Character2(c2);
                 return;
             }
-
-            continue;
-        }
-
-        if (Enemy* e = dynamic_cast<Enemy*>(ele)) {
-
-            // 玩家射的子彈才能打敵人
-            if (!is_enemy_projectile &&
-                hitbox->overlap(*e->hitbox))
-            {
-                e->hp -= damage;
-                dele = true;
-                return;
-            }
-
             continue;
         }
     }
 }
 
-// ----------------------------------------
-// Draw
-// ----------------------------------------
+void Projectile2::interact_Character(Elements *tar){
+    Character* ch = dynamic_cast<Character*>(tar);
+    if(!ch) return;
+
+    ch->blood -= damage;
+    
+    printf("[Projectile] Character1 hit! HP = %d\n", ch->blood);
+}
+
+void Projectile2::interact_Character2(Elements *tar){
+    Character2* ch = dynamic_cast<Character2*>(tar);
+    if(!ch) return;
+
+    ch->blood -= damage;
+
+    printf("[Projectile] Character2 hit! HP = %d\n", ch->blood);
+}
+
 void Projectile2::Draw()
 {
     if (!img || dele) return;
 
-    if (v < 0)
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
-    else
-        al_draw_bitmap(img, x, y, 0);
+    if (hitbox) {
+        Circle* c = static_cast<Circle*>(hitbox);
+        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
+    }
+
+    int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);
+
+    al_draw_bitmap(img, x, y, flags);
 }

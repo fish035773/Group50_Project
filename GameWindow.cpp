@@ -60,7 +60,6 @@ bool GameWindow::Init()
 
     al_start_timer(timer);
 
-    // ★ 初始場景：Menu
     create_scene(Menu_L);
 
     return true;
@@ -115,11 +114,9 @@ void GameWindow::ProcessEvent(ALLEGRO_EVENT& ev)
 
 void GameWindow::Update()
 {
-    // ★ 呼叫當前場景的 Update()
     if (current_scene)
         current_scene->Update();
 
-    // ★ 是否要求切換場景？
     if (current_scene && current_scene->next_scene_requested)
     {
         SceneType next = current_scene->next_scene_type;
@@ -141,7 +138,6 @@ void GameWindow::Draw()
 
 void GameWindow::Destroy()
 {
-    // ★ 在退出遊戲時刪掉最後場景一次即可
     if (current_scene) {
         delete current_scene;
         current_scene = nullptr;

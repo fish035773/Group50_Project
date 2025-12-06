@@ -14,21 +14,21 @@
 #include <allegro5/allegro_primitives.h>
 
 // Damage constants
-/*
+
 static const int DAMAGE_V = 10;
 static const int DAMAGE_L = 10;
 static const int DAMAGE_K = 5;
 static const int DAMAGE_C = 5;
 static const int DAMAGE_J = 5;
 static const int DAMAGE_X = 5;
-*/
 
+/*
 static const int DAMAGE_V = 100;
 static const int DAMAGE_L = 100;
 static const int DAMAGE_K = 500;
 static const int DAMAGE_C = 500;
 static const int DAMAGE_J = 500;
-static const int DAMAGE_X = 500;
+static const int DAMAGE_X = 500;*/
 
 Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
     : Elements(label_), x(x_), y(y_), width(0), height(0),
@@ -50,18 +50,19 @@ Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
 
     if (path)
         img = al_load_bitmap(path);
+    else printf("[Projectile] ERROR loading image for projectile label=%d\n", label_);
 
     if (!img) {
         printf("[Projectile] ERROR loading image for projectile label=%d\n", label_);
         width = height = 16;
     } else {
-        width  = al_get_bitmap_width(img);
+        width = al_get_bitmap_width(img);
         height = al_get_bitmap_height(img);
         printf("[Projectile] Loaded image size = %d x %d\n", width, height);
     }
 
     // hitbox
-    hitbox = new Circle(x + width/2, y + height/2, (std::min(width, height) / 2));
+    hitbox = new Circle(x + width / 2, y + height / 2, (std::min(width, height) / 2));
 }
 
 Projectile::~Projectile()
@@ -85,6 +86,9 @@ void Projectile::Update()
     if (x < 0 || x > 900) {
         dele = true;
         printf("[Projectile] Out of bounds → dele set to true\n");
+    }else {
+        Circle* c = static_cast<Circle*>(hitbox);
+        //printf("X: %d, %lf Y: %d, %lf\n", x, c->center_x(), y, c->center_y());
     }
 }
 
@@ -125,17 +129,17 @@ void Projectile::Interact()
 
 void Projectile::Draw()
 {
-    if (dele || !img) return;
+    if (dele) return;
+    
+    if (hitbox) {
+        Circle* c = static_cast<Circle*>(hitbox);
+        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
+    }
 
     int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);
 
     al_draw_bitmap(img, x, y, flags);
     //al_draw_rectangle(x, y, x+width, y+height, al_map_rgb(0,255,0), 2);
-
-    if (hitbox) {
-        Circle* c = static_cast<Circle*>(hitbox);
-        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
-    }
 }
 
 void Projectile::interactEnemy(Elements* tar)

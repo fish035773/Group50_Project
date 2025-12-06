@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #define maxhp 100
 
-Enemy3::Enemy3(int label): Elements(label){
+Enemy3::Enemy3(int label, int speed): Elements(label), speed(speed){
     char state_string[5][10] = {"stop", "move", "attack", "throw", "dead"};
     for (int i = 0; i < 5; i++){
         char buffer[100];
@@ -74,154 +74,212 @@ Enemy3::~Enemy3() {
     if (atk_sound) al_destroy_sample_instance(atk_sound);
 }
 
-int player_center_x3;
-void enemy_charater3(int dx){
-    player_center_x3 =  dx;
-}
-
 void Enemy3::update_position(int dx, int dy){
+    //printf("UPDATED\n");
     x += dx;
     y += dy;
 
     hitbox->update_position(dx, dy);
 }
 
-void Enemy3::Update(){
-    extern Elements *player;
-    int speed = 5;
+void Enemy3::Update() {
+    Rectangle* b = (Rectangle*)dynamic_cast<Rectangle*>(hitbox);
+    //printf("%d %d\n", x, b->get_pos_x());
+    if (hp <= 0) return;
+    //printf("%d\n", x);
+    int c1_pos = INT_MAX, c2_pos = INT_MAX;
+    int nearest_player_center = 0;
+    int enemy_center_x = x + width / 2;
 
-    int enemy3_center_x = x + width / 2;
-    int dx = player_center_x3 - enemy3_center_x;
+    Elements* target = nullptr;
+    int bestDist = INT_MAX;
 
-    double current_time = al_get_time();
-    if (!can_attack && current_time - spawn_time >= 1.0) can_attack = true;
+    for (Elements* ele : scene->getAllElements()) {
+        if (ele->label == Character_L || ele->label == Character2_L) {
 
-    if (can_attack) {
-        dir = dx >= 0;
-        if (abs(dx) <= ENEMY3_MELEE_RANGE) {
-            if (state != ENEMY3_ATK) {
-                state = ENEMY3_ATK;
-                active_proj = false;
-                move_counter = 0;
-            }
-        } else if (abs(dx) <= ENEMY3_ATTACK_RANGE) {
-            if (state != ENEMY3_THROW) {
-                state = ENEMY3_THROW;
-                active_proj = false;
-                move_counter = 0;
-            }
-        }
-    }
+            int px = 0;
 
-    if (state == ENEMY3_DEAD) {
-        if (death_time == 0) death_time = al_get_time();
-        else if (gif_status[ENEMY3_DEAD]->done && al_get_time() - death_time >= 1.0)
-            dele = true;
-        return;
-    } else if (state == ENEMY3_IDLE) {
-        if (abs(dx) <= ENEMY3_ATTACK_RANGE) {
-            chasing = true;
-            state = ENEMY3_ATK;
-            active_proj = false;
-            move_counter = 0;
-        } else {
-            state = ENEMY3_MOVE;
-        }
-    } else if (state == ENEMY3_MOVE) {
-        if (!chasing) {
-            if (abs(dx) <= ENEMY3_ATTACK_RANGE) {
-                chasing = true; // Start chasing
-            } else {
-                // Patrol behavior
-                if (dir == false) {
-                    update_position(-speed, 0);
-                    if (x < 500) {
-                        dir = true;
-                    }
-                }else {
-                    update_position(speed, 0);
-                    if (x > 700) {
-                        dir = false;
-                    }
-                }
-                state = ENEMY3_MOVE;
-                return;
-            }
-        }
-        // If chasing is true, move toward player
-        dir = dx >= 0;
-        int move_speed = (dx > 0) ? speed : -speed;
-        update_position(move_speed, 0);
-        state = ENEMY3_MOVE;
-    }else if (state == ENEMY3_ATK){
-        int current_frame = gif_status[ENEMY3_ATK]->display_index;
-
-        // Launch projectile once at frame 2
-        if (current_frame == 2 && !active_proj){
-            int projectile_x = dir
-                ? x + width - 100
-                : x + 100;
-
-            Elements* pro = new Projectile3(
-                Projectile3_L,
-                projectile_x,
-                y + height / 2 - 20,
-                dir ? 5 : -5
-            );
-
-            Projectile3* p = dynamic_cast<Projectile3*>(pro);
-            if (p) p->is_enemy_projectile = true;
-            scene->addElement(p);
-            
-            //====
-            al_play_sample_instance(atk_sound);
-            active_proj = true;
-        }
-
-        // When attack animation finishes, transition based on distance
-        if (gif_status[ENEMY3_ATK]->done) {
-            gif_status[ENEMY3_ATK]->done = false;
-            gif_status[ENEMY3_ATK]->display_index = 0;
-            active_proj = false;
-
-            if (std::abs(dx) <= ENEMY3_ATTACK_RANGE) {
-                chasing = true;
-                state = ENEMY3_ATK;
+            if (ele->label == Character_L) {
+                Character* c = dynamic_cast<Character*>(ele);
+                if (!c) continue;
+                px = c->x + c->width / 2;
             }
             else {
-                chasing = true;
-                state = ENEMY3_MOVE;
+                Character2* c2 = dynamic_cast<Character2*>(ele);
+                if (!c2) continue;
+                px = c2->x + c2->width / 2;
+            }
+
+            int dist = abs(px - enemy_center_x);
+            if (dist < bestDist) {
+                bestDist = dist;
+                target = ele;
             }
         }
-    } else if (state == ENEMY3_THROW) {
-        int frame = gif_status[ENEMY3_THROW]->display_index;
+    }
 
-        if (frame == 2 && !active_proj) {
-            Elements* pro = new Projectile3(
-                Projectile3_L,
-                dir ? (x + width - 100) : (x + 20),
-                y + height / 2 + 20,
-                dir ? 5 : -5
-            );
+    if (!target) return;
 
-            Projectile3* p = dynamic_cast<Projectile3*>(pro);
-            if (p) p->is_enemy_projectile = true;
-            scene->addElement(p);
+    int player_center_x = 0;
 
-            al_play_sample_instance(throw_sound);
-            active_proj = true;
-        }
+    if (target->label == Character_L) {
+        Character* c = dynamic_cast<Character*>(target);
+        player_center_x = c->x + c->width / 2;
+    } else {
+        Character2* c2 = dynamic_cast<Character2*>(target);
+        player_center_x = c2->x + c2->width / 2;
+    }
 
-        if (gif_status[ENEMY3_THROW]->done) {
-            gif_status[ENEMY3_THROW]->done = false;
-            gif_status[ENEMY3_THROW]->display_index = 0;
+    int dx = player_center_x - enemy_center_x;
+    //printf("DX: %d\n", dx);
+    double current_time = al_get_time();
+    
+    if (!can_attack && current_time - spawn_time >= 1.0)
+        can_attack = true;
+
+    if (can_attack && abs(dx) <= ENEMY3_ATTACK_RANGE) {
+        dir = dx >= 0;
+
+        if (state != ENEMY3_ATK) {
+            state = ENEMY3_ATK;
             active_proj = false;
-
-            state = (abs(dx) <= ENEMY3_MELEE_RANGE)
-                    ? ENEMY3_ATK : ENEMY3_MOVE;
+            al_play_sample_instance(atk_sound);
         }
     }
+ 
+    switch (state) {
+        // ----------------- IDLE -----------------
+        case ENEMY3_IDLE:
+            //printf("IDLE\n");
+            if (abs(dx) <= ENEMY3_MELEE_RANGE && can_attack) {
+                dir = dx >= 0;
+                state = ENEMY3_ATK;    // 近距離 = 近戰
+                active_proj = false;
+            }
+            else if (abs(dx) <= ENEMY3_ATTACK_RANGE && can_attack) {
+                dir = dx >= 0;
+                state = ENEMY3_THROW;  // 中距離 = 投擲
+                active_proj = false;
+            }
+            else {
+                state = ENEMY3_MOVE;   // 否則 = 追擊
+            }
+            break;
+        // ----------------- MOVE -----------------
+        case ENEMY3_MOVE:
+            //printf("MOVE\n");
+            if (abs(dx) <= ENEMY3_ATTACK_RANGE && can_attack) {
+                //printf("1\n");
+                dir = dx >= 0;
+                state = ENEMY3_ATK;
+                active_proj = false;
+                al_play_sample_instance(atk_sound);
+            } else if(abs(dx) <= ENEMY3_MELEE_RANGE && can_attack){
+                //printf("2\n");
+                dir = dx >= 0;
+                state = ENEMY3_THROW;
+                active_proj = false;
+                al_play_sample_instance(atk_sound);
+            }else {
+                //printf("3\n");
+                if (chasing) {
+                    //printf("CH\n");
+                    dir = (dx >= 0);
+                    int move_speed = (dx > 0) ? speed : -speed;
+                    update_position(move_speed, 0);
+                } else {
+                    if (!dir) {
+                        //printf("CH2\n");
+                        update_position(-speed, 0);
+                        if (x < 200) dir = true;
+                    } else {
+                        //printf("%d\n", speed);
+                        update_position(speed, 0);
+                        if (x > 800) dir = false;
+                    }
+                }
+            }
+            break;
+        case ENEMY3_ATK: {
+            //printf("ATK\n");
+            int frame = gif_status[ENEMY3_ATK]->display_index;
+            int last = gif_status[ENEMY3_ATK]->frames_count - 1;
+
+            if (frame == 2 && !active_proj) {
+                int px = dir ? (x + width - 100) : (x + 100);
+
+                Elements* pro = new Projectile3(
+                    Projectile3_1_L,
+                    px,
+                    y + height / 2 - 20,
+                    dir ? 5 : -5
+                );
+
+                Projectile3* p = dynamic_cast<Projectile3*>(pro);
+                if (p) p->is_enemy_projectile = true;
+                scene->addElement(p);
+
+                al_play_sample_instance(atk_sound);
+                active_proj = true;
+            }
+
+            if (frame == last) {
+                gif_status[ENEMY3_ATK]->display_index = 0;
+                active_proj = false;
+
+                if (abs(dx) <= ENEMY3_ATTACK_RANGE)
+                    state = ENEMY3_IDLE;
+                else state = ENEMY3_MOVE;
+            }
+            break;
+        }
+        // ----------------- THROW -----------------
+        case ENEMY3_THROW: {
+            //printf("THROW\n");
+            int frame = gif_status[ENEMY3_THROW]->display_index;
+            int last = gif_status[ENEMY3_THROW]->frames_count - 1;
+
+            if (frame == 2 && !active_proj) {
+                Elements* pro = new Projectile3(
+                    Projectile3_2_L,
+                    dir ? (x + width - 100) : (x + 20),
+                    y + height / 2 + 20,
+                    dir ? 5 : -5
+                );
+
+                Projectile3* p = dynamic_cast<Projectile3*>(pro);
+                if (p) p->is_enemy_projectile = true;
+                scene->addElement(p);
+
+                al_play_sample_instance(throw_sound);
+                active_proj = true;
+            }
+
+            if (frame == last) {
+                gif_status[ENEMY3_THROW]->display_index = 0;
+                active_proj = false;
+
+                if (abs(dx) <= ENEMY3_MELEE_RANGE)
+                    state = ENEMY3_IDLE;
+                else
+                    state = ENEMY3_MOVE;
+            }
+            break;
+        }
+
+        // ----------------- DEAD -----------------
+        case ENEMY3_DEAD:
+            if (death_time == 0) death_time = al_get_time();
+            else if (gif_status[ENEMY3_DEAD]->done &&
+                al_get_time() - death_time >= 1.0)
+                dele = true;
+            break;
+
+        default:
+            break;
+    }
 }
+
 
 void Enemy3::Draw(){
     if (hp <= 0) return;
@@ -256,36 +314,6 @@ void Enemy3::Draw(){
 }
 
 void Enemy3::Interact(){
-    if (!alive || dying) return;
-
-    if (!alive || dying) return;
-    if (!scene) return;
-
-    for (Elements* obj : scene->getAllElements()) {
-        if (obj->dele) continue;
-        Projectile3* proj = dynamic_cast<Projectile3*>(obj);
-
-        if ((obj->label == Projectile3_Right ||
-                obj->label == Projectile3_Left ||
-                obj->label == Projectile3_L) &&
-            !proj->is_enemy_projectile &&
-            hitbox->overlap(*proj->hitbox))
-        {
-            obj->dele = true;
-            got_hit = true;
-            hit_time = al_get_time();
-            hp--;
-
-            if (hp <= 0 && !dying) {
-                alive = false;
-                dying = true;
-                state = ENEMY3_DEAD;
-                gif_status[ENEMY3_DEAD]->display_index = 0;
-                gif_status[ENEMY3_DEAD]->done = false;
-                death_time = al_get_time();
-            }
-        }
-    }
 }
 
 

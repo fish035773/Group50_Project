@@ -8,8 +8,8 @@
 extern Elements* player;
 extern Elements* player2;
 
-#define ENEMY3_ATTACK_RANGE 100
-#define ENEMY3_MELEE_RANGE 200
+#define ENEMY3_ATTACK_RANGE 200
+#define ENEMY3_MELEE_RANGE 300
 enum Enemy3State {
     ENEMY3_IDLE = 0,
     ENEMY3_MOVE,
@@ -46,8 +46,9 @@ public:
     bool chasing;
     double death_time;
     bool is_melee;        //melee attacks
+    int speed;
 
-    Enemy3(int label);
+    Enemy3(int label, int speed);
     virtual ~Enemy3();
 
     void Update() override;

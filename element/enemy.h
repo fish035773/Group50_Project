@@ -8,7 +8,7 @@
 extern Elements* player;
 extern Elements* player2;
 
-#define ENEMY_ATTACK_RANGE 300
+#define ENEMY_ATTACK_RANGE 200
 
 enum EnemyState {
     ENEMY_IDLE = 0,
@@ -43,8 +43,9 @@ public:
     bool can_attack;
     bool chasing;
     double death_time;
+    int speed;
 
-    Enemy(int label);
+    Enemy(int label, int speed);
     virtual ~Enemy();
 
     void Update() override;
@@ -53,6 +54,3 @@ public:
 
     void update_position(int dx, int dy);
 };
-
-void enemy_charater(int dx);
-Elements* New_Enemy(int label);

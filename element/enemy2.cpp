@@ -18,7 +18,7 @@
    [Character function]
 */
 
-Enemy2::Enemy2(int label): Elements(label){
+Enemy2::Enemy2(int label, int speed): Elements(label), speed(speed){
     char state_string[4][10] = {"stop", "move", "attack", "dead"};
     for (int i = 0; i < 4; i++){
         char buffer[100];
@@ -84,94 +84,145 @@ void Enemy2::update_position(int dx, int dy){
 }
 
 void Enemy2::Update() {
-    extern Elements *player;
-
+   Rectangle* b = (Rectangle*)dynamic_cast<Rectangle*>(hitbox);
+    //printf("%d %d\n", x, b->get_pos_x());
     if (hp <= 0) return;
 
-    int speed = 3;
+    int c1_pos = INT_MAX, c2_pos = INT_MAX;
+    int nearest_player_center = 0;
     int enemy_center_x = x + width / 2;
-    int dx = player_center_x2 - enemy_center_x;
 
-    double now = al_get_time();
-    if (!can_attack && now - spawn_time >= 1.0)
-        can_attack = true;
+    Elements* target = nullptr;
+    int bestDist = INT_MAX;
 
-    switch (state) {
+    for (Elements* ele : scene->getAllElements()) {
+        if (ele->label == Character_L || ele->label == Character2_L) {
 
-    case ENEMY2_IDLE:
-        if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
-            dir = dx >= 0;
-            state = ENEMY2_ATK;
-            active_proj = false;
-            al_play_sample_instance(atk_sound);
-        } else {
-            state = ENEMY2_MOVE;
-        }
-        break;
+            int px = 0;
 
-    case ENEMY2_MOVE:
-        if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
-            dir = dx >= 0;
-            state = ENEMY2_ATK;
-            active_proj = false;
-            al_play_sample_instance(atk_sound);
-        } else {
-            if (chasing) {
-                dir = dx >= 0;
-                update_position((dx > 0 ? speed : -speed), 0);
-            } else {
-                if (!dir) {
-                    update_position(-speed, 0);
-                    if (x < 400) dir = true;
-                } else {
-                    update_position(speed, 0);
-                    if (x > 700) dir = false;
-                }
+            if (ele->label == Character_L) {
+                Character* c = dynamic_cast<Character*>(ele);
+                if (!c) continue;
+                px = c->x + c->width / 2;
+            }
+            else {
+                Character2* c2 = dynamic_cast<Character2*>(ele);
+                if (!c2) continue;
+                px = c2->x + c2->width / 2;
+            }
+
+            int dist = abs(px - enemy_center_x);
+            if (dist < bestDist) {
+                bestDist = dist;
+                target = ele;
             }
         }
-        break;
-
-    case ENEMY2_ATK: {
-        int frame = gif_status[ENEMY2_ATK]->display_index;
-
-        if (frame == 2 && !active_proj) {
-
-            int px = dir ? x + width - 100 : x + 20;
-
-            Elements* pro = new Projectile2(
-                Projectile2_L,
-                px,
-                y + height / 2 - 20,
-                dir ? 5 : -5
-            );
-
-            Projectile2* p = dynamic_cast<Projectile2*>(pro);
-            if (p) p->is_enemy_projectile = true;
-            scene->addElement(p);
-
-            active_proj = true;
-        }
-
-        if (gif_status[ENEMY2_ATK]->done) {
-            gif_status[ENEMY2_ATK]->done = false;
-            gif_status[ENEMY2_ATK]->display_index = 0;
-            active_proj = false;
-
-            if (abs(dx) <= ENEMY_ATTACK_RANGE)
-                state = ENEMY2_IDLE;
-            else
-                state = ENEMY2_MOVE;
-        }
-        break;
     }
 
-    case ENEMY2_DEAD:
-        if (death_time == 0) death_time = now;
-        else if (gif_status[ENEMY2_DEAD]->done && now - death_time >= 1.0)
-            dele = true;
-        break;
+    if (!target) return;
+
+    int player_center_x = 0;
+
+    if (target->label == Character_L) {
+        Character* c = dynamic_cast<Character*>(target);
+        player_center_x = c->x + c->width / 2;
+    } else {
+        Character2* c2 = dynamic_cast<Character2*>(target);
+        player_center_x = c2->x + c2->width / 2;
+    }
+
+    int dx = player_center_x - enemy_center_x;
+
+    double current_time = al_get_time();
+    
+    if (!can_attack && current_time - spawn_time >= 1.0)
+        can_attack = true;
+
+    if (can_attack && abs(dx) <= ENEMY_ATTACK_RANGE) {
+        dir = dx >= 0;
+
+        if (state != ENEMY2_ATK) {
+            state = ENEMY2_ATK;
+            active_proj = false;
+            al_play_sample_instance(atk_sound);
+        }
+    }
+ 
+    // ---------- 3. 狀態機 ----------
+    switch (state) {
+        // ------------------ IDLE ------------------
+        case ENEMY2_IDLE:
+            if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
+                dir = dx >= 0;
+                state = ENEMY2_ATK;
+                active_proj = false;
+                al_play_sample_instance(atk_sound);
+            } else {
+                state = ENEMY2_MOVE;
+            }
+            break;
+
+        // ------------------ MOVE ------------------
+        case ENEMY2_MOVE:
+            if (abs(dx) <= ENEMY_ATTACK_RANGE && can_attack) {
+                dir = dx >= 0;
+                state = ENEMY2_ATK;
+                active_proj = false;
+                al_play_sample_instance(atk_sound);
+            } else {
+                dir = dx >= 0;
+                int move_speed = dx > 0 ? speed : -speed;
+                update_position(move_speed, 0);
+            }
+            break;
+
+        // ------------------ ATK ------------------
+        case ENEMY2_ATK: {
+            int frame = gif_status[ENEMY2_ATK]->display_index;
+            int last = gif_status[ENEMY2_ATK]->frames_count - 1;
+
+            // 第 2 幀射子彈（與 Enemy 一樣）
+            if (frame == 2 && !active_proj) {
+                int px = dir ? (x + width - 100) : (x + 20);
+
+                Elements* pro = new Projectile2(
+                    Projectile2_L,
+                    px,
+                    y + height / 2 - 20,
+                    dir ? 5 : -5
+                );
+
+                Projectile2* p = dynamic_cast<Projectile2*>(pro);
+                if (p) p->is_enemy_projectile = true;
+                scene->addElement(p);
+
+                active_proj = true;
+            }
+
+            // 動畫播放完 → 重置 + 切換狀態（與 Enemy 完全一致）
+            if (frame == last) {
+                gif_status[ENEMY2_ATK]->display_index = 0;
+                active_proj = false;
+
+                if (abs(dx) <= ENEMY_ATTACK_RANGE)
+                    state = ENEMY2_IDLE;
+                else
+                    state = ENEMY2_MOVE;
+            }
+
+            break;
+        }
+        case ENEMY2_DEAD: {
+            printf("DEAD\n");
+            if (death_time == 0) death_time = al_get_time();
+            else if (gif_status[ENEMY2_DEAD]->done &&
+                    al_get_time() - death_time >= 1.0)
+                dele = true;
+            break;
+        }
     }
 }
+
 void Enemy2::Draw() {
     if (hp <= 0) return;
 
@@ -217,40 +268,6 @@ void Enemy2::Draw() {
 
 void Enemy2::Interact()
 {
-    if (!alive || dying) return;
-
-    for (Elements* obj : scene->getAllElements()) {
-        if (obj->dele) continue;
-
-        // hit by projectile
-        Projectile2* proj = dynamic_cast<Projectile2*>(obj);
-        if (!proj) continue;
-
-        Shape* proj_hitbox = proj->hitbox;
-
-        if (proj->is_enemy_projectile) {
-            continue;
-        }
-
-        if (hitbox->overlap(*proj_hitbox)) {
-
-            obj->dele = true;
-
-            hp--;
-            got_hit = true;
-            hit_time = al_get_time();
-
-            if (hp <= 0 && !dying) {
-                alive = false;
-                dying = true;
-                state = ENEMY2_DEAD;
-                gif_status[ENEMY2_DEAD]->display_index = 0;
-                gif_status[ENEMY2_DEAD]->done = false;
-                death_time = al_get_time();
-                return;
-            }
-        }
-    }
 }
 
 

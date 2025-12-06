@@ -3,10 +3,6 @@
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
 
-//Projection Direction
-#define Projectile3_Right 201
-#define Projectile3_Left 202
-
 class Projectile3 : public Elements {
 public:
     int x, y;
@@ -29,6 +25,7 @@ public:
     void update_position(int dx, int dy);
     void interact_Floor(Elements* tar);
     void interact_Character(Elements* tar);
+    void interact_Character2(Elements* tar);
 };
 
 

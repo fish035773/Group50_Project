@@ -58,7 +58,10 @@ Character::~Character()
 
 void Character::Update()
 {
-    if (blood <= 0) return; // dead
+    if (blood <= 0) {
+        create_scene(DeathScene_L);
+        return;
+    }
     
     // Level up
     if (levelup_points >= (level + 1) * 10) {
@@ -212,8 +215,8 @@ void Character::trigger_attack(int atk)
             }
             else {
                 Projectile* main = new Projectile(Projectile::Projectile_C, x - 120, y + 80, -5, this);
-                Projectile* t1   = new Projectile(Projectile::Projectile_C, x - 100, y + 15, -3, this);
-                Projectile* t2   = new Projectile(Projectile::Projectile_C, x - 100, y + 125, -3, this);
+                Projectile* t1 = new Projectile(Projectile::Projectile_C, x - 100, y + 15, -3, this);
+                Projectile* t2 = new Projectile(Projectile::Projectile_C, x - 100, y + 125, -3, this);
 
                 scene->addElement(main);
                 scene->addElement(t1);

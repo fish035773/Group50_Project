@@ -79,27 +79,22 @@ for (auto* e : elements)
 
 void GameScene::Update() {
     Scene::Update();
-
     // === GLOBAL INTERACTION ===
     for (auto* ele : elements)
         ele->Interact();
-
-        // SAFE DELETE ELEMENTS
-        elements.erase(
-            std::remove_if(elements.begin(), elements.end(),
-                [&](Elements* ele){
-                    if (ele->dele) {
-                        delete ele;
-                        return true;
-                    }
-                    return false;
-                }),
-            elements.end()
+    
+    elements.erase(
+        std::remove_if(elements.begin(), elements.end(),
+            [&](Elements* ele){
+                if (ele->dele) {
+                    delete ele;
+                    return true;
+                }
+                return false;
+            }),
+        elements.end()
     );
 
-    // =====================================================
-    // 1. ROUND DISPLAY PHASE ("ROUND X" 從畫面淡出)
-    // =====================================================
     if (round_triggered) {
         round_timer++;
 
@@ -124,7 +119,7 @@ void GameScene::Update() {
             enemy_count = 3;
             spacing = 100;
             for (int i = 0; i < enemy_count; i++) {
-                Enemy* e = new Enemy(Enemy_L);
+                Enemy* e = new Enemy(Enemy_L, i);
                 e->update_position(i * spacing, 0);
                 addElement(e);
             }
@@ -134,7 +129,7 @@ void GameScene::Update() {
             enemy_count = 2;
             spacing = 150;
             for (int i = 0; i < enemy_count; i++) {
-                Enemy2* e = new Enemy2(Enemy2_L);
+                Enemy2* e = new Enemy2(Enemy2_L, i + 3);
                 e->update_position(i * spacing, 0);
                 addElement(e);
             }
@@ -143,7 +138,7 @@ void GameScene::Update() {
         case 3:
             enemy_count = 1;
             for (int i = 0; i < enemy_count; i++) {
-                Enemy3* e = new Enemy3(Enemy3_L);
+                Enemy3* e = new Enemy3(Enemy3_L, 5);
                 e->update_position(i * spacing, 0);
                 addElement(e);
             }
@@ -335,8 +330,10 @@ void GameScene::Draw() {
                 ele->Draw();
 
             // name
-            sprintf(buf, "Character 2");
-            al_draw_text(font, al_map_rgb(255, 0, 0), ch2->x, ch2->y - 20, 0, buf);
+            if(ch2->blood > 0){
+                sprintf(buf, "Character 2");
+                al_draw_text(font, al_map_rgb(255, 0, 0), ch2->x, ch2->y - 20, 0, buf);
+            }
 
             // HP
             sprintf(buf, "Character2 Blood: %d", ch2->blood);
@@ -401,10 +398,12 @@ void GameScene::Draw() {
 
             if (ch->blood > 0)
                 ele->Draw();
-
-            sprintf(buf, "Character 1");
-            al_draw_text(font, al_map_rgb(255, 0, 0), ch->x, ch->y - 20, 0, buf);
-
+            
+            if (ch->blood > 0){
+                sprintf(buf, "Character 1");
+                al_draw_text(font, al_map_rgb(255, 0, 0), ch->x, ch->y - 20, 0, buf);
+            }
+            
             // HP
             sprintf(buf, "Character1 Blood: %d", ch->blood);
             al_draw_text(font, al_map_rgb(255, 0, 0), 10, 10, 0, buf);

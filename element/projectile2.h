@@ -29,4 +29,5 @@ public:
     void update_position(int dx, int dy);
     void interact_Floor(Elements* tar);
     void interact_Character(Elements* tar);
+    void interact_Character2(Elements* tar);
 };

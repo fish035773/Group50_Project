@@ -59,7 +59,10 @@ Character2::~Character2()
 
 void Character2::Update()
 {
-    if (blood <= 0) return; // dead
+    if (blood <= 0) {
+        create_scene(DeathScene_L);
+        return;
+    }
 
     // Level up
     if (levelup_points >= (level + 1) * 10) {
@@ -92,9 +95,9 @@ void Character2::Update()
         }
 
         int new_atk_type = 0;
-        if (key_state[ALLEGRO_KEY_J] && cool_j == 0) { new_atk_type = 1; cool_J = cool_j; }
-        else if (key_state[ALLEGRO_KEY_K]) new_atk_type = 2;
-        else if (key_state[ALLEGRO_KEY_L]) new_atk_type = 3;
+        if (key_state[ALLEGRO_KEY_J]) {new_atk_type = 1; cool_J = cool_j;}
+        else if (key_state[ALLEGRO_KEY_K]) {new_atk_type = 2; cool_K = cool_k;}
+        else if (key_state[ALLEGRO_KEY_L]) {new_atk_type = 3; cool_L = cool_l;}
 
         if (!new_proj && new_atk_type != 0) {
             atk_type = new_atk_type;
@@ -171,35 +174,31 @@ void Character2::trigger_attack(int atk)
     al_play_sample_instance(atk_Sound);
 
     switch (atk) {
+        case 1: {
+            int px = dir ? (x + width) : (x - 150);
+            int vx = dir ? 2 : -2;
 
-    case 1: {
-        int px = dir ? (x + width) : (x - 20);
-        int vx = dir ? 2 : -2;
+            Projectile* pro = new Projectile(Projectile_J, px, y + 30, vx, this);
+            scene->addElement(pro);
+            break;
+        }
+        case 2: {
+            int px = dir ? (x + width) : (x - 20);
 
-        Elements* pro = new Projectile(Projectile_J, px, y + 30, vx, this);
-        scene->addElement(pro);
-        break;
-    }
+            Projectile* main = new Projectile(Projectile_K, px, y + 70, dir ? 5 : -5, this);
+            Projectile* tail1 = new Projectile(Projectile_K, px, y + 15, dir ? 3 : -3, this);
+            Projectile* tail2 = new Projectile(Projectile_K, px, y + 125, dir ? 3 : -3, this);
 
-    case 2: {
-        int px = dir ? (x + width) : (x - 20);
-
-        Elements* main = new Projectile(Projectile_K, px, y + 70, dir ? 5 : -5, this);
-        Elements* tail1 = new Projectile(Projectile_K, px, y + 15, dir ? 3 : -3, this);
-        Elements* tail2 = new Projectile(Projectile_K, px, y + 125, dir ? 3 : -3, this);
-
-        scene->addElement(main);
-        scene->addElement(tail1);
-        scene->addElement(tail2);
-        break;
-    }
-
-
+            scene->addElement(main);
+            scene->addElement(tail1);
+            scene->addElement(tail2);
+            break;
+        }
         case 3: {
-            int px = dir ? (x + width) : (x - width);
+            int px = dir ? (x + width) : (x - 20);
             int vx = dir ? 5 : -5;
 
-            Elements* pro = new Projectile(Projectile_L, px, y + 10, vx, this);
+            Projectile* pro = new Projectile(Projectile_L, px, y + 10, vx, this);
             scene->addElement(pro);
             break;
         }

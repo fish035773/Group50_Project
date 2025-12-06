@@ -9,7 +9,13 @@
 Projectile3::Projectile3(int label, int x, int y, int v)
     : Elements(label), x(x), y(y), v(v)
 {
-    img = al_load_bitmap("assets/image/projectile3.png");
+    if(label == Projectile3_1_L){
+        img = al_load_bitmap("assets/image/projectile3.png");
+        damage = 5;
+    }else if(label == Projectile3_2_L){
+        img = al_load_bitmap("assets/image/projectile2.png");
+        damage = 8;
+    }
 
     if (!img) {
         width = height = 16;
@@ -18,7 +24,6 @@ Projectile3::Projectile3(int label, int x, int y, int v)
         height = al_get_bitmap_height(img);
     }
 
-    damage = 5;
     is_enemy_projectile = true;
 
     hitbox = new Circle(
@@ -47,39 +52,27 @@ void Projectile3::Interact()
 {
     if (dele || !scene) return;
 
-    // === check collision with Characters ===
     for (Elements* ele : scene->getAllElements()) {
-
         if (ele->dele) continue;
+        if (ele->label != Character_L && ele->label != Character2_L) continue;
 
-        Character* c1 = dynamic_cast<Character*>(ele);
-        Character2* c2 = dynamic_cast<Character2*>(ele);
-
-        if (!c1 && !c2)
-            continue; // not a character
-
-        Shape* target_hitbox = nullptr;
-        if (c1) target_hitbox = c1->hitbox;
-        if (c2) target_hitbox = c2->hitbox;
-
-        if (!target_hitbox) continue;
-
-        // --- collision check ---
-        if (hitbox->overlap(*target_hitbox)) {
-
-            if (c1) interact_Character(c1);
-            if (c2) interact_Character(c2);
-
-            dele = true;
-            return;   // projectile disappears after hit
+        if (Character* c1 = dynamic_cast<Character*>(ele)) {
+            if (hitbox->overlap(*c1->hitbox)){
+                dele = true;
+                interact_Character(c1);
+                return;
+            }
+        }
+        if (Character2* c2 = dynamic_cast<Character2*>(ele)) {
+            if (hitbox->overlap(*c2->hitbox)){
+                dele = true;
+                interact_Character2(c2);
+                return;
+            }
+            continue;
         }
     }
-
-    // === delete if out of bounds ===
-    if (x < -width || x > WIDTH + width)
-        dele = true;
 }
-
 
 void Projectile3::interact_Floor(Elements *tar) {
     if (x < -width)
@@ -88,22 +81,22 @@ void Projectile3::interact_Floor(Elements *tar) {
         dele = true;
 }
 
-void Projectile3::interact_Character(Elements *tar)
-{
-    if (tar->label == Character_L) {
-        Character* p = dynamic_cast<Character*>(tar);
-        if (p->hitbox->overlap(*hitbox) && p->blood > 0) {
-            dele = true;
-            p->blood -= damage;
-        }
-    }
-    else if (tar->label == Character2_L) {
-        Character* p2 = dynamic_cast<Character*>(tar);
-        if (p2->hitbox->overlap(*hitbox) && p2->blood > 0) {
-            dele = true;
-            p2->blood -= damage;
-        }
-    }
+void Projectile3::interact_Character(Elements *tar){
+    Character* ch = dynamic_cast<Character*>(tar);
+    if(!ch) return;
+
+    ch->blood -= damage;
+    
+    printf("[Projectile] Character1 hit! HP = %d\n", ch->blood);
+}
+
+void Projectile3::interact_Character2(Elements *tar){
+    Character2* ch = dynamic_cast<Character2*>(tar);
+    if(!ch) return;
+
+    ch->blood -= damage;
+
+    printf("[Projectile] Character2 hit! HP = %d\n", ch->blood);
 }
 
 void Projectile3::Draw() {
