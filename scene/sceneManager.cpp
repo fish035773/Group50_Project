@@ -42,6 +42,9 @@ void create_scene(SceneType type)
     case About_L:
         current_scene = new AboutScene(About_L);
         break;
+    case Exit_L:
+        // Handled elsewhere
+        break;
     }
 
     Elements::scene = current_scene;

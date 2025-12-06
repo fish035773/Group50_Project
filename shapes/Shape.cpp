@@ -21,6 +21,7 @@ bool checkOverlap(const Point *p, const Rectangle *r) {
 }
 
 int get_pos_x(const Rectangle *box){
+	return box->x1;
 	
 }
 

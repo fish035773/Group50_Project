@@ -18,13 +18,14 @@ private:
 
     ALLEGRO_BITMAP* you_win_img;
 
-    int timer;
+    
 
     // Return button
     ALLEGRO_BITMAP* return_btn_img;
     ALLEGRO_BITMAP* return_btn_hover_img;
     int return_btn_x;
     int return_btn_y;
+    int timer;
     bool return_hover;
 
 public:

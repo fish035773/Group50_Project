@@ -17,9 +17,10 @@ private:
 
     float scroll_pos;
     float scroll_speed;
-    int total_text_height;
+  
 
     float scene_timer;  // bonus timer
+    int total_text_height;
 
 public:
     CreditScene(int label);

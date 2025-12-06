@@ -160,12 +160,7 @@ void GameScene::Update() {
     // 3. CHECK ENEMY STATUS
     // =====================================================
     if (enemies_spawned && !enemy_defeated) {
-        int enemy_label = 0;
-        switch (round_counter) {
-            case 1: enemy_label = Enemy_L; break;
-            case 2: enemy_label = Enemy2_L; break;
-            case 3: enemy_label = Enemy3_L; break;
-        }
+      
 
         bool all_defeated = true;
     

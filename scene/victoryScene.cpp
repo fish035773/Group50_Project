@@ -3,19 +3,19 @@
 #include "../global.h"
 #include <cstdio>
 
-VictoryScene::VictoryScene(int label)
-    : Scene(label),
-      background(nullptr),
-      music(nullptr),
-      sample_instance(nullptr),
-      font(nullptr),
-      you_win_img(nullptr),
-      return_btn_img(nullptr),
-      return_btn_hover_img(nullptr),
-      return_btn_x(20),
-      return_btn_y(20),
-      return_hover(false),
-      timer(0)
+VictoryScene::VictoryScene(int label): 
+    Scene(label),
+    background(nullptr),
+    music(nullptr),
+    sample_instance(nullptr),
+    font(nullptr),
+    you_win_img(nullptr),
+    return_btn_img(nullptr),
+    return_btn_hover_img(nullptr),
+    return_btn_x(20),
+    return_btn_y(20),
+    timer(0),
+    return_hover(false)
 {
     printf("[VictoryScene] Creating Victory Scene...\n");
 
