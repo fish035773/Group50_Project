@@ -49,7 +49,9 @@ bool GameWindow::Init()
     }
 
     al_set_window_title(display, title);
-
+     // initialize the icon on the display
+    ALLEGRO_BITMAP *icon = al_load_bitmap("assets/image/icon.png");
+    al_set_display_icon(display, icon);
     event_queue = al_create_event_queue();
     timer = al_create_timer(1.0 / FPS);
 
