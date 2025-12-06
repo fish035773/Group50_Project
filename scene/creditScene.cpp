@@ -13,8 +13,8 @@ static const char* credit_text[] = {
     "Round1: BrunuhVille - Spirit of the Wild","",
     "Round2: Two Steps from Hell - None Shall Live","",
     "Round3: Two Steps from Hell - Unforgiven","",
-    "Credit Track: Two Steps from Hell - Never Give Up on Your Dreams",
-    "",
+    "Victory Scene: Two Steps from Hell - Never Give Up on Your Dreams","",
+    "Credit Scene: Saint-Preuc - Concerto pour une voix","",
     "--- THE END ---",
     nullptr
 };
