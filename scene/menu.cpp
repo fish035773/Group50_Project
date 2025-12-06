@@ -85,9 +85,10 @@ Menu::Menu(int label)
     song = al_load_sample("assets/sound/menu.mp3");
     sample_instance = al_create_sample_instance(song);
     al_set_sample_instance_playmode(sample_instance, ALLEGRO_PLAYMODE_LOOP);
-    al_set_sample_instance_gain(sample_instance, 0.1f);
+    al_set_sample_instance_gain(sample_instance, 1.0f);
     al_attach_sample_instance_to_mixer(sample_instance, al_get_default_mixer());
-
+    //play BGM
+    al_play_sample_instance(sample_instance);
     // Click sound
     click_sound = al_load_sample("assets/sound/click.mp3");  
 }
@@ -125,6 +126,8 @@ void Menu::Update()
             scene_end = true;
             next_scene_requested = true;
             next_scene_type = next_window;
+            if (sample_instance)
+                al_stop_sample_instance(sample_instance);
 
             if (next_window == Exit_L) {
                 exit(0);
@@ -215,7 +218,7 @@ void Menu::Draw()
     }
 
     // BGM（保持播放即可）
-    al_play_sample_instance(sample_instance);
+    //al_play_sample_instance(sample_instance);
 }
 
 
@@ -224,10 +227,13 @@ void Menu::Destroy()
     if (font) al_destroy_font(font);
     if (background) al_destroy_bitmap(background);
 
+   
+   
     if (song) al_destroy_sample(song);
     if (sample_instance){
         al_detach_sample_instance(sample_instance);
         al_destroy_sample_instance(sample_instance);
+        printf("Menu BGM destroyed.\n");
     }
 
     if (title_img) al_destroy_bitmap(title_img);

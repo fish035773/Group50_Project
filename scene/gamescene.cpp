@@ -72,9 +72,9 @@ GameScene::GameScene(int label)
     addElement(new Character());
     addElement(new Character2());
     printf("Added elements: \n");
-for (auto* e : elements)
-    printf(" - label = %d\n", e->label);
-
+    for (auto* e : elements){
+        printf(" - label = %d\n", e->label);
+    }
     printf("[GameScene] Constructor finished.\n");
 }
 
