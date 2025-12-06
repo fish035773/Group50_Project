@@ -141,7 +141,7 @@ void Menu::Update()
            
             if (next_window == Exit_L) exit(0);
             else if (next_window == About_L){
-                al_stop_sample_instance(sample_instance);
+             //   al_stop_sample_instance(sample_instance);
                 create_scene(About_L);
             }
             else if (next_window == GameScene_L) create_scene(GameScene_L);
