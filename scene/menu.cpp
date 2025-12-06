@@ -126,20 +126,22 @@ void Menu::Update()
             scene_end = true;
             next_scene_requested = true;
             next_scene_type = next_window;
-            if (sample_instance)
+            if (sample_instance && next_window == GameScene_L)
                 al_stop_sample_instance(sample_instance);
 
             if (next_window == Exit_L) {
                 exit(0);
-            } else {
-                create_scene(next_window);
+            } else if(next_window == About_L){
+                create_scene(About_L);
+            }
+            else if(next_window == GameScene_L){
+                create_scene(GameScene_L);
             }
         }
         return;
     }
 
-    int mx = mouse.x;
-    int my = mouse.y;
+    
 
     // --- START ---
     if (isHover(btn_x, btn_start_y, btn_start) && isClicked()) {

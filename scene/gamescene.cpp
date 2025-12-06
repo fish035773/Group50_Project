@@ -82,9 +82,9 @@ void GameScene::Update() {
     Scene::Update();
 
     // === GLOBAL INTERACTION ===
-    for (auto* ele : elements)
+    for (auto* ele : elements){
         ele->Interact();
-
+    }
         // SAFE DELETE ELEMENTS
         elements.erase(
             std::remove_if(elements.begin(), elements.end(),
@@ -96,7 +96,7 @@ void GameScene::Update() {
                     return false;
                 }),
             elements.end()
-    );
+        );
 
     // =====================================================
     // 1. ROUND DISPLAY PHASE ("ROUND X" 從畫面淡出)

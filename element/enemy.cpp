@@ -76,7 +76,7 @@ void Enemy::update_position(int dx, int dy){
 
 void Enemy::Update() {
     Rectangle* b = (Rectangle*)dynamic_cast<Rectangle*>(hitbox);
-    printf("%d %d\n", x, b->get_pos_x());
+   // printf("%d %d\n", x, b->get_pos_x());
     if (hp <= 0) return;
 
 
