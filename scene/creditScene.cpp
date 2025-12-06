@@ -26,7 +26,7 @@ CreditScene::CreditScene(int label)
       music_instance(nullptr),
       font(nullptr),
       scroll_pos(HEIGHT),
-      scroll_speed(1.0f),
+      scroll_speed(0.5f),
       scene_timer(0.0f),
       total_text_height(0)
 {
