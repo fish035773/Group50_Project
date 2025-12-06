@@ -1,6 +1,7 @@
 #include "charater.h"
 #include "../scene/gamescene.h"
 #include "projectile.h"
+#include "projectile2.h"
 #include "../shapes/Rectangle.h"
 #include "element.h"
 #include "enemy.h"
@@ -9,7 +10,6 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include "../element/elements_factory.h"
-
 #include <iostream>
 #define cool_v 600
 #define cool_c 480
@@ -35,9 +35,9 @@ Character::Character()
 
     width = gif_status[0]->width;
     height = gif_status[0]->height;
-    y = HEIGHT - height - 20;
+    y = HEIGHT - height - 30;
     ground_y = y;
-
+    
     // Create hitbox
     hitbox = new Rectangle(x, y, x + width, y + height);
 
@@ -71,9 +71,6 @@ void Character::Update()
     if (cool_C > 0) --cool_C;
     if (cool_V > 0) --cool_V;
     if (cool_X > 0) --cool_X;
-
-    // Enemy AI call (if needed)
-    enemy_charater(x);
 
     // Jumping
     if (is_jumping) {
@@ -144,7 +141,7 @@ void Character::Update()
                 trigger_attack(atk_type);
                 new_proj = true;
             }
-            printf("FDSA\n");
+            //printf("FDSA\n");
             if (gif_status[ATK1]->display_index == 4) {
                 gif_status[ATK1]->done = true;
             }
@@ -163,6 +160,8 @@ void Character::Update()
                    gif_status[ATK1]->display_index, gif_status[ATK1]->done, new_proj);
             */
             break;
+        default:
+            break;
     }
 }
 
@@ -174,10 +173,7 @@ void Character::Draw()
     }
 }
 
-void Character::Interact()
-{
-    // Placeholder
-}
+void Character::Interact(){}
 
 void Character::trigger_attack(int atk)
 {
@@ -249,7 +245,6 @@ void Character::update_position(int dx, int dy)
     y += dy;
 
     if (hitbox) {
-        hitbox->update_center_x(hitbox->center_x() + dx);
-        hitbox->update_center_y(hitbox->center_y() + dy);
+        hitbox->update_position(dx, dy);
     }
 }

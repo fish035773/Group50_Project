@@ -11,14 +11,24 @@
 #include "../scene/scene.h"
 #include "Character2.h"
 #include "charater.h"
+#include <allegro5/allegro_primitives.h>
 
 // Damage constants
+/*
 static const int DAMAGE_V = 10;
 static const int DAMAGE_L = 10;
 static const int DAMAGE_K = 5;
 static const int DAMAGE_C = 5;
 static const int DAMAGE_J = 5;
 static const int DAMAGE_X = 5;
+*/
+
+static const int DAMAGE_V = 100;
+static const int DAMAGE_L = 100;
+static const int DAMAGE_K = 500;
+static const int DAMAGE_C = 500;
+static const int DAMAGE_J = 500;
+static const int DAMAGE_X = 500;
 
 Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
     : Elements(label_), x(x_), y(y_), width(0), height(0),
@@ -67,11 +77,10 @@ Projectile::~Projectile()
 void Projectile::Update()
 {
     if (dele) return;
-
     x += v;
-
+    
     if (hitbox)
-        hitbox->update_center_x(v);
+        hitbox->update_position(v, 0);
 
     if (x < 0 || x > 900) {
         dele = true;
@@ -84,7 +93,6 @@ void Projectile::Interact()
     if (dele || !scene) return;
 
     for (Elements* obj : scene->getAllElements()) {
-
         if (obj->dele) continue;
         if (obj == owner) continue;
 
@@ -104,7 +112,6 @@ void Projectile::Interact()
             continue;
 
         if (hitbox->overlap(*enemy_hitbox)) {
-
             dele = true;
 
             if (e1) interactEnemy(e1);
@@ -120,10 +127,15 @@ void Projectile::Draw()
 {
     if (dele || !img) return;
 
-    if (v > 0)
-        al_draw_bitmap(img, x, y, ALLEGRO_FLIP_HORIZONTAL);
-    else
-        al_draw_bitmap(img, x, y, 0);
+    int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);
+
+    al_draw_bitmap(img, x, y, flags);
+    //al_draw_rectangle(x, y, x+width, y+height, al_map_rgb(0,255,0), 2);
+
+    if (hitbox) {
+        Circle* c = static_cast<Circle*>(hitbox);
+        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
+    }
 }
 
 void Projectile::interactEnemy(Elements* tar)

@@ -20,6 +20,10 @@ bool checkOverlap(const Point *p, const Rectangle *r) {
 	return (r->x1 <= p->x && p->x <= r->x2) && (r->y1 <= p->y && p->y <= r->y2);
 }
 
+int get_pos_x(const Rectangle *box){
+	
+}
+
 bool checkOverlap(const Point *p, const Circle *c) {
 	return (c->r * c->r) <= Point::dist2((*p), Point(c->x, c->y));
 }
@@ -65,4 +69,3 @@ bool Circle::overlap(const Shape &s) const {
 	}
 	GAME_ASSERT(false, "Unknown ShapeType.");
 }
-

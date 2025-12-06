@@ -1,5 +1,6 @@
 #include "Character2.h"
 #include "projectile.h"
+#include "projectile2.h"
 #include "../shapes/Rectangle.h"
 #include "../scene/gamescene.h"
 #include "enemy.h"
@@ -35,7 +36,7 @@ Character2::Character2()
 
     width = gif_status[0]->width;
     height = gif_status[0]->height;
-    y = HEIGHT - height - 20;
+    y = HEIGHT - height - 30;
     ground_y = y;
 
     // Create hitbox
@@ -66,14 +67,9 @@ void Character2::Update()
         level++;
         blood += add_blood;
     }
-
-    // Cooldowns
     if (cool_J > 0) --cool_J;
     if (cool_K > 0) --cool_K;
     if (cool_L > 0) --cool_L;
-
-    // Enemy AI call (if needed)
-    enemy_charater(x);
 
     // Jumping
     if (is_jumping) {
@@ -167,53 +163,52 @@ void Character2::Draw()
     }
 }
 
-void Character2::Interact()
-{
-    // Placeholder
+void Character2::Interact(){
 }
 
 void Character2::trigger_attack(int atk)
 {
     al_play_sample_instance(atk_Sound);
-    Elements* pro = nullptr;
 
     switch (atk) {
-        case 1:
-            if (dir) pro = new Projectile(Projectile_J, x + width, y + 30, 2, this);
-            else pro = new Projectile(Projectile_J, x - 150, y + 30, -2, this);
+
+    case 1: {
+        int px = dir ? (x + width) : (x - 20);
+        int vx = dir ? 2 : -2;
+
+        Elements* pro = new Projectile(Projectile_J, px, y + 30, vx, this);
+        scene->addElement(pro);
+        break;
+    }
+
+    case 2: {
+        int px = dir ? (x + width) : (x - 20);
+
+        Elements* main = new Projectile(Projectile_K, px, y + 70, dir ? 5 : -5, this);
+        Elements* tail1 = new Projectile(Projectile_K, px, y + 15, dir ? 3 : -3, this);
+        Elements* tail2 = new Projectile(Projectile_K, px, y + 125, dir ? 3 : -3, this);
+
+        scene->addElement(main);
+        scene->addElement(tail1);
+        scene->addElement(tail2);
+        break;
+    }
+
+
+        case 3: {
+            int px = dir ? (x + width) : (x - width);
+            int vx = dir ? 5 : -5;
+
+            Elements* pro = new Projectile(Projectile_L, px, y + 10, vx, this);
             scene->addElement(pro);
             break;
-        case 2: 
-            if (dir) {
-                pro = new Projectile(Projectile_K, x + width + 10, y + 70, 5, this);
-                scene->addElement(pro);
-                Elements* tail1 = new Projectile(Projectile_K, x + width + 30, y + 15, 3, this);
-                Elements* tail2 = new Projectile(Projectile_K, x + width + 30, y + 125, 3, this);
-                scene->addElement(tail1);
-                scene->addElement(tail2);
-            } else {
-                pro = new Projectile(Projectile_K, x - 120, y + 80, -5, this);
-                scene->addElement(pro);
-                Elements* tail1 = new Projectile(Projectile_K, x - 100, y + 15, -3, this);
-                Elements* tail2 = new Projectile(Projectile_K, x - 100, y + 125, -3, this);
-                scene->addElement(tail1);
-                scene->addElement(tail2);
-            }
-            break;
-        case 3: // V attack
-            if (dir) pro = new Projectile(Projectile_L, x + width, y + 10, 5, this);
-            else pro = new Projectile(Projectile_L, x - 180, y + 10, -5, this);
-            scene->addElement(pro);
-            break;
+        }
     }
 }
-
 
 void Character2::update_position(int dx, int dy)
 {
     x += dx;
     y += dy;
-
-    hitbox->update_center_x(hitbox->center_x() + dx);
-    hitbox->update_center_y(hitbox->center_y() + dy);
+    hitbox->update_position(dx, dy);
 }
