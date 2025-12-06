@@ -84,7 +84,7 @@ void GameScene::Update() {
     // === GLOBAL INTERACTION ===
     for (auto* ele : elements){
         ele->Interact();
-    
+    }
     elements.erase(
         std::remove_if(elements.begin(), elements.end(),
             [&](Elements* ele){
@@ -303,7 +303,7 @@ void GameScene::Update() {
         create_scene(CreditScene_L);
     }
 }
-}
+
 
 void GameScene::Draw() {
 
