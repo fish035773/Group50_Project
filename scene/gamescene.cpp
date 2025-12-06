@@ -36,8 +36,9 @@ GameScene::GameScene(int label)
     printf("[GameScene] Constructor: round state reset.\n");
 
     // ==== LOAD BACKGROUND ====
-    background = al_load_bitmap("assets/image/round1_scene.png");
-
+    background[0] = al_load_bitmap("assets/image/round1_scene.png");
+    background[1] = al_load_bitmap("assets/image/round2_scene.png");
+    background[2] = al_load_bitmap("assets/image/round3_scene.png");
     // ==== LOAD ROUND IMAGES ====
     round_images[0] = al_load_bitmap("assets/image/round_1.png");
     round_images[1] = al_load_bitmap("assets/image/round_2.png");
@@ -53,7 +54,7 @@ GameScene::GameScene(int label)
     round_sounds[1] = al_load_sample("assets/sound/round_2.mp3");
     round_sounds[2] = al_load_sample("assets/sound/round_3.mp3");
 
-    round_bgm[0] = al_load_sample("assets/sound/game_music.mp3");
+    round_bgm[0] = al_load_sample("assets/sound/bgm_round1.mp3");
     round_bgm[1] = al_load_sample("assets/sound/bgm_round2.mp3");
     round_bgm[2] = al_load_sample("assets/sound/bgm_round3.mp3");
 
@@ -103,7 +104,7 @@ void GameScene::Update() {
 
         return;   // 圖片顯示時不做其他邏輯
     }
-
+    
     // =====================================================
     // 2. SPAWN ENEMIES WHEN READY
     // =====================================================
@@ -241,6 +242,7 @@ void GameScene::Update() {
 
             // Play new BGM
             round_bgm_instance = al_create_sample_instance(round_bgm[round_counter - 1]);
+            
             al_set_sample_instance_playmode(round_bgm_instance, ALLEGRO_PLAYMODE_LOOP);
             al_attach_sample_instance_to_mixer(round_bgm_instance, al_get_default_mixer());
             al_set_sample_instance_gain(round_bgm_instance, 1.0f);
@@ -280,8 +282,12 @@ void GameScene::Draw() {
 
     // === DRAW BACKGROUND ===
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    if (background)
-        al_draw_bitmap(background, 0, 0, 0);
+    int bg_index = round_counter - 1;
+    if (bg_index < 0) bg_index = 0;
+    if (bg_index > 2) bg_index = 2; // safety
+
+    if (background[bg_index])
+        al_draw_bitmap(background[bg_index], 0, 0, 0);
 
     // === DRAW FLOOR ===
     for (Elements* e : elements) {
@@ -447,8 +453,7 @@ void GameScene::Draw() {
 
 GameScene::~GameScene() {
 
-    if (background) 
-        al_destroy_bitmap(background);
+    
 
     for (int i = 0; i < 3; i++) {
         if (round_images[i])
@@ -457,6 +462,8 @@ GameScene::~GameScene() {
             al_destroy_sample(round_sounds[i]);
         if (round_bgm[i])
             al_destroy_sample(round_bgm[i]);
+        if (background[i]) 
+            al_destroy_bitmap(background[i]);
     }
 
     if (round_bgm_instance) {

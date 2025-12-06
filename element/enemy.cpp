@@ -80,7 +80,7 @@ void enemy_charater(int dx){
 }
 
 void Enemy::Update(){
-    extern Elements *player;
+   
     
     if(hp < 0) return;
     int speed = 2;

@@ -87,7 +87,7 @@ void Enemy3::update_position(int dx, int dy){
 }
 
 void Enemy3::Update(){
-    extern Elements *player;
+    
     int speed = 5;
 
     int enemy3_center_x = x + width / 2;
