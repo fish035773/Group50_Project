@@ -59,5 +59,7 @@ public:
 
 private:
     bool isHover(int x, int y, ALLEGRO_BITMAP* bmp);
+    // 新增文字版滑鼠判定
+   
     bool isClicked();
 };

@@ -23,6 +23,7 @@
 Scene *current_game_scene = NULL; //pointer to reference active scene
 int i = 0;
 int enemy_count = 0;
+
 GameScene::GameScene(int label)
     : Scene(label)
 {
@@ -37,8 +38,9 @@ GameScene::GameScene(int label)
     printf("[GameScene] Constructor: round state reset.\n");
 
     // ==== LOAD BACKGROUND ====
-    background = al_load_bitmap("assets/image/round1_scene.png");
-
+    background[0] = al_load_bitmap("assets/image/round1_scene.png");
+    background[1] = al_load_bitmap("assets/image/round2_scene.png");
+    background[2] = al_load_bitmap("assets/image/round3_scene.png");
     // ==== LOAD ROUND IMAGES ====
     round_images[0] = al_load_bitmap("assets/image/round_1.png");
     round_images[1] = al_load_bitmap("assets/image/round_2.png");
@@ -54,7 +56,7 @@ GameScene::GameScene(int label)
     round_sounds[1] = al_load_sample("assets/sound/round_2.mp3");
     round_sounds[2] = al_load_sample("assets/sound/round_3.mp3");
 
-    round_bgm[0] = al_load_sample("assets/sound/game_music.mp3");
+    round_bgm[0] = al_load_sample("assets/sound/bgm_round1.mp3");
     round_bgm[1] = al_load_sample("assets/sound/bgm_round2.mp3");
     round_bgm[2] = al_load_sample("assets/sound/bgm_round3.mp3");
 
@@ -71,16 +73,16 @@ GameScene::GameScene(int label)
     addElement(new Character());
     addElement(new Character2());
     printf("Added elements: \n");
-for (auto* e : elements)
-    printf(" - label = %d\n", e->label);
-
+    for (auto* e : elements){
+        printf(" - label = %d\n", e->label);
+    }
     printf("[GameScene] Constructor finished.\n");
 }
 
 void GameScene::Update() {
     Scene::Update();
     // === GLOBAL INTERACTION ===
-    for (auto* ele : elements)
+    for (auto* ele : elements){
         ele->Interact();
     
     elements.erase(
@@ -106,7 +108,7 @@ void GameScene::Update() {
 
         return;   // 圖片顯示時不做其他邏輯
     }
-
+    
     // =====================================================
     // 2. SPAWN ENEMIES WHEN READY
     // =====================================================
@@ -154,12 +156,7 @@ void GameScene::Update() {
     // 3. CHECK ENEMY STATUS
     // =====================================================
     if (enemies_spawned && !enemy_defeated) {
-        int enemy_label = 0;
-        switch (round_counter) {
-            case 1: enemy_label = Enemy_L; break;
-            case 2: enemy_label = Enemy2_L; break;
-            case 3: enemy_label = Enemy3_L; break;
-        }
+      
 
         bool all_defeated = true;
     
@@ -254,6 +251,7 @@ void GameScene::Update() {
 
             // Play new BGM
             round_bgm_instance = al_create_sample_instance(round_bgm[round_counter - 1]);
+            
             al_set_sample_instance_playmode(round_bgm_instance, ALLEGRO_PLAYMODE_LOOP);
             al_attach_sample_instance_to_mixer(round_bgm_instance, al_get_default_mixer());
             al_set_sample_instance_gain(round_bgm_instance, 1.0f);
@@ -274,16 +272,37 @@ void GameScene::Update() {
     // =====================================================
     if (key_state[ALLEGRO_KEY_Q]) {
         scene_end = true;
+        if (round_bgm_instance) {
+            al_stop_sample_instance(round_bgm_instance);
+            al_destroy_sample_instance(round_bgm_instance);
+            round_bgm_instance = NULL;
+        }
         create_scene(VictoryScene_L);
     }
     if (key_state[ALLEGRO_KEY_E]) {
         scene_end = true;
+        //for(int i = 0; i < 3; i++){
+            if(round_bgm_instance){
+                al_stop_sample_instance(round_bgm_instance);
+                al_destroy_sample_instance(round_bgm_instance);
+                round_bgm_instance = NULL;
+                printf("[GameScene] BGM stopped and destroyed.\n");
+            }
+       // }
+        //al_destroy_sample(song);
         create_scene(DeathScene_L);
     }
     if (key_state[ALLEGRO_KEY_Z]) {
+        if(round_bgm_instance){
+                al_stop_sample_instance(round_bgm_instance);
+                al_destroy_sample_instance(round_bgm_instance);
+                round_bgm_instance = NULL;
+                printf("[GameScene] BGM stopped and destroyed.\n");
+        }
         scene_end = true;
         create_scene(CreditScene_L);
     }
+}
 }
 
 void GameScene::Draw() {
@@ -292,8 +311,12 @@ void GameScene::Draw() {
 
     // === DRAW BACKGROUND ===
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    if (background)
-        al_draw_bitmap(background, 0, 0, 0);
+    int bg_index = round_counter - 1;
+    if (bg_index < 0) bg_index = 0;
+    if (bg_index > 2) bg_index = 2; // safety
+
+    if (background[bg_index])
+        al_draw_bitmap(background[bg_index], 0, 0, 0);
 
     // === DRAW FLOOR ===
     for (Elements* e : elements) {
@@ -463,8 +486,7 @@ void GameScene::Draw() {
 
 GameScene::~GameScene() {
 
-    if (background) 
-        al_destroy_bitmap(background);
+    
 
     for (int i = 0; i < 3; i++) {
         if (round_images[i])
@@ -473,6 +495,8 @@ GameScene::~GameScene() {
             al_destroy_sample(round_sounds[i]);
         if (round_bgm[i])
             al_destroy_sample(round_bgm[i]);
+        if (background[i]) 
+            al_destroy_bitmap(background[i]);
     }
 
     if (round_bgm_instance) {

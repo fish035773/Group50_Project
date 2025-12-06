@@ -3,7 +3,38 @@
 #include "aboutScene.h"
 #include "../global.h"
 #include <cstdio>
+#include <allegro5/allegro_primitives.h>
+void draw_glow_text(
+    ALLEGRO_FONT* font,
+    const char* text,
+    float x, float y,
+    float glow_size        // 推薦值：4 ~ 12
+) {
+    // 光暈顏色（冰藍 + 半透明）
+    ALLEGRO_COLOR glow = al_map_rgba(160, 220, 255, 90);
+    ALLEGRO_COLOR glow2 = al_map_rgba(120, 240, 255, 70); // 第二層顏色
 
+    // ---- 光暈外層（大範圍） ----
+    for (int i = 1; i <= glow_size; i++) {
+        float o = i * 0.5;   // 擴散系數
+        al_draw_text(font, glow2, x - o, y - o, 0, text);
+        al_draw_text(font, glow2, x + o, y - o, 0, text);
+        al_draw_text(font, glow2, x - o, y + o, 0, text);
+        al_draw_text(font, glow2, x + o, y + o, 0, text);
+    }
+
+    // ---- 光暈內層（集中亮） ----
+    for (int i = 1; i <= glow_size / 2; i++) {
+        float o = i * 0.1;
+        al_draw_text(font, glow, x - o, y, 0, text);
+        al_draw_text(font, glow, x + o, y, 0, text);
+        al_draw_text(font, glow, x, y - o, 0, text);
+        al_draw_text(font, glow, x, y + o, 0, text);
+    }
+
+    // ---- 主文字（亮白） ----
+    al_draw_text(font, al_map_rgb(255, 255, 255), x, y, 0, text);
+}
 Menu::Menu(int label)
     : Scene(label),
       font(nullptr),
@@ -23,15 +54,15 @@ Menu::Menu(int label)
       next_window(Menu_L)
 {
     // Load font
-    font = al_load_ttf_font("assets/font/pirulen.ttf", 18, 0);
+    font = al_load_ttf_font("assets/font/pirulen.ttf", 50, 0);
 
     // Background
     background = al_load_bitmap("assets/image/main_menu.png");
 
     // Title
     title_img = al_load_bitmap("assets/image/title.png");
-    title_x = -175;
-    title_y = 120;
+    title_x = 10;
+    title_y = 70;
 
     // Buttons
     btn_start = al_load_bitmap("assets/image/start.png");
@@ -55,9 +86,11 @@ Menu::Menu(int label)
     song = al_load_sample("assets/sound/menu.mp3");
     sample_instance = al_create_sample_instance(song);
     al_set_sample_instance_playmode(sample_instance, ALLEGRO_PLAYMODE_LOOP);
-    al_set_sample_instance_gain(sample_instance, 0.1f);
+    al_set_sample_instance_gain(sample_instance, 1.0f);
     al_attach_sample_instance_to_mixer(sample_instance, al_get_default_mixer());
-
+    //play BGM
+    al_play_sample_instance(sample_instance);
+    printf("Menu BGM started.\n");
     // Click sound
     click_sound = al_load_sample("assets/sound/click.mp3");  
 }
@@ -81,6 +114,8 @@ bool Menu::isHover(int x, int y, ALLEGRO_BITMAP* bmp)
     return inside;
 }
 
+
+
 bool Menu::isClicked()
 {
     return mouse_state[1];
@@ -88,7 +123,9 @@ bool Menu::isClicked()
 
 void Menu::Update()
 {
-    //printf("MENU UPDATE RUNNING\n");
+    int mx = mouse.x;
+    int my = mouse.y;
+
     if (button_clicked) {
         delay_counter++;
         if (delay_counter >= 15) {
@@ -96,74 +133,145 @@ void Menu::Update()
             next_scene_requested = true;
             next_scene_type = next_window;
 
-            if (next_window == Exit_L) {
-                exit(0);
-            } else {
-                create_scene(next_window);
+            if (sample_instance && next_window == GameScene_L){
+                al_stop_sample_instance(sample_instance);
+                al_destroy_sample(song);
+                printf("Menu BGM stopped and destroyed.\n");
             }
+           
+            if (next_window == Exit_L) exit(0);
+            else if (next_window == About_L){
+                al_stop_sample_instance(sample_instance);
+                printf("Menu BGM stopped.\n");
+                create_scene(About_L);
+            }
+            else if (next_window == GameScene_L) create_scene(GameScene_L);
+
+            return;
         }
         return;
     }
 
-    int mx = mouse.x;
-    int my = mouse.y;
-
     // --- START ---
-    if (isHover(btn_x, btn_start_y, btn_start) && isClicked()) {
+    int start_w = al_get_text_width(font, "START");
+    int start_h = al_get_font_line_height(font);
+    if (mx >= btn_x + 10 && mx <= btn_x + 10 + start_w &&
+        my >= btn_start_y && my <= btn_start_y + start_h &&
+        isClicked())
+    {
         al_play_sample(click_sound, 1.0, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         button_clicked = true;
-        next_window = GameScene_L;  
-                        printf("hover=%d click=%d\n", 
-       isHover(btn_x, btn_start_y, btn_start),
-       isClicked());
+        next_window = GameScene_L;
+        mouse_state[1] = false;
         return;
-
     }
 
     // --- ABOUT ---
-    if (isHover(btn_about_x, btn_about_y, btn_about) && isClicked()) {
+    int about_w = al_get_text_width(font, "ABOUT");
+    int about_h = al_get_font_line_height(font);
+    if (mx >= btn_about_x + 10 && mx <= btn_about_x + 10 + about_w &&
+        my >= btn_about_y && my <= btn_about_y + about_h &&
+        isClicked())
+    {
         al_play_sample(click_sound, 1.0, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         button_clicked = true;
         next_window = About_L;
+        mouse_state[1] = false;
         return;
     }
 
     // --- QUIT ---
-    if (isHover(btn_quit_x, btn_quit_y, btn_quit) && isClicked()) {
+    int quit_w = al_get_text_width(font, "QUIT");
+    int quit_h = al_get_font_line_height(font);
+    if (mx >= btn_quit_x + 10 && mx <= btn_quit_x + 10 + quit_w &&
+        my >= btn_quit_y && my <= btn_quit_y + quit_h &&
+        isClicked())
+    {
         al_play_sample(click_sound, 1.0, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         button_clicked = true;
         next_window = Exit_L;
+        mouse_state[1] = false;
         return;
     }
 }
 
 void Menu::Draw()
 {
+    // 背景
     al_draw_bitmap(background, 0, 0, 0);
 
     // Title
     al_draw_bitmap(title_img, title_x, title_y, 0);
 
-    // Buttons
-    al_draw_bitmap(isHover(btn_x, btn_start_y, btn_start) ? btn_start_hover : btn_start,
-                   btn_x, btn_start_y, 0);
+    int mx = mouse.x;
+    int my = mouse.y;
 
-    al_draw_bitmap(isHover(btn_about_x, btn_about_y, btn_about) ? btn_about_hover : btn_about,
-                   btn_about_x, btn_about_y, 0);
+    // START
+    int start_w = al_get_text_width(font, "START");
+    int start_h = al_get_font_line_height(font);
+    if (mx >= btn_x + 10 && mx <= btn_x + 10 + start_w &&
+        my >= btn_start_y && my <= btn_start_y + start_h)
+    {
+        draw_glow_text(font, "START", btn_x + 10, btn_start_y, 4);
+    }
+    else {
+        al_draw_text(font, al_map_rgb(255, 255, 255), btn_x + 10, btn_start_y, 0, "START");
+    }
 
-    al_draw_bitmap(isHover(btn_quit_x, btn_quit_y, btn_quit) ? btn_quit_hover : btn_quit,
-                   btn_quit_x, btn_quit_y, 0);
+    // ABOUT
+    int about_w = al_get_text_width(font, "ABOUT");
+    int about_h = al_get_font_line_height(font);
+    if (mx >= btn_about_x + 10 && mx <= btn_about_x + 10 + about_w &&
+        my >= btn_about_y && my <= btn_about_y + about_h)
+    {
+        draw_glow_text(font, "ABOUT", btn_about_x + 10, btn_about_y, 4);
+    }
+    else {
+        al_draw_text(font, al_map_rgb(255, 255, 255), btn_about_x + 10, btn_about_y, 0, "ABOUT");
+    }
 
-    al_play_sample_instance(sample_instance);
+    // QUIT
+    int quit_w = al_get_text_width(font, "QUIT");
+    int quit_h = al_get_font_line_height(font);
+    if (mx >= btn_quit_x + 10 && mx <= btn_quit_x + 10 + quit_w &&
+        my >= btn_quit_y && my <= btn_quit_y + quit_h)
+    {
+        draw_glow_text(font, "QUIT", btn_quit_x + 10, btn_quit_y, 4);
+    }
+    else {
+        al_draw_text(font, al_map_rgb(255, 255, 255), btn_quit_x + 10, btn_quit_y, 0, "QUIT");
+    }
+
+    int debug_mode = 0; // 設為 1 開啟偵錯模式，0 關閉
+    if (!debug_mode) return;
+    // --- Debug: 畫出文字按鈕範圍 ---
+    ALLEGRO_COLOR debug_color = al_map_rgb(255, 0, 0); // 紅色
+    al_draw_rectangle(btn_x + 10, btn_start_y, btn_x + 10 + start_w, btn_start_y + start_h, debug_color, 2.0);
+    al_draw_rectangle(btn_about_x + 10, btn_about_y, btn_about_x + 10 + about_w, btn_about_y + about_h, debug_color, 2.0);
+    al_draw_rectangle(btn_quit_x + 10, btn_quit_y, btn_quit_x + 10 + quit_w, btn_quit_y + quit_h, debug_color, 2.0);
+
+    // --- Debug: 畫出滑鼠位置 ---
+    ALLEGRO_COLOR mouse_color = isClicked() ? al_map_rgb(0, 0, 255) : al_map_rgb(0, 255, 0);
+    float size = 10;
+    al_draw_line(mx - size, my, mx + size, my, mouse_color, 2.0);
+    al_draw_line(mx, my - size, mx, my + size, mouse_color, 2.0);
 }
+
+
 
 void Menu::Destroy()
 {
     if (font) al_destroy_font(font);
     if (background) al_destroy_bitmap(background);
 
+   
+   
     if (song) al_destroy_sample(song);
-    if (sample_instance) al_destroy_sample_instance(sample_instance);
+    if (sample_instance){
+        al_detach_sample_instance(sample_instance);
+        al_destroy_sample_instance(sample_instance);
+        printf("Menu BGM destroyed.\n");
+    }
 
     if (title_img) al_destroy_bitmap(title_img);
 

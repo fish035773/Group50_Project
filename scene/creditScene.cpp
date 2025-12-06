@@ -2,18 +2,19 @@
 #include "sceneManager.h"
 #include "../global.h"
 
+// Credit text
 static const char* credit_text[] = {
-    "Group 40 - Final Project",
-    "Special Thanks to:",
-    "Professor Chen & TAs",
+    "Group 50 - Final Project","",
+    "Project Members:",
+    "吳是悅, 郭宥均",
     "",
-    "Developers:",
-    "郭宥均",
-    "施發梅",
-    "陳慧琦",
-    "",
-    "Music from Pixabay",
-    "",
+    "Music Tracks:","",
+    "Menu: Wuthering Waves - A Fairy Tale OST","",
+    "Round1: BrunuhVille - Spirit of the Wild","",
+    "Round2: Two Steps from Hell - None Shall Live","",
+    "Round3: Two Steps from Hell - Unforgiven","",
+    "Victory Scene: Two Steps from Hell - Never Give Up on Your Dreams","",
+    "Credit Scene: Saint-Preuc - Concerto pour une voix","",
     "--- THE END ---",
     nullptr
 };
@@ -25,7 +26,7 @@ CreditScene::CreditScene(int label)
       music_instance(nullptr),
       font(nullptr),
       scroll_pos(HEIGHT),
-      scroll_speed(1.0f),
+      scroll_speed(0.5f),
       scene_timer(0.0f),
       total_text_height(0)
 {
@@ -58,6 +59,9 @@ void CreditScene::Update()
 
     if (scroll_pos < -total_text_height) {
         create_scene(Menu_L);
+        if(music_instance){
+            al_stop_sample_instance(music_instance);
+        }
         scene_end = true;
     }
 
@@ -68,7 +72,9 @@ void CreditScene::Update()
 }
 
 void CreditScene::Draw()
-{
+{   
+   
+
     if (background)
         al_draw_bitmap(background, 0, 0, 0);
 

@@ -9,6 +9,7 @@ private:
     ALLEGRO_TIMER* timer;
 
     const char* title;
+    
     bool running;
 
 public:

@@ -44,7 +44,7 @@ public:
    ALLEGRO_FONT* font = nullptr;
 
    // ===== Background =====
-   ALLEGRO_BITMAP* background = nullptr;
+   ALLEGRO_BITMAP* background[3] = {nullptr};
 
    // ===== Round Images =====
    ALLEGRO_BITMAP* round_images[3] = {nullptr};

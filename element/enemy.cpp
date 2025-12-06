@@ -76,11 +76,12 @@ void Enemy::update_position(int dx, int dy){
 
 void Enemy::Update() {
     Rectangle* b = (Rectangle*)dynamic_cast<Rectangle*>(hitbox);
-    //printf("%d %d\n", x, b->get_pos_x());
+    printf("%d %d\n", x, b->get_pos_x());
     if (hp <= 0) return;
 
     int c1_pos = INT_MAX, c2_pos = INT_MAX;
     int nearest_player_center = 0;
+    int speed = 2;
     int enemy_center_x = x + width / 2;
 
     // 找最近的玩家

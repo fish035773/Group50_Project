@@ -3,7 +3,7 @@
 int main()
 {
     GameWindow game("Group 50 Final Project");
-
+   
     if (!game.Init())
         return -1;
 
