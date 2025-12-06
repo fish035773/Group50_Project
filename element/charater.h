@@ -29,6 +29,7 @@ public:
     bool new_proj;
 
     State state;
+    bool died;
     
     // 資源
     ALGIF_ANIMATION* gif_status[3];   // 修正型別

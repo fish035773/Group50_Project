@@ -21,7 +21,7 @@ Character2::Character2()
       blood(100), level(0), levelup_points(0), add_blood(10),
       dir(false), is_jumping(false), jump_start_time(0.0), ground_y(0),
       cool_J(0), cool_K(0), cool_L(0),
-      atk_type(0), new_proj(false), state(STOP)
+      atk_type(0), new_proj(false), state(STOP), died(false)
 {
     // Load GIF animations using algif_load_animation
     const char* states[3] = { "stop", "move", "atk" };
@@ -63,7 +63,7 @@ Character2::~Character2()
 void Character2::Update()
 {
     if (blood <= 0) {
-        create_scene(DeathScene_L);
+        died = true;
         return;
     }
 

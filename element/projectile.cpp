@@ -14,7 +14,6 @@
 #include <allegro5/allegro_primitives.h>
 
 // Damage constants
-
 static const int DAMAGE_V = 10;
 static const int DAMAGE_L = 10;
 static const int DAMAGE_K = 5;
@@ -30,6 +29,7 @@ static const int DAMAGE_C = 500;
 static const int DAMAGE_J = 500;
 static const int DAMAGE_X = 500;
 */
+
 Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
     : Elements(label_), x(x_), y(y_), width(0), height(0),
       img(nullptr), v(v_), damage(0), origin(0),

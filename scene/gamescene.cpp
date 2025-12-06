@@ -84,6 +84,30 @@ void GameScene::Update() {
     // === GLOBAL INTERACTION ===
     for (auto* ele : elements){
         ele->Interact();
+        if(ele->label == Character2_L){
+            Character2* c = dynamic_cast<Character2*>(ele);
+
+            if(c && c->died){
+                if (round_bgm_instance){
+                    al_stop_sample_instance(round_bgm_instance);
+                    al_destroy_sample_instance(round_bgm_instance);
+                    printf("Round BGM stopped and destroyed.\n");
+                }
+                create_scene(DeathScene_L);
+            }
+        }
+        if(ele->label == Character_L){
+            Character *c = dynamic_cast<Character*>(ele);
+            
+            if(c && c->died){
+                if (round_bgm_instance){
+                    al_stop_sample_instance(round_bgm_instance);
+                    al_destroy_sample_instance(round_bgm_instance);
+                    printf("Round BGM stopped and destroyed.\n");
+                }
+                create_scene(DeathScene_L);
+            }
+        }
     }
     elements.erase(
         std::remove_if(elements.begin(), elements.end(),
@@ -157,7 +181,6 @@ void GameScene::Update() {
     // =====================================================
     if (enemies_spawned && !enemy_defeated) {
       
-
         bool all_defeated = true;
     
         for (Elements* ele : elements) {
@@ -485,9 +508,6 @@ void GameScene::Draw() {
 }
 
 GameScene::~GameScene() {
-
-    
-
     for (int i = 0; i < 3; i++) {
         if (round_images[i])
             al_destroy_bitmap(round_images[i]);

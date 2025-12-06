@@ -39,7 +39,8 @@ public:
     int atk_type;
     bool new_proj;
     State2 state;
-
+    bool died;
+    
     Shape* hitbox;
     ALGIF_ANIMATION* gif_status[3];
     ALLEGRO_SAMPLE_INSTANCE* atk_Sound;

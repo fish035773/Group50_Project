@@ -86,7 +86,8 @@ void Projectile2::interact_Character(Elements *tar){
     Character* ch = dynamic_cast<Character*>(tar);
     if(!ch) return;
 
-    ch->blood -= damage;
+    int dam = ch->blood - damage;
+    ch->blood = (dam < 0) ? 0 : dam;
     
     printf("[Projectile] Character1 hit! HP = %d\n", ch->blood);
 }
@@ -95,7 +96,8 @@ void Projectile2::interact_Character2(Elements *tar){
     Character2* ch = dynamic_cast<Character2*>(tar);
     if(!ch) return;
 
-    ch->blood -= damage;
+    int dam = ch->blood - damage;
+    ch->blood = (dam < 0) ? 0 : dam;
 
     printf("[Projectile] Character2 hit! HP = %d\n", ch->blood);
 }

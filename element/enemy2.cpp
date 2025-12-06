@@ -212,7 +212,7 @@ void Enemy2::Update() {
             break;
         }
         case ENEMY2_DEAD: {
-            printf("DEAD\n");
+            //printf("DEAD\n");
             if (death_time == 0) death_time = al_get_time();
             else if (gif_status[ENEMY2_DEAD]->done &&
                     al_get_time() - death_time >= 1.0)
