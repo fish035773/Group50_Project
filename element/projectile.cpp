@@ -133,7 +133,7 @@ void Projectile::Draw()
     
     if (hitbox) {
         Circle* c = static_cast<Circle*>(hitbox);
-        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
+        //al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
     }
 
     int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);

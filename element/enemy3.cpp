@@ -301,6 +301,7 @@ void Enemy3::Draw(){
 
     al_draw_filled_rectangle(bar_x, bar_y, bar_x + 100, bar_y+10, al_map_rgb(255,255,255));
     al_draw_filled_rectangle(bar_x, bar_y, bar_x + (100*ratio), bar_y+10, al_map_rgb(150,0,0));
+    /*
     if (hitbox) {
         if (hitbox->getType() == ShapeType::RECTANGLE) {
             Rectangle* r = static_cast<Rectangle*>(hitbox);
@@ -310,7 +311,7 @@ void Enemy3::Draw(){
                 al_map_rgb(0, 255, 0), 2
             );
         }
-    }
+    }*/
 }
 
 void Enemy3::Interact(){

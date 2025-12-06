@@ -252,6 +252,8 @@ void Enemy2::Draw() {
 
     if (got_hit && al_get_time() - hit_time < 0.2)
         al_draw_tinted_bitmap(frame, al_map_rgba(255,0,0,200), x, y, (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
+    
+    /*
     if (hitbox) {
         if (hitbox->getType() == ShapeType::RECTANGLE) {
             Rectangle* r = static_cast<Rectangle*>(hitbox);
@@ -261,7 +263,7 @@ void Enemy2::Draw() {
                 al_map_rgb(0, 255, 0), 2
             );
         }
-    }
+    }*/
 }
 
 

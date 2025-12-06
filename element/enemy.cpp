@@ -270,7 +270,7 @@ void Enemy::Draw() {
             (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL)
         );
     }
-
+    /*
     if (hitbox) {
         if (hitbox->getType() == ShapeType::RECTANGLE) {
             Rectangle* r = static_cast<Rectangle*>(hitbox);
@@ -280,7 +280,7 @@ void Enemy::Draw() {
                 al_map_rgb(0, 255, 0), 2
             );
         }
-    }
+    }*/
 }
 
 void Enemy::Interact()
