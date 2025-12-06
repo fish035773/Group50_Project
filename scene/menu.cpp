@@ -61,8 +61,8 @@ Menu::Menu(int label)
 
     // Title
     title_img = al_load_bitmap("assets/image/title.png");
-    title_x = -175;
-    title_y = 120;
+    title_x = 10;
+    title_y = 70;
 
     // Buttons
     btn_start = al_load_bitmap("assets/image/start.png");
@@ -241,6 +241,8 @@ void Menu::Draw()
         al_draw_text(font, al_map_rgb(255, 255, 255), btn_quit_x + 10, btn_quit_y, 0, "QUIT");
     }
 
+    int debug_mode = 0; // 設為 1 開啟偵錯模式，0 關閉
+    if (!debug_mode) return;
     // --- Debug: 畫出文字按鈕範圍 ---
     ALLEGRO_COLOR debug_color = al_map_rgb(255, 0, 0); // 紅色
     al_draw_rectangle(btn_x + 10, btn_start_y, btn_x + 10 + start_w, btn_start_y + start_h, debug_color, 2.0);
