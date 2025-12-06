@@ -57,26 +57,10 @@ void CreditScene::Update()
     scroll_pos -= scroll_speed;
     scene_timer += 1.0f / FPS;
 
-<<<<<<< HEAD
     if (scroll_pos < -total_text_height) {
         create_scene(Menu_L);
         if(music_instance){
             al_stop_sample_instance(music_instance);
-=======
-    // Update scene timer
-    obj->scene_timer += 1.0f / FPS;
-
-    if (obj->scroll_pos < -obj->total_text_height)
-    {
-        obj->scroll_pos = HEIGHT;
-        printf("[CreditScene] Restarting scroll.\n");
-
-        // Auto return to menu after one full scroll
-        if (obj->scene_timer > 15.0f) {
-            self->scene_end = true;
-            window = Menu_L;
-            printf("[CreditScene] Auto-return to Menu after credit.\n");
->>>>>>> 549dc2f789f9d901a6150fef847ea3da3392f645
         }
         scene_end = true;
     }
