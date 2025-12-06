@@ -285,9 +285,24 @@ void GameScene::Update() {
     }
     if (key_state[ALLEGRO_KEY_E]) {
         scene_end = true;
+        //for(int i = 0; i < 3; i++){
+            if(round_bgm_instance){
+                al_stop_sample_instance(round_bgm_instance);
+                al_destroy_sample_instance(round_bgm_instance);
+                round_bgm_instance = NULL;
+                printf("[GameScene] BGM stopped and destroyed.\n");
+            }
+       // }
+        //al_destroy_sample(song);
         create_scene(DeathScene_L);
     }
     if (key_state[ALLEGRO_KEY_Z]) {
+        if(round_bgm_instance){
+                al_stop_sample_instance(round_bgm_instance);
+                al_destroy_sample_instance(round_bgm_instance);
+                round_bgm_instance = NULL;
+                printf("[GameScene] BGM stopped and destroyed.\n");
+        }
         scene_end = true;
         create_scene(CreditScene_L);
     }
