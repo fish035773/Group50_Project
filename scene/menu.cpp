@@ -3,7 +3,37 @@
 #include "aboutScene.h"
 #include "../global.h"
 #include <cstdio>
+void draw_glow_text(
+    ALLEGRO_FONT* font,
+    const char* text,
+    float x, float y,
+    float glow_size        // 推薦值：4 ~ 12
+) {
+    // 光暈顏色（冰藍 + 半透明）
+    ALLEGRO_COLOR glow = al_map_rgba(160, 220, 255, 90);
+    ALLEGRO_COLOR glow2 = al_map_rgba(120, 240, 255, 70); // 第二層顏色
 
+    // ---- 光暈外層（大範圍） ----
+    for (int i = 1; i <= glow_size; i++) {
+        float o = i * 0.5;   // 擴散系數
+        al_draw_text(font, glow2, x - o, y - o, 0, text);
+        al_draw_text(font, glow2, x + o, y - o, 0, text);
+        al_draw_text(font, glow2, x - o, y + o, 0, text);
+        al_draw_text(font, glow2, x + o, y + o, 0, text);
+    }
+
+    // ---- 光暈內層（集中亮） ----
+    for (int i = 1; i <= glow_size / 2; i++) {
+        float o = i * 0.1;
+        al_draw_text(font, glow, x - o, y, 0, text);
+        al_draw_text(font, glow, x + o, y, 0, text);
+        al_draw_text(font, glow, x, y - o, 0, text);
+        al_draw_text(font, glow, x, y + o, 0, text);
+    }
+
+    // ---- 主文字（亮白） ----
+    al_draw_text(font, al_map_rgb(255, 255, 255), x, y, 0, text);
+}
 Menu::Menu(int label)
     : Scene(label),
       font(nullptr),
@@ -23,7 +53,7 @@ Menu::Menu(int label)
       next_window(Menu_L)
 {
     // Load font
-    font = al_load_ttf_font("assets/font/pirulen.ttf", 18, 0);
+    font = al_load_ttf_font("assets/font/pirulen.ttf", 50, 0);
 
     // Background
     background = al_load_bitmap("assets/image/main_menu.png");
@@ -139,23 +169,55 @@ void Menu::Update()
 
 void Menu::Draw()
 {
+    // 背景
     al_draw_bitmap(background, 0, 0, 0);
 
     // Title
     al_draw_bitmap(title_img, title_x, title_y, 0);
 
-    // Buttons
-    al_draw_bitmap(isHover(btn_x, btn_start_y, btn_start) ? btn_start_hover : btn_start,
-                   btn_x, btn_start_y, 0);
+    int mx = mouse.x;
+    int my = mouse.y;
 
-    al_draw_bitmap(isHover(btn_about_x, btn_about_y, btn_about) ? btn_about_hover : btn_about,
-                   btn_about_x, btn_about_y, 0);
+    const float btn_w = 180;
+    const float btn_h = 55;
 
-    al_draw_bitmap(isHover(btn_quit_x, btn_quit_y, btn_quit) ? btn_quit_hover : btn_quit,
-                   btn_quit_x, btn_quit_y, 0);
+    // --- START BUTTON ---
+    if (mx >= btn_x && mx <= btn_x + btn_w &&
+        my >= btn_start_y && my <= btn_start_y + btn_h) 
+    {
+        draw_glow_text(font, "START", btn_x + 10, btn_start_y, 4);
+    }
+    else {
+        al_draw_text(font, al_map_rgb(255, 255, 255),
+                     btn_x + 10, btn_start_y, 0, "START");
+    }
 
+    // --- ABOUT BUTTON ---
+    if (mx >= btn_about_x && mx <= btn_about_x + btn_w &&
+        my >= btn_about_y && my <= btn_about_y + btn_h) 
+    {
+        draw_glow_text(font, "ABOUT", btn_about_x + 10, btn_about_y, 4);
+    }
+    else {
+        al_draw_text(font, al_map_rgb(255, 255, 255),
+                     btn_about_x + 10, btn_about_y, 0, "ABOUT");
+    }
+
+    // --- QUIT BUTTON ---
+    if (mx >= btn_quit_x && mx <= btn_quit_x + btn_w &&
+        my >= btn_quit_y && my <= btn_quit_y + btn_h) 
+    {
+        draw_glow_text(font, "QUIT", btn_quit_x + 10, btn_quit_y, 4);
+    }
+    else {
+        al_draw_text(font, al_map_rgb(255, 255, 255),
+                     btn_quit_x + 10, btn_quit_y, 0, "QUIT");
+    }
+
+    // BGM（保持播放即可）
     al_play_sample_instance(sample_instance);
 }
+
 
 void Menu::Destroy()
 {
@@ -163,7 +225,10 @@ void Menu::Destroy()
     if (background) al_destroy_bitmap(background);
 
     if (song) al_destroy_sample(song);
-    if (sample_instance) al_destroy_sample_instance(sample_instance);
+    if (sample_instance){
+        al_detach_sample_instance(sample_instance);
+        al_destroy_sample_instance(sample_instance);
+    }
 
     if (title_img) al_destroy_bitmap(title_img);
 
