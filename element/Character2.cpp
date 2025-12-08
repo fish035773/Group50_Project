@@ -11,6 +11,7 @@
 #include "../element/elements_factory.h"
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_primitives.h>
 #include <iostream>
 #define cool_l 10 * 80
 #define cool_k 8 * 80
@@ -61,7 +62,7 @@ Character2::Character2()
     ground_y = y;
 
     // Create hitbox
-    hitbox = new Rectangle(x, y, x + width, y + height);
+    hitbox = new Rectangle(x + 20, y, x + width - 30, y + height);
 
     // Load attack sound
     ALLEGRO_SAMPLE* sample = al_load_sample("assets/sound/atk_sound.wav");
@@ -257,9 +258,6 @@ void Character2::Draw()
         else
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);//
         // second skill
-     
-        
-      
         
         al_draw_bitmap(Skill[1], text_x + 85 + 10, text_y, 0);
         sprintf(buf, "2", skill_1);
@@ -304,9 +302,19 @@ void Character2::Draw()
             al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
         else
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
-
-
     }
+
+    /*
+    if (hitbox) {
+        if (hitbox->getType() == ShapeType::RECTANGLE) {
+            Rectangle* r = static_cast<Rectangle*>(hitbox);
+            al_draw_rectangle(
+                r->x1, r->y1,
+                r->x2, r->y2,
+                al_map_rgb(0, 255, 0), 2
+            );
+        }
+    }*/
 }
 
 void Character2::Interact(){
@@ -323,6 +331,8 @@ void Character2::trigger_attack(int atk)
 
             Projectile* pro = new Projectile(Projectile_J, px, y + 30, vx, this);
             scene->addElement(pro);
+
+            printf("[DEBUG] J projectile created at (%d,%d)\n", pro->x, pro->y);
             break;
         }
         case 2: {
@@ -335,6 +345,8 @@ void Character2::trigger_attack(int atk)
             scene->addElement(main);
             scene->addElement(tail1);
             scene->addElement(tail2);
+
+            printf("[DEBUG] K projectile created at (%d,%d)\n", main->x, main->y);
             break;
         }
         case 3: {
@@ -343,6 +355,8 @@ void Character2::trigger_attack(int atk)
 
             Projectile* pro = new Projectile(Projectile_L, px, y + 10, vx, this);
             scene->addElement(pro);
+
+            printf("[DEBUG] L projectile created at (%d,%d)\n", pro->x, pro->y);
             break;
         }
     }

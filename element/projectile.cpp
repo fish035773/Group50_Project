@@ -131,10 +131,11 @@ void Projectile::Draw()
 {
     if (dele) return;
     
+    /*
     if (hitbox) {
-        //Circle* c = static_cast<Circle*>(hitbox);
-        //al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
-    }
+        Circle* c = static_cast<Circle*>(hitbox);
+        al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
+    }*/
 
     int flags = (v > 0 ? ALLEGRO_FLIP_HORIZONTAL : 0);
 
@@ -167,9 +168,6 @@ void Projectile::interactEnemy3(Elements* tar)
 
     bool kill = (enemy->hp <= 0);
     if (kill) tar->dele = true;
-
-    // 判斷 owner 是誰
-    
 
     if (origin == 2) ((Character2*)owner)->OnHitEnemy(damage, kill);
     else  ((Character*)owner)->OnHitEnemy(damage, kill);
