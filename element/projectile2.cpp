@@ -49,7 +49,7 @@ void Projectile2::Update() {
         dele = true;
         printf("[Projectile] Out of bounds → dele set to true\n");
     }else {
-        Circle* c = static_cast<Circle*>(hitbox);
+        //Circle* c = static_cast<Circle*>(hitbox);
         //printf("X: %d, %lf Y: %d, %lf\n", x, c->center_x(), y, c->center_y());
     }
 }

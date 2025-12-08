@@ -84,7 +84,7 @@ void Enemy2::update_position(int dx, int dy){
 }
 
 void Enemy2::Update() {
-    extern Elements *player;
+   // extern Elements *player;
 
     if (hp <= 0) return;
 

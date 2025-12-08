@@ -14,6 +14,10 @@
 #define cool_v 10 * 80
 #define cool_c 8 * 80
 #define cool_x 5 * 80
+
+#define text_size 24
+#define text_space 30
+#define text_x 910
 // 建立角色的 wrapper 函式
 
 Character::Character()
@@ -46,6 +50,12 @@ Character::Character()
     atk_Sound = al_create_sample_instance(sample);
     al_set_sample_instance_playmode(atk_Sound, ALLEGRO_PLAYMODE_ONCE);
     al_attach_sample_instance_to_mixer(atk_Sound, al_get_default_mixer());
+
+    // ==== LOAD FONTS ====
+    al_init_font_addon();
+    al_init_ttf_addon();
+    font = al_load_ttf_font("assets/font/Consolas.ttf", text_size, 0);
+    coins = 0;
 }
 
 Character::~Character()
@@ -68,6 +78,7 @@ void Character::Update()
         levelup_points -= (level + 1) * 10;
         level++;
         blood += add_blood;
+        coins += 100;
     }
 
     // Cooldowns
@@ -182,6 +193,15 @@ void Character::Draw()
     ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
     if (frame) {
         al_draw_bitmap(frame, x, y, dir ? ALLEGRO_FLIP_HORIZONTAL : 0);
+    }
+    int text_y = 10;
+    if(blood > 0){
+        char buf[64];
+        sprintf(buf, "Character ");
+        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        text_y += text_space;
+        sprintf(buf, "coins: %d", coins);
+        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
     }
 }
 

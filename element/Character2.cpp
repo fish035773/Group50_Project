@@ -9,11 +9,15 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include "../element/elements_factory.h"
-
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <iostream>
 #define cool_l 10 * 80
 #define cool_k 8 * 80
 #define cool_j 5 * 80
+#define text_size 24
+#define text_space 30
+#define text_x 910
 // 建立角色的 wrapper 函式
 
 Character2::Character2()
@@ -50,6 +54,13 @@ Character2::Character2()
     al_set_sample_instance_playmode(atk_Sound, ALLEGRO_PLAYMODE_ONCE);
     al_attach_sample_instance_to_mixer(atk_Sound, al_get_default_mixer());
     //printf("[Character2] Created Character2 at (%d, %d) with width=%d, height=%d\n", x, y, width, height);
+
+    // ==== LOAD FONTS ====
+    al_init_font_addon();
+    al_init_ttf_addon();
+    font = al_load_ttf_font("assets/font/Consolas.ttf", text_size, 0);
+    coins2 = 0;
+
 }
 
 Character2::~Character2()
@@ -72,6 +83,7 @@ void Character2::Update()
         levelup_points -= (level + 1) * 10;
         level++;
         blood += add_blood;
+        coins2 += 100;
         //printf("[Character2] Leveled up to %d, blood increased to %d\n", level, blood);
     }
     if (cool_J > 0) --cool_J;
@@ -173,6 +185,15 @@ void Character2::Draw()
     ALLEGRO_BITMAP* frame = algif_get_bitmap(gif_status[state], al_get_time());
     if (frame) {
         al_draw_bitmap(frame, x, y, dir ? ALLEGRO_FLIP_HORIZONTAL : 0);
+    }
+    int text_y = 350;
+    if(blood > 0){
+        char buf[64];
+        sprintf(buf, "Character 2");
+        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        text_y += text_space;
+        sprintf(buf, "coins: %d", coins2);
+        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
     }
 }
 

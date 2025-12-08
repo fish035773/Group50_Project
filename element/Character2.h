@@ -5,7 +5,10 @@
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
 #include "projectile.h"
-
+// --- 必須加這三行 ---
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 class Character2: public Elements
 {
 public:
@@ -44,6 +47,9 @@ public:
     Shape* hitbox;
     ALGIF_ANIMATION* gif_status[3];
     ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
+    // ===== UI Font =====
+    ALLEGRO_FONT* font;
+    int coins2;
 
 private:
    void trigger_attack(int atk_type);

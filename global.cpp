@@ -3,7 +3,7 @@
 
 // variables for global usage
 const double FPS = 80.0;
-const int WIDTH = 900;
+const int WIDTH = 1100;
 const int HEIGHT = 672;
 int window = 0;
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
