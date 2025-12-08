@@ -19,7 +19,12 @@
 #define text_space 30
 #define text_x 910
 // 建立角色的 wrapper 函式
-
+int jump_power = 5;
+#define add_jump_power 2
+#define skill_add 10
+int skill_1 = 50;
+int skill_2 = 50;
+int skill_3 = 50;
 Character2::Character2()
     :Elements(Character2_L), x(30), y(0), width(0), height(0),
       blood(100), level(0), levelup_points(0), add_blood(10),
@@ -181,6 +186,14 @@ void Character2::Update()
         }
     }
     //printf("[Character2::update] End update: position=(%d,%d), state=%d\n", x, y, state);
+
+    if(coins2 >= skill_1 && key_state[ALLEGRO_KEY_1]){
+        coins2 -= skill_1;
+        skill_1 += skill_add;
+        jump_power += add_jump_power;
+        key_state[ALLEGRO_KEY_1] = false;
+    }
+    
 }
 
 void Character2::Draw()
@@ -201,7 +214,11 @@ void Character2::Draw()
         text_y += text_space;
         //draw skill icons
         al_draw_bitmap(Skill[0], text_x, text_y, 0);
+        sprintf(buf, "%d", skill_1);
+        al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+        //
         al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
+        //
         text_y += text_space + 90;
         al_draw_bitmap(Skill[0], text_x, text_y, 0);
         al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
