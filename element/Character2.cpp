@@ -39,6 +39,10 @@ Character2::Character2()
         }
     }
 
+    // ===== Background =====
+    Skill[0] = al_load_bitmap("assets/image/Skill_1.png");
+   // Skill[1] = al_load_bitmap("assets/image/Skill_2.png");
+   // Skill[2] = al_load_bitmap("assets/image/Skill_3.png");
     width = gif_status[0]->width;
     height = gif_status[0]->height;
     y = HEIGHT - height - 30;
@@ -194,6 +198,18 @@ void Character2::Draw()
         text_y += text_space;
         sprintf(buf, "coins: %d", coins2);
         al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        text_y += text_space;
+        //draw skill icons
+        al_draw_bitmap(Skill[0], text_x, text_y, 0);
+        al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
+        text_y += text_space + 90;
+        al_draw_bitmap(Skill[0], text_x, text_y, 0);
+        al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
+        text_y += text_space ;
+        sprintf(buf, "coins: %d", coins2);
+        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+
+
     }
 }
 
