@@ -10,10 +10,15 @@ Floor::Floor(int label)
     : Elements(label)
 {
     img = al_load_bitmap("assets/image/floor.png");
+  
 
     if (img) {
         width = al_get_bitmap_width(img);
         height = al_get_bitmap_height(img);
+        printf("[Floor] Loaded floor image with width=%d, height=%d\n", width, height);
+    }
+    else{
+        printf("[Floor] ERROR: Failed to load floor image!\n");
     }
 
     x = 0;
@@ -83,18 +88,6 @@ void Floor::Draw()
 {
     if (!img) return;
 
-    for (int i = 0; i < 6; i++)
-    {
-        for (int j = 0; j < 6; j++)
-        {
-            if (map_data[i][j]) {
-                al_draw_bitmap(
-                    img,
-                    x + j * width,
-                    y + i * height,
-                    0
-                );
-            }
-        }
-    }
+    al_draw_bitmap(img, 0, 450, 0);
+
 }

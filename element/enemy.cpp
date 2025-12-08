@@ -79,8 +79,8 @@ void Enemy::Update() {
     //printf("%d %d\n", x, b->get_pos_x());
     if (hp <= 0) return;
 
-    int c1_pos = INT_MAX, c2_pos = INT_MAX;
-    int nearest_player_center = 0;
+   // int c1_pos = INT_MAX, c2_pos = INT_MAX;
+   // int nearest_player_center = 0;
     int speed = 2;
     int enemy_center_x = x + width / 2;
 
