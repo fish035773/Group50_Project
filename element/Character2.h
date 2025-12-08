@@ -24,7 +24,7 @@ public:
     void Draw() override;
     void Interact() override;
     void update_position(int dx, int dy);
-
+   void OnHitEnemy(int damage, bool kill);
     // 成員變數
     int x, y;
     int width, height;
@@ -32,7 +32,7 @@ public:
     int level;
     int levelup_points;
     int add_blood;
-
+   int skill_3_add_blood = 0;
     bool dir; // false: left, true: right
     bool is_jumping;
     double jump_start_time;
@@ -43,15 +43,15 @@ public:
     bool new_proj;
     State2 state;
     bool died;
-    
+    int skill2_damage = 0;
     Shape* hitbox;
     ALGIF_ANIMATION* gif_status[3];
     ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
     // ===== UI Font =====
     ALLEGRO_FONT* font;
-    int coins2;
+    int coins2 = 0;
     // ===== Background =====
-   ALLEGRO_BITMAP* Skill[3] = {nullptr};
+   ALLEGRO_BITMAP* Skill[4] = {nullptr};
 
 private:
    void trigger_attack(int atk_type);

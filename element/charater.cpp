@@ -14,7 +14,8 @@
 #define cool_v 10 * 80
 #define cool_c 8 * 80
 #define cool_x 5 * 80
-
+#define hit_coins_add 10
+#define kill_coins_add 50
 #define text_size 24
 #define text_space 30
 #define text_x 910
@@ -279,4 +280,10 @@ void Character::update_position(int dx, int dy)
     if (hitbox) {
         hitbox->update_position(dx, dy);
     }
+}
+
+void Character::OnHitEnemy(int damage, bool kill)
+{
+    levelup_points++;
+    coins += (kill ? kill_coins_add : hit_coins_add);
 }

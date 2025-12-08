@@ -3,7 +3,7 @@
 #include <allegro5/allegro_image.h>
 #include "../shapes/Shape.h"
 #include "../element/element.h"
-
+#include "Character2.h"
 
 class Projectile : public Elements {
 public:
