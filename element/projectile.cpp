@@ -20,7 +20,8 @@ static const int DAMAGE_K = 5;
 static const int DAMAGE_C = 5;
 static const int DAMAGE_J = 5;
 static const int DAMAGE_X = 5;
-
+#define hit_coins_add 10
+#define kill_coins_add 50
 /*
 static const int DAMAGE_V = 100;
 static const int DAMAGE_L = 100;
@@ -87,7 +88,7 @@ void Projectile::Update()
         dele = true;
         printf("[Projectile] Out of bounds → dele set to true\n");
     }else {
-        Circle* c = static_cast<Circle*>(hitbox);
+        //Circle* c = static_cast<Circle*>(hitbox);
         //printf("X: %d, %lf Y: %d, %lf\n", x, c->center_x(), y, c->center_y());
     }
 }
@@ -132,7 +133,7 @@ void Projectile::Draw()
     if (dele) return;
     
     if (hitbox) {
-        Circle* c = static_cast<Circle*>(hitbox);
+        //Circle* c = static_cast<Circle*>(hitbox);
         //al_draw_circle(c->x, c->y, c->r, al_map_rgb(255, 0, 0), 2);
     }
 
@@ -150,15 +151,24 @@ void Projectile::interactEnemy(Elements* tar)
     if (enemy->hp > 0)
         enemy->hp -= damage;
 
-    if (enemy->hp <= 0)
+    if (enemy->hp <= 0){
+        if (origin == 2){
+            ((Character2*)owner)->coins2 += kill_coins_add;
+        }
+        else{
+            ((Character*)owner)->coins += kill_coins_add;
+        }
         tar->dele = true;
-
+    }
     // award owner EXP
-    if (origin == 2)
-        ((Character2*)owner)->levelup_points++;
-    else
-        ((Character*)owner)->levelup_points++;
-
+    if (origin == 2){
+        ((Character2*)owner)->levelup_points++; 
+        ((Character2*)owner)->coins2 += hit_coins_add;
+    }
+    else{
+        ((Character*)owner)->levelup_points++; 
+        ((Character*)owner)->coins += hit_coins_add;
+    }
     printf("[Projectile] Enemy1 hit! HP = %d\n", enemy->hp);
 }
 

@@ -5,6 +5,10 @@
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
 #include "projectile.h"
+// --- 必須加這三行 ---
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 class Character : public Elements{
 public:
     enum State { STOP = 0, MOVE, ATK1 };
@@ -35,6 +39,9 @@ public:
     ALGIF_ANIMATION* gif_status[3];   // 修正型別
     ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
     Shape* hitbox;
+    // ===== UI Font =====
+    ALLEGRO_FONT* font;
+    int coins;
 
     // 建構子 / 解構子
     Character();
