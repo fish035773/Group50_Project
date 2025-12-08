@@ -41,6 +41,7 @@ GameScene::GameScene(int label)
     background[0] = al_load_bitmap("assets/image/round1_scene.png");
     background[1] = al_load_bitmap("assets/image/round2_scene.png");
     background[2] = al_load_bitmap("assets/image/round3_scene.png");
+    background_skill = al_load_bitmap("assets/image/skill_background.png");
     // ==== LOAD ROUND IMAGES ====
     round_images[0] = al_load_bitmap("assets/image/round_1.png");
     round_images[1] = al_load_bitmap("assets/image/round_2.png");
@@ -331,7 +332,7 @@ void GameScene::Update() {
 void GameScene::Draw() {
 
     //printf("GameScene::Draw elements size = %d\n", (int)elements.size());
-
+    
     // === DRAW BACKGROUND ===
     al_clear_to_color(al_map_rgb(0, 0, 0));
     int bg_index = round_counter - 1;
@@ -341,6 +342,7 @@ void GameScene::Draw() {
     if (background[bg_index])
         al_draw_bitmap(background[bg_index], 0, 0, 0);
 
+    al_draw_bitmap(background_skill, 905, 0, 0);//draw background for skill UI
     // === DRAW FLOOR ===
     for (Elements* e : elements) {
         if (e->label == Floor_L && !e->dele)
@@ -364,6 +366,7 @@ void GameScene::Draw() {
         // --------------------------
         // CHARACTER 2 (Player 2)
         // --------------------------
+        
         if (ele->label == Character2_L) {
 
             Character2* ch2 = dynamic_cast<Character2*>(ele);
