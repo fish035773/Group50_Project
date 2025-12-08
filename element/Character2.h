@@ -50,6 +50,8 @@ public:
     // ===== UI Font =====
     ALLEGRO_FONT* font;
     int coins2;
+    // ===== Background =====
+   ALLEGRO_BITMAP* Skill[3] = {nullptr};
 
 private:
    void trigger_attack(int atk_type);
