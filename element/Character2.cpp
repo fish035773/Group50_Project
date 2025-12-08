@@ -18,13 +18,16 @@
 #define text_size 24
 #define text_space 30
 #define text_x 910
+
 // 建立角色的 wrapper 函式
-int jump_power = 5;
-#define add_jump_power 2
+double jump_time = 0.5;
+#define add_jump_time 0.2
 #define skill_add 10
 int skill_1 = 50;
 int skill_2 = 50;
 int skill_3 = 50;
+#define hit_coins_add 10
+#define kill_coins_add 50
 Character2::Character2()
     :Elements(Character2_L), x(30), y(0), width(0), height(0),
       blood(100), level(0), levelup_points(0), add_blood(10),
@@ -46,8 +49,9 @@ Character2::Character2()
 
     // ===== Background =====
     Skill[0] = al_load_bitmap("assets/image/Skill_1.png");
-   // Skill[1] = al_load_bitmap("assets/image/Skill_2.png");
-   // Skill[2] = al_load_bitmap("assets/image/Skill_3.png");
+    Skill[1] = al_load_bitmap("assets/image/Skill_2.png");
+    Skill[2] = al_load_bitmap("assets/image/Skill_3.png");
+    Skill[3] = al_load_bitmap("assets/image/Skill_4.png");
     width = gif_status[0]->width;
     height = gif_status[0]->height;
     y = HEIGHT - height - 30;
@@ -104,7 +108,7 @@ void Character2::Update()
         double elapsed = al_get_time() - jump_start_time;
         int dx = 0;
 
-        if (key_state[ALLEGRO_KEY_UP] && elapsed < 0.5)
+        if (key_state[ALLEGRO_KEY_UP] && elapsed < jump_time)
             update_position(0, -5);
         else if (y < ground_y)
             update_position(0, 5);
@@ -190,8 +194,22 @@ void Character2::Update()
     if(coins2 >= skill_1 && key_state[ALLEGRO_KEY_1]){
         coins2 -= skill_1;
         skill_1 += skill_add;
-        jump_power += add_jump_power;
+        jump_time += add_jump_time;
         key_state[ALLEGRO_KEY_1] = false;
+    }
+    if(coins2 >= skill_2 && key_state[ALLEGRO_KEY_2]){
+        coins2 -= skill_2;
+        skill_2 += skill_add;
+        skill2_damage += 1;
+        printf("Character2 Skill 2 Damage: %d\n", skill2_damage);
+        key_state[ALLEGRO_KEY_2] = false;
+    }
+    if(coins2 >= skill_3 && key_state[ALLEGRO_KEY_3]){
+        coins2 -= skill_3;
+        skill_3 += skill_add;
+        skill_3_add_blood += 1;
+        printf("Character2 Skill 3 Add Blood: %d\n", skill_3_add_blood);
+        key_state[ALLEGRO_KEY_3] = false;
     }
     
 }
@@ -214,13 +232,52 @@ void Character2::Draw()
         text_y += text_space;
         //draw skill icons
         al_draw_bitmap(Skill[0], text_x, text_y, 0);
+
+        sprintf(buf, "1", skill_1);
+        if(coins2 >= skill_1)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x, text_y, 0, buf);
+
         sprintf(buf, "%d", skill_1);
-        al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+        if(coins2 >= skill_1)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);//
+        // second skill
+     
+        
+      
+        
+        al_draw_bitmap(Skill[1], text_x + 85 + 10, text_y, 0);
+        sprintf(buf, "2", skill_1);
+        if(coins2 >= skill_1)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x + 85 + 10, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10, text_y, 0, buf);
+
+        sprintf(buf, "%d", skill_2);
+        if(coins2 >= skill_2)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
         //
-        al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
-        //
+
+        // third skill
         text_y += text_space + 90;
-        al_draw_bitmap(Skill[0], text_x, text_y, 0);
+        al_draw_bitmap(Skill[2], text_x, text_y, 0);
+        sprintf(buf, "3", skill_3);
+        if(coins2 >= skill_1)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x , text_y, 0, buf);
+
+        sprintf(buf, "%d", skill_3);
+        if(coins2 >= skill_3)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);
+        
         al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
         text_y += text_space ;
         sprintf(buf, "coins: %d", coins2);
@@ -276,4 +333,14 @@ void Character2::update_position(int dx, int dy)
     x += dx;
     y += dy;
     hitbox->update_position(dx, dy);
+}
+void Character2::OnHitEnemy(int damage, bool kill)
+{
+    levelup_points++;
+    blood += skill_3_add_blood;
+
+    int maxBlood = 100 + level * add_blood;
+    if (blood > maxBlood) blood = maxBlood;
+
+    coins2 += (kill ? kill_coins_add : hit_coins_add);
 }

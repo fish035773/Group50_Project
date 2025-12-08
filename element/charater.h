@@ -31,7 +31,7 @@ public:
     int cool_X, cool_C, cool_V;
     int atk_type;
     bool new_proj;
-
+    int skill2_damage = 0;
     State state;
     bool died;
     
@@ -51,7 +51,7 @@ public:
     void Update() override;
     void Draw() override;
     void Interact() override;
-
+    void OnHitEnemy(int damage, bool kill);
     void update_position(int dx, int dy);
 private:
     void trigger_attack(int atk_type);
