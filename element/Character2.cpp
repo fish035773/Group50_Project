@@ -54,6 +54,7 @@ Character2::Character2()
     Skill[1] = al_load_bitmap("assets/image/Skill_2.png");
     Skill[2] = al_load_bitmap("assets/image/Skill_3.png");
     Skill[3] = al_load_bitmap("assets/image/Skill_4.png");
+    
     width = gif_status[0]->width;
     height = gif_status[0]->height;
     y = HEIGHT - height - 30;
@@ -231,6 +232,8 @@ void Character2::Draw()
         al_draw_bitmap(frame, x, y, dir ? ALLEGRO_FLIP_HORIZONTAL : 0);
     }
     int text_y = 350;
+    
+
     if(blood > 0){
         char buf[64];
         sprintf(buf, "Character 2");

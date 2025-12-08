@@ -20,7 +20,7 @@ VictoryScene::VictoryScene(int label):
     printf("[VictoryScene] Creating Victory Scene...\n");
 
     // Background
-    background = al_load_bitmap("assets/image/victory_bg2.png");
+    background = al_load_bitmap("assets/image/victory_bg.png");
     if (!background)
         printf("WARNING: Victory bg NOT FOUND!\n");
 

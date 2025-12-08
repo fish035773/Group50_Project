@@ -52,6 +52,7 @@ public:
     int coins2 = 0;
     // ===== Background =====
    ALLEGRO_BITMAP* Skill[4] = {nullptr};
+   
 
 private:
    void trigger_attack(int atk_type);
