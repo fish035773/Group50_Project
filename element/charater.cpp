@@ -27,6 +27,7 @@ int skill_4 = 50;
 int move_speed2 = 5;
 // 建立角色的 wrapper 函式
 double jump_time2 = 0.5;
+
 #define add_jump_time2 0.2
 #define skill_add2 10
 
@@ -205,7 +206,10 @@ void Character::Update()
     if(coins >= skill_1 && key_state[ALLEGRO_KEY_1]){
         coins -= skill_1;
         skill_1 += skill_add2;
-        add_blood += 5;
+        blood += 20;
+        if(blood >= 100 + (level * add_blood))
+            blood = 100 + (level * add_blood);
+        
         printf("add blood %d\n", add_blood);
         key_state[ALLEGRO_KEY_1] = false;
     }   
