@@ -229,8 +229,14 @@ void Character::Update()
         coins -= skill_4;
         skill_4 += skill_add2;
         cool_x -= 80;
+        if(cool_x < 0)
+            cool_x = 0;
         cool_c -= 80;
+        if(cool_c < 0)
+            cool_c = 0;
         cool_v -= 80;
+        if(cool_v < 0)
+            cool_v = 0;
         key_state[ALLEGRO_KEY_4] = false;
     }
 }
@@ -393,4 +399,5 @@ void Character::OnHitEnemy(int damage, bool kill)
 {
     levelup_points++;
     coins += (kill ? kill_coins_add : hit_coins_add);
+    
 }
