@@ -11,9 +11,9 @@
 #include <allegro5/allegro_acodec.h>
 #include "../element/elements_factory.h"
 #include <iostream>
-#define cool_v 10 * 80
-#define cool_c 8 * 80
-#define cool_x 5 * 80
+int cool_v = 10 * 80;
+int cool_c = 8 * 80;
+int cool_x = 5 * 80;
 #define hit_coins_add 10
 #define kill_coins_add 50
 #define text_size 24
@@ -71,8 +71,8 @@ Character::Character()
     // ===== Background =====
     Skill[0] = al_load_bitmap("assets/image/skill_+5.png");
     Skill[1] = al_load_bitmap("assets/image/skill_jump.png");
-    Skill[2] = al_load_bitmap("assets/image/Skill_3.png");
-    Skill[3] = al_load_bitmap("assets/image/Skill_4.png");
+    Skill[2] = al_load_bitmap("assets/image/Skill_move.png");
+    Skill[3] = al_load_bitmap("assets/image/Skill_time.png");
 }
 
 Character::~Character()
@@ -113,8 +113,8 @@ void Character::Update()
         else if (y < ground_y)
             update_position(0, 5);
 
-        if (key_state[ALLEGRO_KEY_A]) { dx -= 5; dir = false; }
-        if (key_state[ALLEGRO_KEY_D]) { dx += 5; dir = true; }
+        if (key_state[ALLEGRO_KEY_A]) { dx -= move_speed2; dir = false; }
+        if (key_state[ALLEGRO_KEY_D]) { dx += move_speed2; dir = true; }
         update_position(dx, 0);
 
         if (y >= ground_y) {
@@ -159,8 +159,8 @@ void Character::Update()
 
         case MOVE: {
             int dx = 0;
-            if (key_state[ALLEGRO_KEY_A]) { dx -= 5; dir = false; }
-            if (key_state[ALLEGRO_KEY_D]) { dx += 5; dir = true; }
+            if (key_state[ALLEGRO_KEY_A]) { dx -= move_speed2; dir = false; }
+            if (key_state[ALLEGRO_KEY_D]) { dx += move_speed2; dir = true; }
             update_position(dx, 0);
 
             if (key_state[ALLEGRO_KEY_W] && !is_jumping && y == ground_y) {
@@ -228,9 +228,9 @@ void Character::Update()
     if(coins >= skill_4 && key_state[ALLEGRO_KEY_4]){
         coins -= skill_4;
         skill_4 += skill_add2;
-        cool_X = std::max(0, cool_X - 80);
-        cool_C = std::max(0, cool_C - 80);
-        cool_V = std::max(0, cool_V - 80);
+        cool_x -= 80;
+        cool_c -= 80;
+        cool_v -= 80;
         key_state[ALLEGRO_KEY_4] = false;
     }
 }
