@@ -32,7 +32,7 @@ public:
     int level;
     int levelup_points;
     int add_blood;
-   int skill_3_add_blood = 0;
+   int skill_8_add_blood = 0;
     bool dir; // false: left, true: right
     bool is_jumping;
     double jump_start_time;
@@ -43,7 +43,7 @@ public:
     bool new_proj;
     State2 state;
     bool died;
-    int skill2_damage = 0;
+    int skill7_damage = 0;
     Shape* hitbox;
     ALGIF_ANIMATION* gif_status[3];
     ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
@@ -51,7 +51,7 @@ public:
     ALLEGRO_FONT* font;
     int coins2 = 0;
     // ===== Background =====
-   ALLEGRO_BITMAP* Skill[4] = {nullptr};
+   ALLEGRO_BITMAP* Skill2[4] = {nullptr};
    
 
 private:

@@ -42,7 +42,7 @@ public:
     // ===== UI Font =====
     ALLEGRO_FONT* font;
     int coins;
-
+    ALLEGRO_BITMAP* Skill[4] = {nullptr};
     // 建構子 / 解構子
     Character();
     ~Character();

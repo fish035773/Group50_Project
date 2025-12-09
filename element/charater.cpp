@@ -20,6 +20,15 @@
 #define text_space 30
 #define text_x 910
 // 建立角色的 wrapper 函式
+int skill_1 = 50;
+int skill_2 = 50;
+int skill_3 = 50;
+int skill_4 = 50;
+int move_speed2 = 5;
+// 建立角色的 wrapper 函式
+double jump_time2 = 0.5;
+#define add_jump_time2 0.2
+#define skill_add2 10
 
 Character::Character()
     : Elements(Character_L), x(30), y(0), width(0), height(0),
@@ -57,6 +66,12 @@ Character::Character()
     al_init_ttf_addon();
     font = al_load_ttf_font("assets/font/Consolas.ttf", text_size, 0);
     coins = 0;
+
+    // ===== Background =====
+    Skill[0] = al_load_bitmap("assets/image/skill_+5.png");
+    Skill[1] = al_load_bitmap("assets/image/skill_jump.png");
+    Skill[2] = al_load_bitmap("assets/image/Skill_3.png");
+    Skill[3] = al_load_bitmap("assets/image/Skill_4.png");
 }
 
 Character::~Character()
@@ -92,7 +107,7 @@ void Character::Update()
         double elapsed = al_get_time() - jump_start_time;
         int dx = 0;
 
-        if (key_state[ALLEGRO_KEY_W] && elapsed < 0.5)
+        if (key_state[ALLEGRO_KEY_W] && elapsed < jump_time2)
             update_position(0, -5);
         else if (y < ground_y)
             update_position(0, 5);
@@ -187,6 +202,33 @@ void Character::Update()
         default:
             break;
     }
+    if(coins >= skill_1 && key_state[ALLEGRO_KEY_1]){
+        coins -= skill_1;
+        skill_1 += skill_add2;
+        add_blood += 5;
+        printf("add blood %d\n", add_blood);
+        key_state[ALLEGRO_KEY_1] = false;
+    }   
+    if(coins >= skill_2 && key_state[ALLEGRO_KEY_2]){
+        coins -= skill_2;
+        skill_2 += skill_add2;
+        jump_time2 += add_jump_time2;
+        key_state[ALLEGRO_KEY_2] = false;
+    }
+    if(coins >= skill_3 && key_state[ALLEGRO_KEY_3]){
+        coins -= skill_3;
+        skill_3 += skill_add2;
+        move_speed2 += 1;
+        key_state[ALLEGRO_KEY_3] = false;
+    }
+    if(coins >= skill_4 && key_state[ALLEGRO_KEY_4]){
+        coins -= skill_4;
+        skill_4 += skill_add2;
+        cool_X = std::max(0, cool_X - 80);
+        cool_C = std::max(0, cool_C - 80);
+        cool_V = std::max(0, cool_V - 80);
+        key_state[ALLEGRO_KEY_4] = false;
+    }
 }
 
 void Character::Draw()
@@ -203,8 +245,69 @@ void Character::Draw()
         text_y += text_space;
         sprintf(buf, "coins: %d", coins);
         al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        text_y += text_space;
+        //draw skill icons
+        al_draw_bitmap(Skill[0], text_x, text_y, 0);
+
+        sprintf(buf, "1", skill_1);
+        if(coins >= skill_1)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x, text_y, 0, buf);
+
+        sprintf(buf, "%d", skill_1);
+        if(coins >= skill_1)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);//
+        // second skill
+        
+        al_draw_bitmap(Skill[1], text_x + 85 + 10, text_y, 0);
+        sprintf(buf, "2", skill_2);
+        if(coins >= skill_2)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x + 85 + 10, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10, text_y, 0, buf);
+
+        sprintf(buf, "%d", skill_2);
+        if(coins >= skill_2)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
+        //
+
+        // third skill
+        text_y += text_space + 90;
+        al_draw_bitmap(Skill[2], text_x, text_y, 0);
+        sprintf(buf, "3", skill_3);
+        if(coins >= skill_3)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x , text_y, 0, buf);
+
+        sprintf(buf, "%d", skill_3);
+        if(coins >= skill_3)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);
+        
+        al_draw_bitmap(Skill[0], text_x + 85 + 10, text_y, 0);
+     
+        // fourth skill
+        al_draw_bitmap(Skill[3], text_x + 85 + 10, text_y, 0);
+        sprintf(buf, "4", skill_4); 
+        if(coins >= skill_4)
+            al_draw_text(font, al_map_rgb(255, 255, 0), text_x + 85 + 10, text_y, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10, text_y, 0, buf);
+        sprintf(buf, "%d", skill_4);
+        if(coins >= skill_4)
+            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
+        else
+            al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
     }
 }
+
 
 void Character::Interact(){}
 

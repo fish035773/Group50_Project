@@ -38,9 +38,9 @@ Projectile::Projectile(int label_, int x_, int y_, int v_, void* owner_)
     const char* path = nullptr;
 
     switch (label_) {
-        case Projectile_K: path = "assets/image/projectile_k.png"; damage = DAMAGE_K + ((Character2*)owner)->skill2_damage; origin = 2; break;
-        case Projectile_L: path = "assets/image/projectile_l.png"; damage = DAMAGE_L + ((Character2*)owner)->skill2_damage; origin = 2; break;
-        case Projectile_J: path = "assets/image/projectile_j.png"; damage = DAMAGE_J + ((Character2*)owner)->skill2_damage; origin = 2; break;
+        case Projectile_K: path = "assets/image/projectile_k.png"; damage = DAMAGE_K + ((Character2*)owner)->skill7_damage; origin = 2; break;
+        case Projectile_L: path = "assets/image/projectile_l.png"; damage = DAMAGE_L + ((Character2*)owner)->skill7_damage; origin = 2; break;
+        case Projectile_J: path = "assets/image/projectile_j.png"; damage = DAMAGE_J + ((Character2*)owner)->skill7_damage; origin = 2; break;
         case Projectile_V: path = "assets/image/projectile_v.png"; damage = DAMAGE_V + ((Character*)owner)->skill2_damage; origin = 1; break;
         case Projectile_C: path = "assets/image/projectile_c.png"; damage = DAMAGE_C + ((Character*)owner)->skill2_damage; origin = 1; break;
         case Projectile_X: path = "assets/image/projectile_x.png"; damage = DAMAGE_X + ((Character*)owner)->skill2_damage; origin = 1; break;
