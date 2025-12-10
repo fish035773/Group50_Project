@@ -28,8 +28,10 @@ enum EleType {
    Projectile2_L,
    Projectile3_1_L,
    Projectile3_2_L,
+   Projectile4_L,
    Enemy3_L,
-   Enemy2_L
+   Enemy2_L,
+   Boss_L
 };
 
 /*
@@ -44,14 +46,14 @@ public:
    ALLEGRO_FONT* font = nullptr;
 
    // ===== Background =====
-   ALLEGRO_BITMAP* background[3] = {nullptr};
+   ALLEGRO_BITMAP* background[4] = {nullptr};
    ALLEGRO_BITMAP* background_skill = nullptr;
    // ===== Round Images =====
-   ALLEGRO_BITMAP* round_images[3] = {nullptr};
+   ALLEGRO_BITMAP* round_images[4] = {nullptr};
 
    // ===== Sounds =====
-   ALLEGRO_SAMPLE* round_sounds[3] = {nullptr};
-   ALLEGRO_SAMPLE* round_bgm[3]    = {nullptr};
+   ALLEGRO_SAMPLE* round_sounds[4] = {nullptr};
+   ALLEGRO_SAMPLE* round_bgm[4]    = {nullptr};
    ALLEGRO_SAMPLE_INSTANCE* round_bgm_instance = nullptr;
 
    // ===== Element images inside the scene =====

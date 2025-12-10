@@ -6,6 +6,7 @@
 #include "../element/element.h"
 #include "../element/charater.h"
 #include "../element/floor.h"
+#include "../element/boss.h"
 #include "../element/projectile.h"
 #include "../element/Character2.h"
 #include "../element/elements_factory.h"
@@ -28,7 +29,7 @@ GameScene::GameScene(int label)
     : Scene(label)
 {
     // ==== INITIAL STATE ====
-    round_counter = 1;
+    round_counter = 4;
     round_triggered = true;
     round_timer = 0;
     enemy_defeated = false;
@@ -41,11 +42,13 @@ GameScene::GameScene(int label)
     background[0] = al_load_bitmap("assets/image/round1_scene.png");
     background[1] = al_load_bitmap("assets/image/round2_scene.png");
     background[2] = al_load_bitmap("assets/image/round3_scene.png");
+    background[3] = al_load_bitmap("assets/image/round4_scene.png");
     background_skill = al_load_bitmap("assets/image/skill_background.png");
     // ==== LOAD ROUND IMAGES ====
     round_images[0] = al_load_bitmap("assets/image/round_1.png");
     round_images[1] = al_load_bitmap("assets/image/round_2.png");
     round_images[2] = al_load_bitmap("assets/image/round_3.png");
+    round_images[3] = al_load_bitmap("assets/image/round_3.png");
 
     // ==== LOAD FONTS ====
     al_init_font_addon();
@@ -56,10 +59,12 @@ GameScene::GameScene(int label)
     round_sounds[0] = al_load_sample("assets/sound/round_1.mp3");
     round_sounds[1] = al_load_sample("assets/sound/round_2.mp3");
     round_sounds[2] = al_load_sample("assets/sound/round_3.mp3");
+    round_sounds[3] = al_load_sample("assets/sound/round_3.mp3");
 
     round_bgm[0] = al_load_sample("assets/sound/bgm_round1.mp3");
     round_bgm[1] = al_load_sample("assets/sound/bgm_round2.mp3");
     round_bgm[2] = al_load_sample("assets/sound/bgm_round3.mp3");
+    round_bgm[3] = al_load_sample("assets/sound/bgm_round3.mp3");
 
     // ==== START FIRST BGM ====
     if (round_bgm[0]) {
@@ -170,6 +175,13 @@ void GameScene::Update() {
                 addElement(e);
             }
             break;
+        case 4:
+            enemy_count = 1;
+            for (int i = 0; i < enemy_count; i++) {
+                Boss* e = new Boss(Boss_L, 5);
+                e->update_position(i * spacing, 0);
+                addElement(e);
+            }
         }
 
         enemies_spawned = true;
@@ -204,6 +216,14 @@ void GameScene::Update() {
                 }
                 case Enemy3_L: {
                     Enemy3* e3 = dynamic_cast<Enemy3*>(ele);
+                    if (e3 && e3->hp > 0) {
+                        all_defeated = false;
+                        break;
+                    }
+                    break;
+                }
+                case Boss_L: {
+                    Boss* e3 = dynamic_cast<Boss*>(ele);
                     if (e3 && e3->hp > 0) {
                         all_defeated = false;
                         break;
@@ -259,7 +279,7 @@ void GameScene::Update() {
             round_counter++;
             round_advancing = false;
 
-            if (round_counter > 3) {
+            if (round_counter > 4) {
                 // === ALL ROUNDS FINISHED ===
                 printf("[GameScene] All rounds completed!\n");
                 scene_end = true;
@@ -282,9 +302,10 @@ void GameScene::Update() {
             al_play_sample_instance(round_bgm_instance);
 
             // Play sound cue
-            al_play_sample(round_sounds[round_counter - 1], 
-                1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-
+            //if(round_sounds[round_counter - 1])
+                al_play_sample(round_sounds[round_counter - 1], 
+                    1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            //else printf("round_sounds invalid\n");
             printf("[GameScene] >>> ENTER ROUND %d <<<\n", round_counter);
         }
 
@@ -301,6 +322,7 @@ void GameScene::Update() {
             al_destroy_sample_instance(round_bgm_instance);
             round_bgm_instance = NULL;
         }
+        
         create_scene(VictoryScene_L);
     }
     if (key_state[ALLEGRO_KEY_E]) {
@@ -337,16 +359,23 @@ void GameScene::Draw() {
     al_clear_to_color(al_map_rgb(0, 0, 0));
     int bg_index = round_counter - 1;
     if (bg_index < 0) bg_index = 0;
-    if (bg_index > 2) bg_index = 2; // safety
-
+    if (bg_index > 3) bg_index = 3; // safety
+    
+    if (!background[bg_index]) {
+        printf("Background[%d] = NULL\n", bg_index);
+    } else {
+        //printf("Background[%d] bitmap OK\n", bg_index);
+    }
     if (background[bg_index])
         al_draw_bitmap(background[bg_index], 0, 0, 0);
 
     al_draw_bitmap(background_skill, 905, 0, 0);//draw background for skill UI
-    // === DRAW FLOOR ===
+    
+    // === DRAW FLOOR + BOSS ===
     for (Elements* e : elements) {
-        if (e->label == Floor_L && !e->dele)
-            e->Draw(); // C++ virtual Draw()
+        if (!e->dele && (e->label == Floor_L || e->label == Boss_L)) {
+            e->Draw();
+        }
     }
 
     // === ROUND INDICATOR ===
@@ -355,7 +384,7 @@ void GameScene::Draw() {
         if (img) {
             int img_w = al_get_bitmap_width(img);
             al_draw_bitmap(img, WIDTH / 2 - img_w / 2, 100, 0);
-        }
+        }else printf("img invalid\n");
     }
 
     // === DRAW ALL ELEMENTS ===
@@ -504,14 +533,15 @@ void GameScene::Draw() {
         // --------------------------
         // OTHER ELEMENTS
         // --------------------------
-        else {
-            ele->Draw();     // 直接呼叫 virtual Draw()
+        else if (ele->label != Boss_L) {
+            ele->Draw(); // prevent boss from being drawn twice
         }
     }
+    //printf("DREW\n")
 }
 
 GameScene::~GameScene() {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         if (round_images[i])
             al_destroy_bitmap(round_images[i]);
         if (round_sounds[i])
@@ -525,7 +555,7 @@ GameScene::~GameScene() {
     if (round_bgm_instance) {
         al_stop_sample_instance(round_bgm_instance);
         al_destroy_sample_instance(round_bgm_instance);
-    }
+    }else printf("round_bgm invalid\n");
 
     if (box_image)
         al_destroy_bitmap(box_image);

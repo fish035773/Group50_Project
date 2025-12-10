@@ -13,7 +13,7 @@ enum SceneType {
     DeathScene_L = 4,
     CreditScene_L = 5,
     About_L = 6,
-    Exit_L = 7
+    Exit_L = 7,
 };
 
 #define GAME_TERMINATE -1
