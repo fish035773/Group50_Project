@@ -33,6 +33,9 @@ Boss::Boss(int label, int speed): Elements(label), speed(speed){
 
     ALLEGRO_SAMPLE *sample = al_load_sample("assets/sound/fire_atk_sound.mp3");
     atk_sound = al_create_sample_instance(sample);
+    sfx_qte_right = al_load_sample("assets/sound/hit_right.mp3");
+    sfx_qte_wrong = al_load_sample("assets/sound/hit_wrong.mp3");
+
     al_set_sample_instance_playmode(atk_sound, ALLEGRO_PLAYMODE_ONCE);
     al_attach_sample_instance_to_mixer(atk_sound, al_get_default_mixer());
     
@@ -78,12 +81,20 @@ Boss::Boss(int label, int speed): Elements(label), speed(speed){
     qte_duration = 3.0; // QTE 有效時間（可調）
 
     next_qte_time = al_get_time() + 10.0;
+    qte_bg = al_load_bitmap("assets/image/key.png");
+
+    qte_fail_time = 0;
+    qte_failed = false;
 }
 
 Boss::~Boss(){
     al_destroy_sample_instance(atk_sound);
     for (int i = 0; i < 4; i++)
         algif_destroy_animation(gif_status[i]);
+    
+    al_destroy_bitmap(qte_bg);
+    if (sfx_qte_right) al_destroy_sample(sfx_qte_right);
+    if (sfx_qte_wrong) al_destroy_sample(sfx_qte_wrong);
 
     delete hitbox;
 }
@@ -98,9 +109,10 @@ void Boss::update_position(int dx, int dy){
 void Boss::StartQTE() {
     qte_active = true;
     qte_start_time = al_get_time();
+
     qte_keys.clear();
 
-    int count = 3 + rand() % 2; // 3 或 4 個按鍵
+    int count = 3 + rand() % 2;
 
     int pool[] = { 
         ALLEGRO_KEY_Q, ALLEGRO_KEY_R, ALLEGRO_KEY_T, ALLEGRO_KEY_Y, 
@@ -109,11 +121,13 @@ void Boss::StartQTE() {
         ALLEGRO_KEY_B, ALLEGRO_KEY_N, ALLEGRO_KEY_M
     };
 
-
     for (int i = 0; i < count; i++) {
-        int idx = rand() % 7;
+        int idx = rand() % 14;
         qte_keys.push_back(pool[idx]);
     }
+
+    qte_state.clear();
+    qte_state.resize(qte_keys.size(), 0);
 
     qte_index = 0;
 
@@ -159,19 +173,27 @@ void Boss::HandleQTEKey(int keycode) {
     if (!qte_active) return;
 
     if (keycode == qte_keys[qte_index]) {
+        qte_state[qte_index] = 1;
         qte_index++;
-
+         if (sfx_qte_right)
+            al_play_sample(sfx_qte_right, 1.0, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         if (qte_index >= qte_keys.size()) {
             qte_active = false;
-            hp -= 10; // 成功攻擊 Boss
+            hp -= 10;
             printf("QTE Success! Boss HP = %d\n", hp);
         }
-    } else {
-        qte_active = false;
-        PlayerTakeDamage(20);
+    }
+    else {
+        if (sfx_qte_wrong)
+            al_play_sample(sfx_qte_wrong, 1.0, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            
+        qte_state[qte_index] = 2;
+        qte_failed = true;
+        qte_fail_time = al_get_time();
         printf("QTE Failed! Wrong key!\n");
     }
 }
+
 
 void Boss::Update() {
     if (hp <= 0) return;
@@ -217,6 +239,16 @@ void Boss::Update() {
 
         drop_queue.pop();
     }
+
+    if (qte_failed) {
+        if (now - qte_fail_time > 0.5) {
+            qte_failed = false;
+            qte_active = false;
+            PlayerTakeDamage(20);
+            printf("QTE failed: damage dealt.\n");
+        }
+        return;
+    }
 }
 
 void Boss::SpawnFallingAttack() {
@@ -253,7 +285,9 @@ void Boss::Draw() {
     if (state == BOSS_ATK && gif_status[state]->display_index == 2)
         al_play_sample_instance(atk_sound);
 
-    // HP bar
+    // -------------------------
+    // BOSS HP BAR
+    // -------------------------
     int bar_width = 400;
     int bar_height = 30;
     int bar_x = (WIDTH - bar_width) / 2;
@@ -261,56 +295,79 @@ void Boss::Draw() {
 
     float hp_ratio = (float)hp / maxhp;
 
-    al_draw_filled_rectangle(
-        bar_x, bar_y,
-        bar_x + bar_width,
-        bar_y + bar_height,
-        al_map_rgb(225, 225, 225)
-    );
+    al_draw_filled_rectangle(bar_x, bar_y, bar_x + bar_width, bar_y + bar_height,
+                             al_map_rgb(225, 225, 225));
 
-    al_draw_filled_rectangle(
-        bar_x, bar_y,
-        bar_x + (int)(bar_width * hp_ratio),
-        bar_y + bar_height,
-        al_map_rgb(150, 0, 0)
-    );
+    al_draw_filled_rectangle(bar_x, bar_y,
+                             bar_x + (int)(bar_width * hp_ratio),
+                             bar_y + bar_height,
+                             al_map_rgb(150, 0, 0));
 
     if (got_hit && al_get_time() - hit_time < 0.2) {
-        al_draw_tinted_bitmap(
-            frame,
-            al_map_rgba(255, 0, 0, 200),
-            x, y,
-            (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL)
-        );
-    }
-    
-    if (hitbox) {
-        if (hitbox->getType() == ShapeType::RECTANGLE) {
-            Rectangle* r = static_cast<Rectangle*>(hitbox);
-            al_draw_rectangle(
-                r->x1, r->y1,
-                r->x2, r->y2,
-                al_map_rgb(0, 255, 0), 2
-            );
-        }
+        al_draw_tinted_bitmap(frame, al_map_rgba(255, 0, 0, 200), x, y,
+                              (dir ? 0 : ALLEGRO_FLIP_HORIZONTAL));
     }
 
+    // ========================================================
+    //                       QTE DISPLAY
+    // ========================================================
     if (qte_active) {
+
         float cx = WIDTH / 2 - 150;
         float cy = HEIGHT / 2;
 
+        int kw = al_get_bitmap_width(qte_bg);
+        int kh = al_get_bitmap_height(qte_bg);
+
+        double now = al_get_time();
+        double elapsed = now - qte_start_time;
+        double ratio = 1.0 - (elapsed / qte_duration);
+        if (ratio < 0) ratio = 0;
+
+        int tw = 300; 
+        int th = 15;
+        int tx = WIDTH / 2 - tw / 2;
+        int ty = cy - 80;
+
+        al_draw_filled_rectangle(tx, ty, tx + tw, ty + th,
+                                 al_map_rgb(60, 60, 60));
+        ALLEGRO_COLOR time_color =
+            (ratio > 0.5) ? al_map_rgb(255, 255, 0) :
+            (ratio > 0.2) ? al_map_rgb(255, 150, 0) :
+                            al_map_rgb(255, 0, 0);
+
+        al_draw_filled_rectangle(tx, ty, tx + tw * ratio, ty + th, time_color);
+
         for (int i = 0; i < qte_keys.size(); i++) {
-            ALLEGRO_COLOR color = (i == qte_index ?
-                                al_map_rgb(255, 255, 0) :
-                                al_map_rgb(255, 255, 255));
+
+            float x = cx + i * 100;
+            float y = cy;
+
+            ALLEGRO_COLOR tint;
+
+            if (qte_state[i] == 0)
+                tint = al_map_rgba_f(1, 1, 1, 1);
+            else if (qte_state[i] == 1)
+                tint = al_map_rgba_f(0.5, 0.5, 0.5, 1);
+            else    
+                tint = al_map_rgba_f(1, 0.2, 0.2, 1);
+
+            al_draw_tinted_bitmap(qte_bg, tint, x, y, 0);
+
             char buf[8];
             snprintf(buf, 8, "%s", al_keycode_to_name(qte_keys[i]));
 
-            al_draw_text(font, color, cx + i * 80, cy, 0, buf);
+            int text_w = al_get_text_width(font, buf);
+            int text_h = al_get_font_line_height(font);
+
+            al_draw_text(font, al_map_rgb(0, 0, 0),
+                         x + kw / 2 - text_w / 2,
+                         y + kh / 2 - text_h / 2,
+                         0, buf);
         }
     }
-
 }
+
 
 void Boss::Interact()
 {}

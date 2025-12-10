@@ -57,12 +57,21 @@ public:
     double qte_start_time;
     double qte_duration;   // 玩家允許反應時間 
     double next_qte_time;
-    
-    std::vector<int> qte_keys; // 要按的按鍵（keycode）
+
+    double qte_fail_time;
+    bool qte_failed;
+
+    std::vector<int> qte_keys;
+    std::vector<int> qte_state;
     int qte_index;             // 玩家要按的順序
 
+    ALLEGRO_BITMAP* qte_bg = nullptr;
     ALLEGRO_FONT* font;
     int text_size;
+
+    ALLEGRO_SAMPLE *sfx_qte_right;
+    ALLEGRO_SAMPLE *sfx_qte_wrong;
+
 
     Boss(int label, int speed);
     virtual ~Boss();

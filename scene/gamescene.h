@@ -38,6 +38,7 @@ enum EleType {
    [GameScene] — Pure C++ Class
    Inherits from Scene
 */
+
 class GameScene : public Scene
 {
 public:

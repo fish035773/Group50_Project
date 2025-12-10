@@ -315,6 +315,7 @@ void GameScene::Update() {
     // =====================================================
     // 6. SCENE SWITCH KEYS
     // =====================================================
+    /*
     if (key_state[ALLEGRO_KEY_Q]) {
         scene_end = true;
         if (round_bgm_instance) {
@@ -337,7 +338,7 @@ void GameScene::Update() {
        // }
         //al_destroy_sample(song);
         create_scene(DeathScene_L);
-    }
+    }*/
     if (key_state[ALLEGRO_KEY_Z]) {
         if(round_bgm_instance){
                 al_stop_sample_instance(round_bgm_instance);
