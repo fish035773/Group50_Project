@@ -1,6 +1,8 @@
 #pragma once
 
 #include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_font.h>
+#include <vector>
 #include "element.h"
 #include "../shapes/Shape.h"
 #include "../algif5/algif.h"
@@ -50,6 +52,18 @@ public:
 
     double scale;
     
+    //QTE
+    bool qte_active;
+    double qte_start_time;
+    double qte_duration;   // 玩家允許反應時間 
+    double next_qte_time;
+    
+    std::vector<int> qte_keys; // 要按的按鍵（keycode）
+    int qte_index;             // 玩家要按的順序
+
+    ALLEGRO_FONT* font;
+    int text_size;
+
     Boss(int label, int speed);
     virtual ~Boss();
 
@@ -59,4 +73,7 @@ public:
 
     void update_position(int dx, int dy);
     void SpawnFallingAttack();
+    void StartQTE();
+    void PlayerTakeDamage(int dmg);
+    void HandleQTEKey(int keycode);
 };

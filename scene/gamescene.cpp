@@ -35,7 +35,7 @@ GameScene::GameScene(int label)
     enemy_defeated = false;
     round_locked = false;
     enemies_spawned = false;
-
+    
     printf("[GameScene] Constructor: round state reset.\n");
 
     // ==== LOAD BACKGROUND ====
@@ -348,11 +348,37 @@ void GameScene::Update() {
         scene_end = true;
         create_scene(CreditScene_L);
     }
+
+    // =====================================================
+    // QTE KEY HANDLING — send key input to Boss
+    // =====================================================
+    int qte_keys[] = {
+        ALLEGRO_KEY_Q, ALLEGRO_KEY_R, ALLEGRO_KEY_T, ALLEGRO_KEY_Y,
+        ALLEGRO_KEY_U, ALLEGRO_KEY_I, ALLEGRO_KEY_O, ALLEGRO_KEY_P,
+        ALLEGRO_KEY_F, ALLEGRO_KEY_G, ALLEGRO_KEY_H,
+        ALLEGRO_KEY_B, ALLEGRO_KEY_N, ALLEGRO_KEY_M
+    };
+    int qte_key_count = sizeof(qte_keys) / sizeof(int);
+
+    for (int i = 0; i < qte_key_count; i++) {
+        int key = qte_keys[i];
+
+        if (key_state[key]) {
+            // Send key to Boss
+            for (Elements* e : elements) {
+                if (e->label == Boss_L) {
+                    Boss* boss = dynamic_cast<Boss*>(e);
+                    if (boss) boss->HandleQTEKey(key);
+                }
+            }
+
+            key_state[key] = false; // avoid repeat
+        }
+    }
 }
 
 
 void GameScene::Draw() {
-
     //printf("GameScene::Draw elements size = %d\n", (int)elements.size());
     
     // === DRAW BACKGROUND ===
@@ -369,7 +395,8 @@ void GameScene::Draw() {
     if (background[bg_index])
         al_draw_bitmap(background[bg_index], 0, 0, 0);
 
-    al_draw_bitmap(background_skill, 905, 0, 0);//draw background for skill UI
+    if(round_counter <= 4)
+        al_draw_bitmap(background_skill, 905, 0, 0);//draw background for skill UI
     
     // === DRAW FLOOR + BOSS ===
     for (Elements* e : elements) {
