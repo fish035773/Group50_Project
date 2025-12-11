@@ -55,7 +55,7 @@ Character::Character()
     // ==== LOAD FONTS ====
     al_init_font_addon();
     al_init_ttf_addon();
-    font = al_load_ttf_font("assets/font/Consolas.ttf", text_size, 0);
+    font = al_load_ttf_font("assets/font/Gil.ttf", text_size, 0);
     coins = 0;
 
     hp_bg = al_load_bitmap("assets/image/chara_hp_bg.png");
@@ -209,11 +209,11 @@ void Character::Draw()
     int text_y = 10;
     if(blood > 0){
         char buf[64];
-        sprintf(buf, "Character ");
-        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        sprintf(buf, "Character 1");
+        al_draw_text(font, al_map_rgb(84, 74, 67), text_x, text_y, 0, buf);
         text_y += text_space;
         sprintf(buf, "coins: %d", coins);
-        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        al_draw_text(font, al_map_rgb(84, 74, 67), text_x, text_y, 0, buf);
     }
 
     // === DRAW HP BAR ===

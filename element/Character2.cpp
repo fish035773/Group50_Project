@@ -75,7 +75,7 @@ Character2::Character2()
     // ==== LOAD FONTS ====
     al_init_font_addon();
     al_init_ttf_addon();
-    font = al_load_ttf_font("assets/font/Consolas.ttf", text_size, 0);
+    font = al_load_ttf_font("assets/font/Gil.ttf", text_size, 0);
     coins2 = 0;
 
     hp_bg = al_load_bitmap("assets/image/chara_hp_bg.png");
@@ -248,10 +248,10 @@ void Character2::Draw()
     if(blood > 0){
         char buf[64];
         sprintf(buf, "Character 2");
-        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        al_draw_text(font, al_map_rgb(84, 74, 67), text_x, text_y, 0, buf);
         text_y += text_space;
         sprintf(buf, "coins: %d", coins2);
-        al_draw_text(font, al_map_rgb(0, 255, 0), text_x, text_y, 0, buf);
+        al_draw_text(font, al_map_rgb(84, 74, 67), text_x, text_y, 0, buf);
         text_y += text_space;
         //draw skill icons
         al_draw_bitmap(Skill[0], text_x, text_y, 0);
@@ -264,7 +264,7 @@ void Character2::Draw()
 
         sprintf(buf, "%d", skill_1);
         if(coins2 >= skill_1)
-            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+            al_draw_text(font, al_map_rgb(84, 74, 67), text_x + 55, text_y + 60, 0, buf);
         else
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);//
         // second skill
@@ -278,7 +278,7 @@ void Character2::Draw()
 
         sprintf(buf, "%d", skill_2);
         if(coins2 >= skill_2)
-            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
+            al_draw_text(font, al_map_rgb(84, 74, 67), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
         else
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
         //
@@ -294,7 +294,7 @@ void Character2::Draw()
 
         sprintf(buf, "%d", skill_3);
         if(coins2 >= skill_3)
-            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 55, text_y + 60, 0, buf);
+            al_draw_text(font, al_map_rgb(84, 74, 67), text_x + 55, text_y + 60, 0, buf);
         else
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 55, text_y + 60, 0, buf);
         
@@ -309,7 +309,7 @@ void Character2::Draw()
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10, text_y, 0, buf);
         sprintf(buf, "%d", skill_4);
         if(coins2 >= skill_4)
-            al_draw_text(font, al_map_rgb(0, 255, 0), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
+            al_draw_text(font, al_map_rgb(84, 74, 67), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
         else
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
     }
@@ -345,7 +345,7 @@ void Character2::Draw()
             al_draw_rectangle(
                 r->x1, r->y1,
                 r->x2, r->y2,
-                al_map_rgb(0, 255, 0), 2
+                al_map_rgb(84, 74, 67), 2
             );
         }
     }*/
