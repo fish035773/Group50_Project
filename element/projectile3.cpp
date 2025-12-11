@@ -13,7 +13,7 @@ Projectile3::Projectile3(int label, int x, int y, int v)
         img = al_load_bitmap("assets/image/projectile3.png");
         damage = 5;
     }else if(label == Projectile3_2_L){
-        img = al_load_bitmap("assets/image/projectile2.png");
+        img = al_load_bitmap("assets/image/projectile3.png");
         damage = 8;
     }
 

@@ -29,7 +29,7 @@ GameScene::GameScene(int label)
     : Scene(label)
 {
     // ==== INITIAL STATE ====
-    round_counter = 4;
+    round_counter = 1;
     round_triggered = true;
     round_timer = 0;
     enemy_defeated = false;
@@ -53,18 +53,18 @@ GameScene::GameScene(int label)
     // ==== LOAD FONTS ====
     al_init_font_addon();
     al_init_ttf_addon();
-    font = al_load_ttf_font("assets/font/Consolas.ttf", 24, 0);
+    font = al_load_ttf_font("assets/font/Gil.ttf", 24, 0);
 
     // ==== LOAD SOUNDS ====
     round_sounds[0] = al_load_sample("assets/sound/round_1.mp3");
     round_sounds[1] = al_load_sample("assets/sound/round_2.mp3");
     round_sounds[2] = al_load_sample("assets/sound/round_3.mp3");
-    round_sounds[3] = al_load_sample("assets/sound/round_3.mp3");
+    round_sounds[3] = al_load_sample("assets/sound/round_4.mp3");
 
     round_bgm[0] = al_load_sample("assets/sound/bgm_round1.mp3");
     round_bgm[1] = al_load_sample("assets/sound/bgm_round2.mp3");
     round_bgm[2] = al_load_sample("assets/sound/bgm_round3.mp3");
-    round_bgm[3] = al_load_sample("assets/sound/bgm_round3.mp3");
+    round_bgm[3] = al_load_sample("assets/sound/bgm_round4.mp3");
 
     // ==== START FIRST BGM ====
     if (round_bgm[0]) {
@@ -87,6 +87,9 @@ GameScene::GameScene(int label)
 
 void GameScene::Update() {
     Scene::Update();
+
+    if(key_state[ALLEGRO_KEY_ENTER]) god = true;
+
     // === GLOBAL INTERACTION ===
     for (auto* ele : elements){
         ele->Interact();
@@ -148,6 +151,7 @@ void GameScene::Update() {
 
         switch (round_counter) {
         case 1:
+            god = false;
             enemy_count = 3;
             spacing = 100;
             for (int i = 0; i < enemy_count; i++) {
@@ -158,16 +162,18 @@ void GameScene::Update() {
             break;
 
         case 2:
+            god = false;
             enemy_count = 2;
             spacing = 150;
-            for (int i = 0; i < enemy_count; i++) {
-                Enemy2* e = new Enemy2(Enemy2_L, i + 3);
+            for (int i = 1; i <= enemy_count; i++) {
+                Enemy2* e = new Enemy2(Enemy2_L, i * 2);
                 e->update_position(i * spacing, 0);
                 addElement(e);
             }
             break;
 
         case 3:
+            god = false;
             enemy_count = 1;
             for (int i = 0; i < enemy_count; i++) {
                 Enemy3* e = new Enemy3(Enemy3_L, 5);
@@ -176,6 +182,7 @@ void GameScene::Update() {
             }
             break;
         case 4:
+            god = false;
             enemy_count = 1;
             for (int i = 0; i < enemy_count; i++) {
                 Boss* e = new Boss(Boss_L, 5);
@@ -438,58 +445,68 @@ void GameScene::Draw() {
             // name
             if(ch2->blood > 0){
                 sprintf(buf, "Character 2");
-                al_draw_text(font, al_map_rgb(255, 0, 0), ch2->x, ch2->y - 20, 0, buf);
+                al_draw_text(font, al_map_rgb(232, 210, 193), ch2->x, ch2->y - 20, 0, buf);
             }
 
             // HP
-            sprintf(buf, "Character2 Blood: %d", ch2->blood);
-            al_draw_text(font, al_map_rgb(255, 0, 0), 10, 70, 0, buf);
+            sprintf(buf, "Character2   Blood: %d", ch2->blood);
+            al_draw_text(font, al_map_rgb(232, 210, 193), 20, 70, 0, buf);
 
             // cooldown display J K L
             if (ch2->cool_J / FPS == 0)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 820, 70, 0, "J");
+                al_draw_text(font, al_map_rgb(232, 210, 193), 800, 70, 0, "J");
             else {
                 sprintf(buf, "%d", ch2->cool_J / FPS);
-                al_draw_text(font, al_map_rgb(200, 200, 200), 820, 70, 0, buf);
+                al_draw_text(font, al_map_rgb(200, 200, 200), 800, 70, 0, buf);
             }
 
             if (ch2->cool_K / FPS == 0)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 820, 70, 0, "  K");
+                al_draw_text(font, al_map_rgb(232, 210, 193), 820, 70, 0, "  K");
             else {
                 sprintf(buf, "  %d", ch2->cool_K / FPS);
                 al_draw_text(font, al_map_rgb(200, 200, 200), 820, 70, 0, buf);
             }
 
             if (ch2->cool_L / FPS == 0)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 820, 70, 0, "    L");
+                al_draw_text(font, al_map_rgb(232, 210, 193), 840, 70, 0, "    L");
             else {
                 sprintf(buf, "    %d", ch2->cool_L / FPS);
-                al_draw_text(font, al_map_rgb(200, 200, 200), 820, 70, 0, buf);
+                al_draw_text(font, al_map_rgb(200, 200, 200), 840, 70, 0, buf);
             }
 
-            // blood bar
-            int maxblood = 100 + (ch2->level * ch2->add_blood);
-            float percent = (float)ch2->blood / maxblood;
-            float barLength = percent * barlong;
-
-            // background
-            al_draw_filled_rectangle(298, 68, 812, 93, al_map_rgb(0, 0, 0)); // border
-            al_draw_filled_rectangle(300, 70, 810, 90, al_map_rgb(150, 150, 150)); // base
-
-            if (ch2->blood > 0)
-                al_draw_filled_rectangle(300, 70, 300 + barLength, 90, al_map_rgb(255, 0, 0));
-
-            // level progress
             int maxpoints = (ch2->level + 1) * ch2->add_blood;
-            sprintf(buf, "Level:%d points: %d/%d", ch2->level, ch2->levelup_points, maxpoints);
-            al_draw_text(font, al_map_rgb(0,255,0), 10, 100, 0, buf);
+            float exp_percent = (float)ch2->levelup_points / maxpoints;
+            if (exp_percent < 0) exp_percent = 0;
+            if (exp_percent > 1) exp_percent = 1;
 
-            percent = (float)ch2->levelup_points / maxpoints;
-            barLength = percent * barlong;
+            int exp_x = 300;
+            int exp_y = 100;
 
-            al_draw_filled_rectangle(298, 98, 812, 123, al_map_rgb(0,0,0));
-            al_draw_filled_rectangle(300, 100, 810, 120, al_map_rgb(150,150,150));
-            al_draw_filled_rectangle(300, 100, 300 + barLength, 120, al_map_rgb(0,255,0));
+            int bg_w = al_get_bitmap_width(ch2->hp_bg);
+            int bg_h = al_get_bitmap_height(ch2->hp_bg);
+
+            int bar_w = 432;
+            int bar_h = 31;
+
+            al_draw_scaled_bitmap(
+                ch2->hp_bg,
+                0, 0,
+                bg_w, bg_h,
+                exp_x, exp_y,
+                bg_w, bg_h,
+                0
+            );
+
+            al_draw_scaled_bitmap(
+                ch2->exp_bar, 
+                0, 0,
+                bar_w * exp_percent,
+                bar_h,
+                exp_x, exp_y,
+                bar_w * exp_percent,
+                bar_h,
+                0
+            );
         }
 
         // --------------------------
@@ -507,55 +524,68 @@ void GameScene::Draw() {
             
             if (ch->blood > 0){
                 sprintf(buf, "Character 1");
-                al_draw_text(font, al_map_rgb(255, 0, 0), ch->x, ch->y - 20, 0, buf);
+                al_draw_text(font, al_map_rgb(232, 210, 193), ch->x, ch->y - 20, 0, buf);
             }
             
             // HP
-            sprintf(buf, "Character1 Blood: %d", ch->blood);
-            al_draw_text(font, al_map_rgb(255, 0, 0), 10, 10, 0, buf);
+            sprintf(buf, "Character1   Blood: %d", ch->blood);
+            al_draw_text(font, al_map_rgb(232, 210, 193), 20, 10, 0, buf);
 
             // cooldown X C V
             if (ch->cool_X / FPS == 0)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 820, 10, 0, "X");
+                al_draw_text(font, al_map_rgb(232, 210, 193), 800, 10, 0, "X");
             else {
                 sprintf(buf, "%d", ch->cool_X / FPS);
-                al_draw_text(font, al_map_rgb(200, 200, 200), 820, 10, 0, buf);
+                al_draw_text(font, al_map_rgb(200, 200, 200), 800, 10, 0, buf);
             }
 
             if (ch->cool_C / FPS == 0)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 820, 10, 0, "  C");
+                al_draw_text(font, al_map_rgb(232, 210, 193), 820, 10, 0, "  C");
             else {
                 sprintf(buf, "  %d", ch->cool_C / FPS);
                 al_draw_text(font, al_map_rgb(200, 200, 200), 820, 10, 0, buf);
             }
 
             if (ch->cool_V / FPS == 0)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 820, 10, 0, "    V");
+                al_draw_text(font, al_map_rgb(232, 210, 193), 840, 10, 0, "    V");
             else {
                 sprintf(buf, "    %d", ch->cool_V / FPS);
-                al_draw_text(font, al_map_rgb(200, 200, 200), 820, 10, 0, buf);
+                al_draw_text(font, al_map_rgb(200, 200, 200), 840, 10, 0, buf);
             }
 
-            // blood bar
-            int maxblood = 100 + (ch->level * ch->add_blood);
-            float percent = (float)ch->blood / maxblood;
-            float barLength = percent * barlong;
-
-            al_draw_filled_rectangle(298, 8, 812, 33, al_map_rgb(0,0,0));
-            al_draw_filled_rectangle(300, 10, 810, 30, al_map_rgb(150,150,150));
-            if (ch->blood > 0)
-                al_draw_filled_rectangle(300, 10, 300 + barLength, 30, al_map_rgb(255, 0, 0));
-
             int maxpoints = (ch->level + 1) * ch->add_blood;
-            sprintf(buf, "Level:%d points: %d/%d", ch->level, ch->levelup_points, maxpoints);
-            al_draw_text(font, al_map_rgb(0,255,0), 10, 40, 0, buf);
+            float exp_percent = (float)ch->levelup_points / maxpoints;
+            if (exp_percent < 0) exp_percent = 0;
+            if (exp_percent > 1) exp_percent = 1;
 
-            percent = (float)ch->levelup_points / maxpoints;
-            barLength = percent * barlong;
+            int exp_x = 300;
+            int exp_y = 40;
 
-            al_draw_filled_rectangle(298, 38, 812, 63, al_map_rgb(0,0,0));
-            al_draw_filled_rectangle(300, 40, 810, 60, al_map_rgb(150,150,150));
-            al_draw_filled_rectangle(300, 40, 300 + barLength, 60, al_map_rgb(0,255,0));
+            int bg_w = al_get_bitmap_width(ch->hp_bg);
+            int bg_h = al_get_bitmap_height(ch->hp_bg);
+
+            int bar_w = 432;
+            int bar_h = 31;
+
+            al_draw_scaled_bitmap(
+                ch->hp_bg,
+                0, 0,
+                bg_w, bg_h,
+                exp_x, exp_y,
+                bg_w, bg_h,
+                0
+            );
+
+            al_draw_scaled_bitmap(
+                ch->exp_bar,       
+                0, 0,
+                bar_w * exp_percent, 
+                bar_h,
+                exp_x, exp_y,
+                bar_w * exp_percent, 
+                bar_h,
+                0
+            );
         }
 
         // --------------------------
@@ -565,7 +595,6 @@ void GameScene::Draw() {
             ele->Draw(); // prevent boss from being drawn twice
         }
     }
-    //printf("DREW\n")
 }
 
 GameScene::~GameScene() {

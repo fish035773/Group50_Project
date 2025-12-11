@@ -10,7 +10,7 @@ Projectile4::Projectile4(int label, int x, int y, int v)
     : Elements(label), x(x), y(y), v(v)
 {
 
-    img = al_load_bitmap("assets/image/projectile3.png");
+    img = al_load_bitmap("assets/image/projectile4.png");
     damage = 5;
     v = 0;
     falling = false;

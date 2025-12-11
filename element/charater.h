@@ -38,6 +38,9 @@ public:
     // 資源
     ALGIF_ANIMATION* gif_status[3];   // 修正型別
     ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
+    ALLEGRO_BITMAP* hp_bg = nullptr;
+    ALLEGRO_BITMAP* hp_bar = nullptr;
+    ALLEGRO_BITMAP* exp_bar = nullptr;
     Shape* hitbox;
     // ===== UI Font =====
     ALLEGRO_FONT* font;

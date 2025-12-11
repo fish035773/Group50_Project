@@ -78,6 +78,13 @@ Character2::Character2()
     font = al_load_ttf_font("assets/font/Consolas.ttf", text_size, 0);
     coins2 = 0;
 
+    hp_bg = al_load_bitmap("assets/image/chara_hp_bg.png");
+    hp_bar = al_load_bitmap("assets/image/chara_hp.png");
+    exp_bar = al_load_bitmap("assets/image/exp_bar.png");
+
+    if (!hp_bg) std::cerr << "Failed to load HP BG!\n";
+    if (!hp_bar) std::cerr << "Failed to load HP BAR!\n";
+
 }
 
 Character2::~Character2()
@@ -86,6 +93,9 @@ Character2::~Character2()
     for (int i = 0; i < 3; ++i)
         algif_destroy_animation(gif_status[i]);
     delete hitbox;
+
+    if (hp_bg) al_destroy_bitmap(hp_bg);
+    if (hp_bar) al_destroy_bitmap(hp_bar);
 }
 
 void Character2::Update()
@@ -304,6 +314,30 @@ void Character2::Draw()
             al_draw_text(font, al_map_rgb(200, 200, 200), text_x + 85 + 10 + 55, text_y + 60, 0, buf);
     }
 
+    // === DRAW HP BAR ===
+    float hp_percent = (float)blood / 100.0f;
+    if (hp_percent < 0) hp_percent = 0;
+    if (hp_percent > 1) hp_percent = 1;
+
+    int bar_width = 461;
+    int bar_height = 31;
+
+    int ui_hp_x = 300;
+    int ui_hp_y = 70;
+    
+    al_draw_bitmap(hp_bg, ui_hp_x, ui_hp_y, 0);
+    int current_width = (int)(bar_width * hp_percent);
+
+    if (current_width > 0) {
+        al_draw_bitmap_region(
+            hp_bar,
+            0, 0,
+            current_width,
+            bar_height,
+            ui_hp_x, ui_hp_y,
+            0
+        );
+    }
     /*
     if (hitbox) {
         if (hitbox->getType() == ShapeType::RECTANGLE) {

@@ -38,7 +38,7 @@ Enemy3::Enemy3(int label, int speed): Elements(label), speed(speed){
     height = gif_status[0]->height;
 
     x = 200;
-    y = HEIGHT - width + 20;
+    y = HEIGHT - width - 70;
 
     hitbox = new Rectangle(
         x * 1.3, y * 1.0,
@@ -296,12 +296,13 @@ void Enemy3::Draw(){
 
     // HP bar
     int bar_x = x + 80;
-    int bar_y = y + 80;
+    int bar_y = y;
     float ratio = (float)hp / maxhp;
 
     al_draw_filled_rectangle(bar_x, bar_y, bar_x + 100, bar_y+10, al_map_rgb(255,255,255));
     al_draw_filled_rectangle(bar_x, bar_y, bar_x + (100*ratio), bar_y+10, al_map_rgb(150,0,0));
-    /*
+    
+    /**
     if (hitbox) {
         if (hitbox->getType() == ShapeType::RECTANGLE) {
             Rectangle* r = static_cast<Rectangle*>(hitbox);

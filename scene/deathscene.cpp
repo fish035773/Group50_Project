@@ -92,7 +92,7 @@ void DeathScene::Draw()
             0
         );
     }
-
+    
     // Optional: draw text
     if (font) {
         al_draw_text(

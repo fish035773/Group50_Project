@@ -172,6 +172,9 @@ void Boss::PlayerTakeDamage(int dmg) {
 void Boss::HandleQTEKey(int keycode) {
     if (!qte_active) return;
 
+    int damage = 10;
+    if(god) damage  = 1000;
+
     if (keycode == qte_keys[qte_index]) {
         qte_state[qte_index] = 1;
         qte_index++;
@@ -179,7 +182,7 @@ void Boss::HandleQTEKey(int keycode) {
             al_play_sample(sfx_qte_right, 1.0, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         if (qte_index >= qte_keys.size()) {
             qte_active = false;
-            hp -= 10;
+            hp -= damage;
             printf("QTE Success! Boss HP = %d\n", hp);
         }
     }

@@ -45,5 +45,6 @@ extern bool debug_mode;
 extern int current_round;
 extern int round_count;
 extern bool scene_switched;
+extern bool god;
 
 #endif

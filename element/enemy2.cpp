@@ -35,7 +35,7 @@ Enemy2::Enemy2(int label, int speed): Elements(label), speed(speed){
     height = gif_status[0]->height;
 
     x = 200;
-    y = HEIGHT - width - 30;
+    y = HEIGHT - width;
 
     hitbox = new Rectangle(
         x * 1.2, y * 1.0,

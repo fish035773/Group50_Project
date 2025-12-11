@@ -12,45 +12,48 @@
 class Character2: public Elements
 {
 public:
-    enum State2 { STOP = 0, MOVE, ATK };
-    enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };
+   enum State2 { STOP = 0, MOVE, ATK };
+   enum ProjectileType { Projectile_X, Projectile_C, Projectile_V, Projectile_K, Projectile_L, Projectile_J };
 
-    // 建構與解構
-   // 建構子 / 解構子
-    Character2();
-    ~Character2();
-    
-    void Update() override;
-    void Draw() override;
-    void Interact() override;
-    void update_position(int dx, int dy);
+   // 建構與解構
+// 建構子 / 解構子
+   Character2();
+   ~Character2();
+   
+   void Update() override;
+   void Draw() override;
+   void Interact() override;
+   void update_position(int dx, int dy);
    void OnHitEnemy(int damage, bool kill);
-    // 成員變數
-    int x, y;
-    int width, height;
-    int blood;
-    int level;
-    int levelup_points;
-    int add_blood;
+   // 成員變數
+   int x, y;
+   int width, height;
+   int blood;
+   int level;
+   int levelup_points;
+   int add_blood;
    int skill_3_add_blood = 0;
-    bool dir; // false: left, true: right
-    bool is_jumping;
-    double jump_start_time;
-    int ground_y;
+   bool dir; // false: left, true: right
+   bool is_jumping;
+   double jump_start_time;
+   int ground_y;
 
-    int cool_J, cool_K, cool_L;
-    int atk_type;
-    bool new_proj;
-    State2 state;
-    bool died;
-    int skill2_damage = 0;
-    Shape* hitbox;
-    ALGIF_ANIMATION* gif_status[3];
-    ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
-    // ===== UI Font =====
-    ALLEGRO_FONT* font;
-    int coins2 = 0;
-    // ===== Background =====
+   int cool_J, cool_K, cool_L;
+   int atk_type;
+   bool new_proj;
+   State2 state;
+   bool died;
+   int skill2_damage = 0;
+   Shape* hitbox;
+
+   ALGIF_ANIMATION* gif_status[3];
+   ALLEGRO_SAMPLE_INSTANCE* atk_Sound;
+   ALLEGRO_BITMAP* hp_bg = nullptr;
+   ALLEGRO_BITMAP* hp_bar = nullptr;
+   ALLEGRO_BITMAP* exp_bar = nullptr;
+   ALLEGRO_FONT* font;
+   int coins2 = 0;
+
    ALLEGRO_BITMAP* Skill[4] = {nullptr};
    
 
